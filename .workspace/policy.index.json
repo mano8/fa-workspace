@@ -1,0 +1,38 @@
+﻿{
+  "python": [
+    "context/python.md",
+    "context/env.md",
+    "context/git.md",
+    "contracts/workspace.contract.md"
+  ],
+  "typescript": [
+    "context/typescript.md",
+    "context/env.md",
+    "context/git.md",
+    "contracts/workspace.contract.md"
+  ],
+  "astro-plugin": [
+    "context/typescript.md",
+    "context/astro-plugin.md",
+    "context/env.md",
+    "context/git.md",
+    "contracts/workspace.contract.md"
+  ],
+  "astro-ui": [
+    "context/typescript.md",
+    "context/astro-plugin.md",
+    "context/env.md",
+    "context/git.md",
+    "contracts/workspace.contract.md"
+  ],
+  "docker": [
+    "context/docker.md",
+    "context/env.md",
+    "context/git.md",
+    "contracts/workspace.contract.md"
+  ],
+  "contracts": [
+    "contracts/workspace.contract.md"
+  ]
+}
+

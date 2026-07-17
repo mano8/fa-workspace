@@ -1,0 +1,70 @@
+services:
+  workspace:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu
+
+    volumes:
+      - ..:/workspace:cached
+
+      # Safer than binding host ~/.claude or ~/.codex.
+      - m8_claude_config:/home/vscode/.claude
+      - m8_codex_config:/home/vscode/.codex
+
+    environment:
+      TZ: Europe/Madrid
+      HEADROOM_MCP_URL: http://headroom-mcp:8787/mcp
+
+    networks:
+      - default
+      - mcp_internal
+
+    # Only enable if Codex sandbox fails without it.
+    # security_opt:
+    #   - seccomp=unconfined
+
+    command: sleep infinity
+
+  headroom-mcp:
+    image: ghcr.io/chopratejas/headroom:code-slim-nonroot
+    container_name: headroom-mcp-server
+    restart: unless-stopped
+
+    entrypoint: ["headroom"]
+    #command: ["proxy", "--host", "0.0.0.0", "--port", "8787"]
+    command: ["mcp", "serve", "--transport", "http", "--host", "0.0.0.0", "--port", "8787"]
+  
+    environment:
+      HEADROOM_LOG_LEVEL: INFO
+      XDG_CACHE_HOME: /cache
+
+    volumes:
+      - m8_headroom_cache:/cache
+
+    networks:
+      - mcp_internal
+
+    # Dashboard available only from your host machine.
+    # Only in proxy mode, not in direct mode (which is the default for MCP).
+    # Dev container reaches it via http://headroom-mcp:8787/mcp
+    #ports:
+    #  - "127.0.0.1:8787:8787"    
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    read_only: true
+
+    tmpfs:
+      - /tmp
+
+volumes:
+  m8_claude_config:
+  m8_codex_config:
+  m8_headroom_cache:
+
+networks:
+  default:
+  mcp_internal:
+    internal: true

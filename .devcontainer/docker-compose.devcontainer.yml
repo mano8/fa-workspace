@@ -1,0 +1,77 @@
+services:
+  workspace:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu
+
+    volumes:
+      - ..:/workspace:cached
+
+      # Persistent, container-scoped AI tool state.
+      # Safer than binding host ~/.claude or ~/.codex.
+      - m8_claude_config:/home/vscode/.claude
+      - m8_codex_config:/home/vscode/.codex
+
+    environment:
+      TZ: Europe/Madrid
+      HEADROOM_PROXY_URL: http://headroom-proxy:8787
+
+    networks:
+      - default
+      - mcp_internal
+
+    init: true
+
+    # Only enable if Codex sandbox fails without it.
+    # security_opt:
+    #   - seccomp=unconfined
+
+    command: sleep infinity
+
+  headroom-proxy:
+    image: ghcr.io/chopratejas/headroom:code-nonroot
+    container_name: headroom-proxy-server
+    restart: unless-stopped
+    # headroom proxy --host 0.0.0.0 --port 8787 --mode token --no-telemetry --no-subscription-tracking
+    command:
+      [
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8787",
+        "--mode",
+        "token",
+        "--no-telemetry",
+        "--no-subscription-tracking"
+      ]
+
+    environment:
+      HEADROOM_LOG_LEVEL: INFO
+      XDG_CACHE_HOME: /cache
+
+    volumes:
+      - m8_headroom_cache:/cache
+
+    networks:
+      - mcp_internal
+
+    # No host port exposed.
+    # Workspace reaches it via:
+    # http://headroom-proxy:8787
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    tmpfs:
+      - /tmp
+
+volumes:
+  m8_claude_config:
+  m8_codex_config:
+  m8_headroom_cache:
+
+networks:
+  default:
+  mcp_internal:
+    internal: true

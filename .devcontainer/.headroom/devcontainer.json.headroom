@@ -1,0 +1,58 @@
+{
+  "name": "Microservices FastApi Sandbox",
+
+  "dockerComposeFile": "docker-compose.devcontainer.yml",
+  "service": "workspace",
+  "workspaceFolder": "/workspace",
+
+  "remoteUser": "vscode",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:2": {
+      "version": "24"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "moby": false
+    },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+
+  "remoteEnv": {
+    "PATH": "/home/vscode/.npm-global/bin:${containerEnv:PATH}",
+    "HEADROOM_MCP_URL": "http://headroom-mcp:8787/mcp"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "openai.chatgpt",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.pylint",
+        "ms-python.debugpy",
+        "charliermarsh.ruff",
+        "davidanson.vscode-markdownlint",
+        "ms-vscode.makefile-tools",
+        "ms-vscode.vscode-typescript-next",
+        "astro-build.astro-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.defaultInterpreterPath": "/workspace/.shared-venv/bin/python",
+        "python.testing.pytestPath": "/workspace/.shared-venv/bin/pytest"
+      }
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/configure-mcp.sh",
+
+  "forwardPorts": []
+}

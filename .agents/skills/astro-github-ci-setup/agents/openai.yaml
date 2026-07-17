@@ -1,0 +1,4 @@
+interface:
+  display_name: "Astro GitHub CI Setup"
+  short_description: "Adapted Astro CI quality gates"
+  default_prompt: "Use $astro-github-ci-setup to set up CI for this Astro repository."

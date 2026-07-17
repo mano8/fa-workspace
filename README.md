@@ -27,12 +27,17 @@ The complete presentation of the shared workspace, its ownership model, and its 
 ## Workspace layout
 
 ```text
-parent-workspace/
-├── fa-workspace/            # This repository: shared workspace control plane
-├── fa-auth-m8/              # Service repository used by initial container setup
-├── imgtools_m8/             # Platform repository used by initial container setup
-└── media-service-m8/        # Service repository used by initial container setup
+fa-workspace/                # This repository: the workspace root and control plane
+├── .workspace/              # Canonical shared workspace context
+├── .agents/ .claude/ .codex/ .devcontainer/ .githooks/ scripts/
+├── auth-sdk-m8/ fastapi-m8/ imgtools_m8/ media-sdk-m8/ security-tests-m8/
+├── fa-auth-m8/ media-service-m8/ media-worker-m8/ prompt-engine-m8/
+├── reparto-docente-m8/
+├── astro-auth-m8/ astro-media-m8/ astro-prompt-m8/ astro-reparto-m8/
+└── astro-ui-m8/ fa-ui-m8/
 ```
+
+The directories above are direct children of `fa-workspace`; they are not siblings of it. The Dev Container bind-mounts this repository root as `/workspace`. Its initial setup reads development requirements from the direct children `fa-auth-m8`, `imgtools_m8`, and `media-service-m8`.
 
 Within `fa-workspace`:
 
@@ -120,7 +125,7 @@ Use Headroom for logs, test output, JSON, stack traces, and long file excerpts. 
 
 1. Install and start [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 2. Install [Visual Studio Code](https://code.visualstudio.com/) and the **Dev Containers** extension.
-3. Clone this repository and the three repositories shown in [Workspace layout](#workspace-layout) as siblings. The initial setup installs their configured development requirements.
+3. Keep `fa-auth-m8`, `imgtools_m8`, and `media-service-m8` as direct children of this workspace root. The initial setup installs their configured development requirements.
 4. Open `fa-workspace` in VS Code.
 5. Open the Command Palette (`F1` or `Ctrl+Shift+P`) and select **Dev Containers: Reopen in Container**.
 6. Wait for the first build. It installs system tools, development dependencies, Codex CLI, and Headroom.

@@ -31,12 +31,17 @@ La presentación completa del espacio de trabajo compartido, su modelo de propie
 ## Estructura del espacio de trabajo
 
 ```text
-parent-workspace/
-├── fa-workspace/            # Este repositorio: plano de control compartido
-├── fa-auth-m8/              # Servicio usado por la configuración inicial
-├── imgtools_m8/             # Plataforma usada por la configuración inicial
-└── media-service-m8/        # Servicio usado por la configuración inicial
+fa-workspace/                # Este repositorio: raíz y plano de control del espacio de trabajo
+├── .workspace/              # Contexto compartido canónico
+├── .agents/ .claude/ .codex/ .devcontainer/ .githooks/ scripts/
+├── auth-sdk-m8/ fastapi-m8/ imgtools_m8/ media-sdk-m8/ security-tests-m8/
+├── fa-auth-m8/ media-service-m8/ media-worker-m8/ prompt-engine-m8/
+├── reparto-docente-m8/
+├── astro-auth-m8/ astro-media-m8/ astro-prompt-m8/ astro-reparto-m8/
+└── astro-ui-m8/ fa-ui-m8/
 ```
+
+Los directorios anteriores son hijos directos de `fa-workspace`; no son repositorios hermanos. El Dev Container monta la raíz de este repositorio como `/workspace`. La configuración inicial lee requisitos de desarrollo de los hijos directos `fa-auth-m8`, `imgtools_m8` y `media-service-m8`.
 
 | Ruta | Función |
 | --- | --- |
@@ -123,7 +128,7 @@ La configuración activa está en [`.devcontainer/devcontainer.json`](.devcontai
 
 1. Instala e inicia [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 2. Instala [Visual Studio Code](https://code.visualstudio.com/) y la extensión **Dev Containers**.
-3. Clona este repositorio y los tres repositorios del apartado [Estructura del espacio de trabajo](#estructura-del-espacio-de-trabajo) como hermanos.
+3. Mantén `fa-auth-m8`, `imgtools_m8` y `media-service-m8` como hijos directos de la raíz de este espacio de trabajo. La configuración inicial instala sus requisitos de desarrollo.
 4. Abre `fa-workspace` en VS Code.
 5. Desde la paleta de comandos (`F1` o `Ctrl+Shift+P`), selecciona **Dev Containers: Reopen in Container**.
 6. Espera la primera compilación y verifica en una terminal nueva:

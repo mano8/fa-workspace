@@ -31,12 +31,17 @@ La présentation complète de l'espace de travail partagé, de son modèle de pr
 ## Structure de l'espace de travail
 
 ```text
-parent-workspace/
-├── fa-workspace/            # Ce dépôt : plan de contrôle partagé
-├── fa-auth-m8/              # Service utilisé par la configuration initiale
-├── imgtools_m8/             # Plateforme utilisée par la configuration initiale
-└── media-service-m8/        # Service utilisé par la configuration initiale
+fa-workspace/                # Ce dépôt : racine et plan de contrôle de l'espace de travail
+├── .workspace/              # Contexte partagé canonique
+├── .agents/ .claude/ .codex/ .devcontainer/ .githooks/ scripts/
+├── auth-sdk-m8/ fastapi-m8/ imgtools_m8/ media-sdk-m8/ security-tests-m8/
+├── fa-auth-m8/ media-service-m8/ media-worker-m8/ prompt-engine-m8/
+├── reparto-docente-m8/
+├── astro-auth-m8/ astro-media-m8/ astro-prompt-m8/ astro-reparto-m8/
+└── astro-ui-m8/ fa-ui-m8/
 ```
+
+Les répertoires ci-dessus sont des enfants directs de `fa-workspace` ; ils ne sont pas des dépôts voisins. Le Dev Container monte la racine de ce dépôt dans `/workspace`. Sa configuration initiale lit les exigences de développement des enfants directs `fa-auth-m8`, `imgtools_m8` et `media-service-m8`.
 
 | Chemin | Rôle |
 | --- | --- |
@@ -123,7 +128,7 @@ Utilisez-le pour les journaux, résultats de tests, JSON, traces et extraits lon
 
 1. Installez et démarrez [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 2. Installez [Visual Studio Code](https://code.visualstudio.com/) et l'extension **Dev Containers**.
-3. Clonez ce dépôt et les trois dépôts de la section [Structure de l'espace de travail](#structure-de-lespace-de-travail) comme dépôts voisins.
+3. Conservez `fa-auth-m8`, `imgtools_m8` et `media-service-m8` comme enfants directs de cette racine d'espace de travail. La configuration initiale installe leurs exigences de développement.
 4. Ouvrez `fa-workspace` dans VS Code.
 5. Dans la palette de commandes (`F1` ou `Ctrl+Shift+P`), choisissez **Dev Containers: Reopen in Container**.
 6. Attendez la première construction, puis vérifiez dans un nouveau terminal :

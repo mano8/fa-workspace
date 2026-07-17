@@ -20,6 +20,11 @@
 # Shared tool-neutral workspace truth.
 !/.workspace/
 !/.workspace/**
+**/todo/**
+
+# Versioned local safety hooks that reject commits and pushes containing TODO plans.
+!/.githooks/
+!/.githooks/**
 
 # Codex
 !/AGENTS.md
@@ -38,13 +43,13 @@
 /.claude/**
 # Track shareable Claude-specific tooling, but not local permissions, locks, or
 # memory.
-!/.claude/settings.json
 !/.claude/README.md
 !/.claude/agents/
 !/.claude/agents/**
 
 # DevContainer
 !/.devcontainer/
+/.devcontainer/.back/**
 
 # VSCode
 !/.vscode/

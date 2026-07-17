@@ -9,11 +9,7 @@
   "media-service-m8": "python",
   "media-worker-m8": "python",
   "prompt-engine-m8": "python",
-  "form-automation-m8": "python",
   "reparto-docente-m8": "python",
-
-  "docentes-m8/backend": "python",
-  "docentes-m8/frontend": "typescript",
 
   "fa-ui-m8": "typescript",
   "fa-ui-m8/app": "typescript",
@@ -24,7 +20,6 @@
   "astro-prompt-m8": "astro-plugin",
   "astro-reparto-m8": "astro-plugin",
   "vite-auth-m8": "typescript",
-  "ext-form-toolbox-m8": "typescript",
   "ext-prompt-builder-m8": "typescript",
 
   "docker_compose": "docker",

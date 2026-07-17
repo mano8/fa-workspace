@@ -27,7 +27,6 @@
 - astro-prompt-m8
 - astro-reparto-m8
 - ext-* (Vite + Preact)
-- docs (Astro/Starlight)
 
 ### Shared Layer
 

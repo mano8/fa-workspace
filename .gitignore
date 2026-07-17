@@ -1,0 +1,62 @@
+# Ignore every root-level entry by default.
+/*
+
+# Files owned by fa-workspace.
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/README.*.md
+!/LICENSE
+!/fa-workspace.code-workspace
+
+# Workspace tool profiles. Real machine values stay local; safe templates are
+# shared.
+/.env.local
+/.env.devcontainer
+!/.env.local.example
+!/.env.devcontainer.example
+
+# Directories owned by fa-workspace.
+
+# Shared tool-neutral workspace truth.
+!/.workspace/
+!/.workspace/**
+**/todo/**
+
+# Versioned local safety hooks that reject commits and pushes containing TODO plans.
+!/.githooks/
+!/.githooks/**
+
+# Codex
+!/AGENTS.md
+# Allow Git to traverse .codex and .agents.
+!/.codex/
+!/.agents/
+# Keep Codex-local state private by default.
+/.codex/**
+!/.codex/README.md
+
+# Claude
+!/CLAUDE.md
+# Allow Git to traverse .claude.
+!/.claude/
+# Keep Claude-local state private by default.
+/.claude/**
+# Track shareable Claude-specific tooling, but not local permissions, locks, or
+# memory.
+!/.claude/README.md
+!/.claude/agents/
+!/.claude/agents/**
+
+# DevContainer
+!/.devcontainer/
+/.devcontainer/.back/**
+
+# VSCode
+!/.vscode/
+
+# Config
+!/config/
+!/scripts/
+!/scripts/**
+!/docs/

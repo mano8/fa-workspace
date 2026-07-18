@@ -1,0 +1,22 @@
+{
+    "git.autoRepositoryDetection": "subFolders",
+    "git.repositoryScanMaxDepth": 1,
+    "git.scanRepositories": [
+        "fa-auth-m8",
+        "auth-sdk-m8",
+        "fastapi-m8",
+        "imgtools_m8",
+        "media-service-m8",
+        "media-sdk-m8",
+        "media-worker-m8",
+        "prompt-engine-m8",
+        "reparto-docente-m8",
+        "form-automation-m8",
+        "fa-ui-m8",
+        "astro-ui-m8",
+        "astro-auth-m8",
+        "astro-media-m8",
+        "astro-prompt-m8",
+        "astro-reparto-m8"
+    ]
+}

@@ -12,7 +12,6 @@
   "reparto-docente-m8": "python",
 
   "fa-ui-m8": "typescript",
-  "fa-ui-m8/app": "typescript",
 
   "astro-ui-m8": "astro-ui",
   "astro-auth-m8": "astro-plugin",

@@ -1,6 +1,9 @@
 # M8 Workspace
 
-This is the ONLY entrypoint.
+This is the workspace-level entrypoint.
+
+For work inside a registered child repository, also load that repository's own CLAUDE.md.
+Workspace rules apply globally; repository rules apply only to that repository.
 
 ---
 

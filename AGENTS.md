@@ -1,6 +1,9 @@
 ﻿# M8 Workspace
 
-This is the ONLY entrypoint.
+This is the workspace-level entrypoint.
+
+For work inside a registered child repository, also load that repository's own AGENTS.md. Workspace rules apply globally; repository rules apply only
+to that repository.
 
 ---
 
@@ -45,4 +48,3 @@ If conflicts occur:
 - No duplicated configuration across repos
 - No implicit architecture decisions outside `.workspace/`
 - NEVER ever mention a `co-authored-by` or similar aspects. In particular, never mention the tool used to create the commit message or PR.
-

@@ -28,7 +28,7 @@ services:
 
   headroom-proxy:
     image: ghcr.io/chopratejas/headroom:code-nonroot
-    container_name: headroom-proxy-server
+    container_name: fa-headroom-proxy-server
     restart: unless-stopped
     # headroom proxy --host 0.0.0.0 --port 8787 --mode token --no-telemetry --no-subscription-tracking
     command:

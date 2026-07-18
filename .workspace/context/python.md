@@ -162,5 +162,3 @@ Never commit if any step fails.
    - Follow existing patterns
    - Document public APIs
    - Test thoroughly
-
-

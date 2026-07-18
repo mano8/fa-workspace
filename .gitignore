@@ -22,6 +22,9 @@
 !/.workspace/
 !/.workspace/**
 **/todo/**
+/.workspace/plans/**
+/.workspace/status/**
+/.workspace/analyse/**
 
 # Versioned local safety hooks that reject commits and pushes containing TODO plans.
 !/.githooks/

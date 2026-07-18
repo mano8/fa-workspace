@@ -56,5 +56,3 @@ contracts, plans, analyses, and status is `.workspace/`.
 Codex and Claude may use different tools and execution workflows, but both must
 load the same shared facts from `.workspace/`. Tool-specific configuration must
 not redefine or copy shared workspace truth.
-
-

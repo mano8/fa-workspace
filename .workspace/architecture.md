@@ -16,7 +16,6 @@
 - media-service-m8
 - media-worker-m8
 - prompt-engine-m8
-- form-automation-m8
 - reparto-docente-m8
 
 ### Client Layer
@@ -26,7 +25,6 @@
 - astro-media-m8
 - astro-prompt-m8
 - astro-reparto-m8
-- ext-* (Vite + Preact)
 
 ### Shared Layer
 

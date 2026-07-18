@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-if git diff --cached --name-only --diff-filter=ACMR | grep -Eq '(^|/)(todo|\.workspace/status)(/|$)'; then
-  echo 'Commit blocked: TODO plans and .workspace/status artifacts must remain local.' >&2
+if git diff --cached --name-only --diff-filter=ACMR | git check-ignore --no-index --stdin -q; then
+  echo 'Commit blocked: ignored files must remain local.' >&2
   exit 1
 fi

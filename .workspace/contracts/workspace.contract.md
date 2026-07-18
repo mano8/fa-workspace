@@ -1,4 +1,4 @@
-﻿# Workspace Contract
+# Workspace Contract
 
 ## System Invariants
 

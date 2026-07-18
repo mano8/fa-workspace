@@ -1,4 +1,4 @@
-﻿# Git Conventions
+# Git Conventions
 
 ## Commits
 

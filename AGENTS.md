@@ -1,4 +1,4 @@
-﻿# M8 Workspace
+# M8 Workspace
 
 This is the workspace-level entrypoint.
 

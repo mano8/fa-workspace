@@ -1,4 +1,4 @@
-﻿# Python Policy
+# Python Policy
 
 ## Stack
 - Python 3.12+

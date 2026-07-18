@@ -18,8 +18,6 @@
   "astro-media-m8": "astro-plugin",
   "astro-prompt-m8": "astro-plugin",
   "astro-reparto-m8": "astro-plugin",
-  "vite-auth-m8": "typescript",
-  "ext-prompt-builder-m8": "typescript",
 
   "docker_compose": "docker",
   "traefik": "docker"

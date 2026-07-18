@@ -25,7 +25,7 @@ services:
 
   headroom-mcp:
     image: ghcr.io/chopratejas/headroom:code-slim-nonroot
-    container_name: headroom-mcp-server
+    container_name: fa-headroom-mcp-server
     restart: unless-stopped
 
     entrypoint: ["headroom"]

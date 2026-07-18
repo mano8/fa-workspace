@@ -1,4 +1,4 @@
-﻿# Git Conventions
+# Git Conventions
 
 ## Commits
 
@@ -14,7 +14,4 @@
 ## Pull Requests
 
 - PR description must be wrapped in a fenced ```markdown block so it is directly copyable
-- Always add `EliSerra` as reviewer
 - NEVER mention `co-authored-by` or the tool used to create the PR
-
-

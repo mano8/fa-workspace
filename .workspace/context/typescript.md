@@ -1,4 +1,4 @@
-﻿# TypeScript Policy
+# TypeScript Policy
 
 ## Stack
 - Next.js / Vite + Preact

@@ -1,4 +1,4 @@
-﻿# Docker Infrastructure Policy
+# Docker Infrastructure Policy
 
 ## Stack
 - Docker Compose

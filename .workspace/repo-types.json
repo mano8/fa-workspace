@@ -1,4 +1,4 @@
-﻿{
+{
   "auth-sdk-m8": "python",
   "media-sdk-m8": "python",
   "fastapi-m8": "python",
@@ -12,15 +12,12 @@
   "reparto-docente-m8": "python",
 
   "fa-ui-m8": "typescript",
-  "fa-ui-m8/app": "typescript",
 
   "astro-ui-m8": "astro-ui",
   "astro-auth-m8": "astro-plugin",
   "astro-media-m8": "astro-plugin",
   "astro-prompt-m8": "astro-plugin",
   "astro-reparto-m8": "astro-plugin",
-  "vite-auth-m8": "typescript",
-  "ext-prompt-builder-m8": "typescript",
 
   "docker_compose": "docker",
   "traefik": "docker"

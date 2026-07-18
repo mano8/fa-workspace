@@ -1,4 +1,4 @@
-﻿# Python Policy
+# Python Policy
 
 ## Stack
 - Python 3.12+
@@ -162,5 +162,3 @@ Never commit if any step fails.
    - Follow existing patterns
    - Document public APIs
    - Test thoroughly
-
-

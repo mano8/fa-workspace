@@ -4,6 +4,7 @@
 # Files owned by fa-workspace.
 !/.gitignore
 !/.gitattributes
+!/.m8-workspace-root
 !/README.md
 !/README.*.md
 !/LICENSE
@@ -22,6 +23,12 @@
 !/.workspace/
 !/.workspace/**
 **/todo/**
+/.workspace/plans/**
+# Status artifacts are strictly local evidence and must never be committed.
+/.workspace/status/
+/.workspace/analyse/**
+.workspace/.runtime/
+.workspace/.cache/
 
 # Versioned local safety hooks that reject commits and pushes containing TODO plans.
 !/.githooks/
@@ -35,6 +42,7 @@
 # Keep Codex-local state private by default.
 /.codex/**
 !/.codex/README.md
+!/.codex/config.toml
 
 # Claude
 !/CLAUDE.md
@@ -42,6 +50,9 @@
 !/.claude/
 # Keep Claude-local state private by default.
 /.claude/**
+!/.claude/settings.json
+/.claude/settings.local.json
+CLAUDE.local.md
 # Track shareable Claude-specific tooling, but not local permissions, locks, or
 # memory.
 !/.claude/README.md

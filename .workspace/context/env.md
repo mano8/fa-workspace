@@ -1,4 +1,4 @@
-﻿# Environment Policy
+# Environment Policy
 
 ## Rules
 

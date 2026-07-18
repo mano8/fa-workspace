@@ -24,7 +24,8 @@
 !/.workspace/**
 **/todo/**
 /.workspace/plans/**
-/.workspace/status/**
+# Status artifacts are strictly local evidence and must never be committed.
+/.workspace/status/
 /.workspace/analyse/**
 .workspace/.runtime/
 .workspace/.cache/

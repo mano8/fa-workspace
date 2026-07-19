@@ -1,38 +1,49 @@
 {
-  "python": [
-    "context/python.md",
-    "context/env.md",
-    "context/git.md",
-    "contracts/workspace.contract.md"
-  ],
-  "typescript": [
-    "context/typescript.md",
-    "context/env.md",
-    "context/git.md",
-    "contracts/workspace.contract.md"
-  ],
-  "astro-plugin": [
-    "context/typescript.md",
-    "context/astro-plugin.md",
-    "context/env.md",
-    "context/git.md",
-    "contracts/workspace.contract.md"
-  ],
-  "astro-ui": [
-    "context/typescript.md",
-    "context/astro-plugin.md",
-    "context/env.md",
-    "context/git.md",
-    "contracts/workspace.contract.md"
-  ],
-  "docker": [
-    "context/docker.md",
-    "context/env.md",
-    "context/git.md",
-    "contracts/workspace.contract.md"
-  ],
-  "contracts": [
-    "contracts/workspace.contract.md"
-  ]
+  "schema_version": 2,
+  "mode": "transitional-v1-bundles",
+  "budgets": {
+    "preferred_bytes": 24576,
+    "hard_bytes": 32768
+  },
+  "always": [],
+  "facets": {},
+  "tasks": {},
+  "exclusions": {},
+  "compatibility_bundles": {
+    "astro-plugin": [
+      "context/typescript.md",
+      "context/astro-plugin.md",
+      "context/env.md",
+      "context/git.md",
+      "contracts/workspace.contract.md"
+    ],
+    "astro-ui": [
+      "context/typescript.md",
+      "context/astro-plugin.md",
+      "context/env.md",
+      "context/git.md",
+      "contracts/workspace.contract.md"
+    ],
+    "contracts": [
+      "contracts/workspace.contract.md"
+    ],
+    "docker": [
+      "context/docker.md",
+      "context/env.md",
+      "context/git.md",
+      "contracts/workspace.contract.md"
+    ],
+    "python": [
+      "context/python.md",
+      "context/env.md",
+      "context/git.md",
+      "contracts/workspace.contract.md"
+    ],
+    "typescript": [
+      "context/typescript.md",
+      "context/env.md",
+      "context/git.md",
+      "contracts/workspace.contract.md"
+    ]
+  }
 }
-

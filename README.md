@@ -60,12 +60,12 @@ Within `fa-workspace`:
 Use [`.workspace/README.md`](.workspace/README.md) as the entry point. The key files are:
 
 - [`architecture.md`](.workspace/architecture.md) — layers and dependency direction;
-- [`repo-types.json`](.workspace/repo-types.json) — each repository's type;
-- [`policy.index.json`](.workspace/policy.index.json) — the policy files to load for that type;
+- [`repo-types.json`](.workspace/repo-types.json) — v2 direct-child repository classification and its active selector;
+- [`policy.index.json`](.workspace/policy.index.json) — the active v2 policy index and transitional compatibility bundles;
 - [`context/`](.workspace/context/) — language, environment, Git, Docker, and Astro guidance; and
 - [`contracts/`](.workspace/contracts/) — validation-only shared contracts.
 
-When working in a repository, read its own `AGENTS.md` as well as the root workspace entry point. Resolve its type through `repo-types.json`, then load only the matching policy context. The environment policy has priority over language policy, architecture, and validation contracts.
+When working in a repository, read its own `AGENTS.md` as well as the root workspace entry point. During the active transitional index mode, resolve its `migration.v1_bundle` through `repo-types.json` and load only that ordered compatibility bundle. The environment policy has priority over language policy, architecture, and validation contracts.
 
 Plans, analyses, and status artifacts belong in `.workspace/`. Do not duplicate them under `.codex/` or `.claude/`.
 

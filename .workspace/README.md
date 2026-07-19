@@ -10,8 +10,10 @@ and `CLAUDE.md`/`.claude/`.
 ## Ownership
 
 - `architecture.md`: workspace layers and dependency rules
-- `repo-types.json`: repository-to-policy classification
-- `policy.index.json`: context files loaded for each repository type
+- `repo-types.json`: v2 direct-child repository classification and transitional
+  compatibility selectors
+- `policy.index.json`: active v2 policy index; it temporarily retains ordered
+  legacy path bundles under `compatibility_bundles`
 - `context/`: shared language, environment, Git, and framework policies
 - `contracts/`: shared validation contracts
 - `plans/`: canonical plans; migrated from `.claude/plans`

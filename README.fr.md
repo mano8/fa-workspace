@@ -65,7 +65,7 @@ Les répertoires ci-dessus sont des enfants directs de `fa-workspace` ; ils ne s
 
 Utilisez [`.workspace/README.md`](.workspace/README.md) comme point d'entrée. Les fichiers importants sont [`architecture.md`](.workspace/architecture.md), [`repo-types.json`](.workspace/repo-types.json), [`policy.index.json`](.workspace/policy.index.json), [`context/`](.workspace/context/) et [`contracts/`](.workspace/contracts/).
 
-Avant de travailler dans un dépôt, lisez aussi son propre `AGENTS.md`. Déterminez son type avec `repo-types.json`, puis chargez uniquement le contexte de politique adapté. La politique d'environnement est prioritaire sur la politique de langage, l'architecture et les contrats de validation. Les plans, analyses et états appartiennent à `.workspace/` ; ne les dupliquez pas dans `.codex/` ou `.claude/`.
+Avant de travailler dans un dépôt, lisez aussi son propre `AGENTS.md`. Pendant le mode transitoire actif, résolvez son sélecteur `migration.v1_bundle` avec `repo-types.json`, puis chargez uniquement le lot de compatibilité ordonné correspondant. La politique d'environnement est prioritaire sur la politique de langage, l'architecture et les contrats de validation. Les plans, analyses et états appartiennent à `.workspace/` ; ne les dupliquez pas dans `.codex/` ou `.claude/`.
 
 <a id="configuration-propre-aux-outils"></a>
 

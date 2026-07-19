@@ -1,6 +1,8 @@
 {
     "git.autoRepositoryDetection": "subFolders",
     "git.repositoryScanMaxDepth": 1,
+    "python.analysis.indexing": false,
+    "python.analysis.diagnosticMode": "openFilesOnly",
     "git.scanRepositories": [
         "fa-auth-m8",
         "auth-sdk-m8",

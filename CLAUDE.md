@@ -20,9 +20,10 @@ Workspace rules apply globally; repository rules apply only to that repository.
 
 1. Read `.workspace/architecture.md`
 2. Read `.workspace/repo-types.json`
-3. Resolve repo type
+3. Resolve the registered direct-child repository and its active selector
 4. Load `.workspace/policy.index.json`
-5. Load ONLY matched `.workspace/` context files
+5. While the index is `transitional-v1-bundles`, load ONLY the ordered paths
+   selected by that repository's `migration.v1_bundle`
 
 > ALWAYS also read the target repo's own `CLAUDE.md` before doing any work in
 > that repo, every session. The workspace root `CLAUDE.md` is the general one

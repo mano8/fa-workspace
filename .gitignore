@@ -71,3 +71,6 @@ CLAUDE.local.md
 !/scripts/
 !/scripts/**
 !/docs/
+
+# Python
+*.pyc

@@ -65,7 +65,7 @@ Los directorios anteriores son hijos directos de `fa-workspace`; no son reposito
 
 Usa [`.workspace/README.md`](.workspace/README.md) como punto de entrada. Los archivos principales son [`architecture.md`](.workspace/architecture.md), [`repo-types.json`](.workspace/repo-types.json), [`policy.index.json`](.workspace/policy.index.json), [`context/`](.workspace/context/) y [`contracts/`](.workspace/contracts/).
 
-Antes de trabajar en un repositorio, lee también su propio `AGENTS.md`. Resuelve su tipo con `repo-types.json` y carga solamente el contexto de política correspondiente. La política de entorno tiene prioridad sobre la política de lenguaje, la arquitectura y los contratos de validación. Los planes, análisis y estados pertenecen a `.workspace/`; no los dupliques en `.codex/` ni `.claude/`.
+Antes de trabajar en un repositorio, lee también su propio `AGENTS.md`. Mientras esté activo el modo transitorio, resuelve su selector `migration.v1_bundle` con `repo-types.json` y carga solamente el paquete de compatibilidad ordenado correspondiente. La política de entorno tiene prioridad sobre la política de lenguaje, la arquitectura y los contratos de validación. Los planes, análisis y estados pertenecen a `.workspace/`; no los dupliques en `.codex/` ni `.claude/`.
 
 <a id="configuracion-especifica-de-herramientas"></a>
 

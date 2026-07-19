@@ -22,7 +22,7 @@
   },
 
   "remoteEnv": {
-    "PATH": "/home/vscode/.npm-global/bin:/home/vscode/.venvs/headroom/bin:${containerEnv:PATH}",
+    "PATH": "/home/vscode/.venvs/headroom/bin:${containerEnv:PATH}",
     "HEADROOM_PROXY_URL": "http://headroom-proxy:8787"
   },
 
@@ -30,7 +30,7 @@
     "vscode": {
       "extensions": [
         "anthropic.claude-code",
-        "openai.chatgpt",
+        "openai.chatgpt@26.707.91948",
         "ms-azuretools.vscode-docker",
         "eamodio.gitlens",
         "ms-python.python",
@@ -44,9 +44,12 @@
         "astro-build.astro-vscode"
       ],
       "settings": {
+        "extensions.supportNodeGlobalNavigator": true,
         "terminal.integrated.defaultProfile.linux": "bash",
         "python.defaultInterpreterPath": "/workspace/.shared-venv/bin/python",
         "python.testing.pytestPath": "/workspace/.shared-venv/bin/pytest",
+        "python.analysis.indexing": false,
+        "python.analysis.diagnosticMode": "openFilesOnly",
 
         "files.watcherExclude": {
           "**/.shared-venv/**": true,

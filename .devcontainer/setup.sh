@@ -14,13 +14,11 @@ echo "[2/7] Préparation des dossiers persistants..."
 mkdir -p \
     "${HOME}/.claude" \
     "${HOME}/.codex" \
-    "${HOME}/.npm-global" \
     "${HOME}/.venvs"
 
 sudo chown -R "$(id -u):$(id -g)" \
     "${HOME}/.claude" \
     "${HOME}/.codex" \
-    "${HOME}/.npm-global" \
     "${HOME}/.venvs"
 
 echo "[3/7] Configuration Git safe.directory pour les repos du workspace..."
@@ -45,13 +43,7 @@ python3 -m venv .shared-venv
     -r /workspace/media-service-m8/media_service/requirements_dev.txt
 
 echo "[5/7] Installation de Codex CLI sans sudo..."
-npm config set prefix "${HOME}/.npm-global"
-export PATH="${HOME}/.npm-global/bin:${PATH}"
-
-if ! grep -q '.npm-global/bin' "${HOME}/.bashrc"; then
-    echo 'export PATH="${HOME}/.npm-global/bin:${PATH}"' >> "${HOME}/.bashrc"
-fi
-
+npm config delete prefix
 npm install -g @openai/codex
 
 echo "[6/7] Installation de Headroom MCP CLI dans un venv isolé..."
@@ -64,7 +56,7 @@ if ! grep -q '.venvs/headroom/bin' "${HOME}/.bashrc"; then
 fi
 
 echo "[7/7] Vérification..."
-export PATH="${HOME}/.npm-global/bin:${HOME}/.venvs/headroom/bin:${PATH}"
+export PATH="${HOME}/.venvs/headroom/bin:${PATH}"
 
 python3 --version
 node --version

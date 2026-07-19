@@ -48,7 +48,7 @@ def _unit(
         "path": path,
         "authority_tier": tier,
         "scope": {"repository_id": repository_id, "prefix": prefix},
-        "invariant_ids": ["ownership"],
+        "invariant_ids": ["OWNERSHIP"],
         "conflicts_with": [],
         "may_override": [],
         "required": policy_id == "workspace.root",
@@ -75,6 +75,7 @@ class ScopedResolverTests(unittest.TestCase):
                     "kind": "python",
                     "layer": "platform",
                     "facets": ["a"],
+                    "migration": {"v1_bundle": "python"},
                 },
                 {
                     "id": "repo-b",
@@ -82,6 +83,7 @@ class ScopedResolverTests(unittest.TestCase):
                     "kind": "python",
                     "layer": "platform",
                     "facets": ["b"],
+                    "migration": {"v1_bundle": "python"},
                 },
             ],
         }
@@ -95,6 +97,7 @@ class ScopedResolverTests(unittest.TestCase):
             "mode": "faceted",
             "budgets": {"preferred_bytes": 24576, "hard_bytes": 32768},
             "always": ["workspace.root"],
+            "facet_ids": ["a", "b"],
             "facets": {"a": ["repo.a"], "b": ["repo.b"]},
             "tasks": {
                 "cross.a": {
@@ -166,7 +169,7 @@ class ScopedResolverTests(unittest.TestCase):
             policy_index=self.index,
             policy_metadata={
                 "units": self.units,
-                "invariants": ["ownership"],
+                "invariants": ["OWNERSHIP"],
                 "capabilities": ["read"],
             },
             capability_row=self.capability,
@@ -232,7 +235,7 @@ class ScopedResolverTests(unittest.TestCase):
                 **request.__dict__,
                 "policy_metadata": {
                     "units": [*self.units, duplicate],
-                    "invariants": ["ownership"],
+                    "invariants": ["OWNERSHIP"],
                     "capabilities": ["read"],
                 },
                 "policy_index": {
@@ -270,7 +273,7 @@ class ScopedResolverTests(unittest.TestCase):
                 **request.__dict__,
                 "policy_metadata": {
                     "units": [self.units[0], first, second],
-                    "invariants": ["ownership"],
+                    "invariants": ["OWNERSHIP"],
                     "capabilities": ["read"],
                 },
                 "policy_index": {
@@ -290,7 +293,7 @@ class ScopedResolverTests(unittest.TestCase):
                 **request.__dict__,
                 "policy_metadata": {
                     "units": [self.units[0], lower, self.units[2]],
-                    "invariants": ["ownership"],
+                    "invariants": ["OWNERSHIP"],
                     "capabilities": ["read"],
                 },
                 "authorizations": (),

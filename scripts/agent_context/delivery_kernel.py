@@ -303,7 +303,11 @@ class DeliveryKernel:
                     prior["manifest_id"] != request.resolved.manifest["manifest_id"]
                     or prior["capability_evidence_id"] != request.capability_evidence_id
                     or prior["native_evidence_ids"] != sorted({entry["native_evidence_id"] for entry in request.resolved.manifest["entries"] if entry["native_evidence_id"]})
+                    or prior["repositories"] != request.resolved.manifest["repositories"]
+                    or prior["tasks"] != request.resolved.manifest["tasks"]
+                    or prior["operations"] != request.resolved.manifest["operations"]
                     or prior["authorization_ids"] != request.resolved.manifest["authorization_ids"]
+                    or prior["authorization_provenance"] != request.resolved.manifest["authorization_provenance"]
                 ):
                     _fail("E_RECEIPT", "resume receipt linkage no longer exactly matches")
                 self._rehash_sources(request)
@@ -389,7 +393,11 @@ class DeliveryKernel:
             "envelope_sha256": request.resolved.envelope_sha256,
             "capability_evidence_id": request.capability_evidence_id,
             "native_evidence_ids": sorted({entry["native_evidence_id"] for entry in manifest["entries"] if entry["native_evidence_id"]}),
+            "repositories": manifest["repositories"],
+            "tasks": manifest["tasks"],
+            "operations": manifest["operations"],
             "authorization_ids": manifest["authorization_ids"],
+            "authorization_provenance": manifest["authorization_provenance"],
             "created_at": _now(),
             "updated_at": _now(),
             "previous_receipt_sha256": ZERO_SHA256,
@@ -404,7 +412,10 @@ class DeliveryKernel:
             "launch_id": session["launch_id"], "client_session_id": session["client_session_id"],
             "generation": session["generation"], "manifest_id": session["manifest_id"],
             "envelope_sha256": session["envelope_sha256"], "capability_evidence_id": session["capability_evidence_id"],
-            "native_evidence_ids": session["native_evidence_ids"], "authorization_ids": session["authorization_ids"],
+            "native_evidence_ids": session["native_evidence_ids"], "repositories": session["repositories"],
+            "tasks": session["tasks"], "operations": session["operations"],
+            "authorization_ids": session["authorization_ids"],
+            "authorization_provenance": session["authorization_provenance"],
             "previous_state": current, "state": state, "channel_id": channel_id,
             "delivered_bytes": delivered_bytes, "failure_code": failure_code, "recorded_at": _now(),
         })

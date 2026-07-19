@@ -234,9 +234,13 @@ def _metadata_catalog(
     value: Mapping[str, Any],
 ) -> tuple[dict[str, dict[str, Any]], set[str], set[str]]:
     catalog = _closed(value, {"units", "invariants", "capabilities"}, "policy metadata")
-    invariants = set(
-        _canonical_set(catalog["invariants"], "policy metadata invariants")
-    )
+    try:
+        w2b1._canonical_invariant_set(
+            catalog["invariants"], "policy metadata invariants"
+        )
+    except w2b1.AgentContextError as error:
+        _fail(error.message, error.code)
+    invariants = set(catalog["invariants"])
     capabilities = set(
         _canonical_set(catalog["capabilities"], "policy metadata capabilities")
     )
@@ -488,9 +492,11 @@ def _selected_policy_ids(
         if not matches:
             _fail(f"unknown repository: {repository}", "E_UNKNOWN_ID")
         for facet in matches[0]["facets"]:
-            if facet not in index["facets"]:
+            if facet not in index["facet_ids"]:
                 _fail(f"unknown facet: {facet}", "E_UNKNOWN_ID")
-            selected.extend(index["facets"][facet])
+            # A known, evidenced facet may have no shared policy slice.  It is
+            # deliberately a no-op rather than an empty policy slice.
+            selected.extend(index["facets"].get(facet, ()))
     for task in tasks:
         if task not in index["tasks"]:
             _fail(f"unknown task: {task}", "E_UNKNOWN_ID")
@@ -565,7 +571,7 @@ def _validate_selected_scope(
 
 def _validate_authorizations(
     request: ResolutionRequest, tasks: tuple[str, ...]
-) -> tuple[str, ...]:
+) -> tuple[tuple[str, ...], tuple[dict[str, str], ...]]:
     task_definitions = request.policy_index["tasks"]
     requires_authorization = any(
         task_definitions[task]["authorization"] != "none" for task in tasks
@@ -584,10 +590,30 @@ def _validate_authorizations(
                 "authorization records require an authorized selected task",
                 "E_AUTHORIZATION",
             )
-        return ()
+        if request.operations:
+            _fail(
+                "operation scope requires an authorized selected task",
+                "E_AUTHORIZATION",
+            )
+        return (), ()
     repositories = _canonical_input(request.repositories, "repository")
     operations = _canonical_input(request.operations, "operation")
-    valid_ids: list[str] = []
+    mutating_operations = {
+        task
+        for task in tasks
+        if task_definitions[task]["authorization"] == "mutating"
+    }
+    if not operations:
+        _fail(
+            "authorized selected tasks require a non-empty operation scope",
+            "E_AUTHORIZATION",
+        )
+    if not mutating_operations.issubset(operations):
+        _fail(
+            "mutating task operations do not match the selected task set",
+            "E_AUTHORIZATION",
+        )
+    valid_records: dict[str, dict[str, str]] = {}
     for supplied in request.authorizations:
         record = _closed(
             supplied, AUTHORIZATION_FIELDS, "authorization", "E_AUTHORIZATION"
@@ -628,12 +654,17 @@ def _validate_authorizations(
                 "authorization operation scope does not exactly match",
                 "E_AUTHORIZATION",
             )
-        if authorization_id in valid_ids:
+        if authorization_id in valid_records:
             _fail(f"duplicate authorization id: {authorization_id}", "E_AUTHORIZATION")
-        valid_ids.append(authorization_id)
-    if not valid_ids:
+        valid_records[authorization_id] = {
+            "authorization_id": authorization_id,
+            "authorization_sha256": w2b1.canonical_sha256(record),
+            "source_sha256": record["source_sha256"],
+        }
+    if not valid_records:
         _fail("selected task requires explicit human authorization", "E_AUTHORIZATION")
-    return tuple(sorted(set(valid_ids)))
+    ordered_ids = tuple(sorted(valid_records))
+    return ordered_ids, tuple(valid_records[item] for item in ordered_ids)
 
 
 def _manifest_entries(
@@ -722,7 +753,10 @@ def resolve_context(request: ResolutionRequest) -> ResolvedContext:
     selected = _selected_policy_ids(request, request.registry, units)
     _validate_authority(selected, units)
     _validate_selected_scope(selected, units, repositories)
-    authorization_ids = _validate_authorizations(request, tasks)
+    authorization_ids, authorization_provenance = _validate_authorizations(
+        request, tasks
+    )
+    operations = _canonical_input(request.operations, "operation")
     entries, injected_entries, native_bytes, raw_injected_bytes = _manifest_entries(
         request, selected, units
     )
@@ -760,7 +794,9 @@ def resolve_context(request: ResolutionRequest) -> ResolvedContext:
         "capability_evidence_id": _capability_evidence_id(request.capability_row),
         "repositories": list(repositories),
         "tasks": list(tasks),
+        "operations": list(operations),
         "authorization_ids": list(authorization_ids),
+        "authorization_provenance": list(authorization_provenance),
         "entries": entries,
         "accounting": {
             "policy_hard_limit": policy_hard_limit,

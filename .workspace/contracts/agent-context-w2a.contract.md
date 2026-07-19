@@ -132,9 +132,9 @@ Registry v2 is one closed object with exactly these fields:
 `repositories` is sorted by `id`; `id` and `path` are unique. `path` must name a
 direct child Git repository and must equal its canonical repository root.
 Internal paths and infrastructure directories owned by a child are rejected.
-`migration` is required only while the active index mode is
-`transitional-v1-bundles`, is forbidden after Step 9.2, and contains only
-`v1_bundle`.
+`migration` remains required while W3 rollback compatibility is retained,
+including the interim faceted W4 index, and is removed only in Step 9.2. It
+contains only `v1_bundle`; the active faceted resolver does not select it.
 
 ### 3.3 Policy-index v2
 
@@ -149,13 +149,20 @@ Both variants share this exact closed prefix:
     "hard_bytes": 32768
   },
   "always": ["policy-unit"],
+  "facet_ids": ["canonical-set-of-evidenced-facet-id"],
   "facets": {"facet-id": ["policy-unit"]},
   "tasks": {"task-id": {"policies": ["policy-unit"], "authorization": "none|mutating|cross-repository"}},
   "exclusions": {"exclusion-id": ["policy-unit-id"]}
 }
 ```
 
-In `transitional-v1-bundles` mode, `always`, `facets`, `tasks`, and `exclusions`
+`facet_ids` is the complete, canonical set of evidenced language, layer, kind,
+framework, and domain identifiers. `facets` contains only identifiers with at
+least one policy unit; a declared-but-unmapped facet intentionally contributes
+no shared policy, avoiding empty slices. Every registered repository facet must
+be declared in `facet_ids`.
+
+In `transitional-v1-bundles` mode, `always`, `facet_ids`, `facets`, `tasks`, and `exclusions`
 must be empty and one additional field is required:
 
 ```json
@@ -224,8 +231,10 @@ Mutating and cross-repository tasks carry this closed authorization record:
 ```
 
 The plan, repository metadata, policy metadata, an agent-generated statement,
-or mere task selection cannot create authorization. Receipts contain only the
-authorization identifier and hash, never raw user or owner content.
+or mere task selection cannot create authorization. The resolver derives an
+`authorization_sha256` over each complete canonical record and carries only
+the authorization ID, that record hash, and `source_sha256` into manifests,
+sessions, and receipts; raw user or owner content is never persisted there.
 
 ## 5. Source bytes and canonical serialization
 
@@ -285,7 +294,15 @@ The manifest is a closed JSON object with these required fields:
   "capability_evidence_id": "sha256",
   "repositories": ["canonical-set"],
   "tasks": ["canonical-set"],
+  "operations": ["canonical-set"],
   "authorization_ids": ["canonical-set"],
+  "authorization_provenance": [
+    {
+      "authorization_id": "identifier",
+      "authorization_sha256": "sha256",
+      "source_sha256": "sha256"
+    }
+  ],
   "entries": [
     {
       "policy_id": "identifier",
@@ -401,11 +418,14 @@ pre-task gate is the sole injection authority.
 
 The session record is closed and contains `schema_version`, `launch_id`,
 `client_session_id`, `generation`, `state`, `manifest_id`, `envelope_sha256`,
-`capability_evidence_id`, `native_evidence_ids`, `authorization_ids`,
-`created_at`, `updated_at`, and `previous_receipt_sha256`. Identifiers unavailable
-from the client make the row noncanonical rather than accepting placeholders.
+`capability_evidence_id`, `native_evidence_ids`, the selected `repositories`,
+`tasks`, and `operations`, `authorization_ids`, metadata-only
+`authorization_provenance`, `created_at`, `updated_at`, and
+`previous_receipt_sha256`. Identifiers unavailable from the client make the row
+noncanonical rather than accepting placeholders.
 
-A receipt is closed and contains the same identity/link fields plus
+A receipt is closed and contains the same identity/link fields, selected
+repository/task/operation sets, and metadata-only authorization provenance plus
 `receipt_id`, `previous_state`, `state`, `channel_id`, `delivered_bytes`,
 `failure_code`, and `recorded_at`. `receipt_id` is the JCS SHA-256 of the record
 without that field. Only an adapter callback confirming the exact envelope hash

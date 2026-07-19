@@ -18,6 +18,7 @@ from typing import Any, NoReturn
 MAX_BYTE_COUNT = 2_147_483_647
 MAX_SAFE_INTEGER = 9_007_199_254_740_991
 IDENTIFIER_RE = re.compile(r"^[a-z0-9._$-]{1,128}$")
+INVARIANT_ID_RE = re.compile(r"^[A-Z][A-Z0-9-]{1,127}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 GIT_TREE_RE = {
@@ -56,6 +57,11 @@ def _byte_count(value: Any, field: str) -> None:
 def _identifier(value: Any, field: str) -> None:
     if not isinstance(value, str) or not IDENTIFIER_RE.fullmatch(value):
         _fail(f"{field} must be a 1-128 byte lowercase identifier")
+
+
+def _invariant_id(value: Any, field: str) -> None:
+    if not isinstance(value, str) or not INVARIANT_ID_RE.fullmatch(value):
+        _fail(f"{field} must be a 2-128 byte uppercase invariant identifier")
 
 
 def _sha256(value: Any, field: str) -> None:
@@ -113,6 +119,17 @@ def _ordered_ids(value: Any, field: str) -> None:
 
 def _canonical_set(value: Any, field: str) -> None:
     _ordered_ids(value, field)
+    if value != sorted(value):
+        _fail(f"{field} must be sorted by Unicode code point")
+
+
+def _canonical_invariant_set(value: Any, field: str) -> None:
+    if not isinstance(value, list):
+        _fail(f"{field} must be an array")
+    for index, item in enumerate(value):
+        _invariant_id(item, f"{field}[{index}]")
+    if len(value) != len(set(value)):
+        _fail(f"{field} must not contain duplicate invariant identifiers")
     if value != sorted(value):
         _fail(f"{field} must be sorted by Unicode code point")
 
@@ -227,7 +244,10 @@ def validate_registry_v2(value: Any, *, index_mode: str | None = None) -> None:
     ids: list[str] = []
     paths: list[str] = []
     for index, repository in enumerate(repositories):
-        repo = _closed(repository, {"id", "path", "kind", "layer", "facets", "migration"} if index_mode == "transitional-v1-bundles" else {"id", "path", "kind", "layer", "facets"}, f"registry v2 repositories[{index}]")
+        # W4 keeps the rollback selector while the faceted index is activated.
+        # Phase 9.2 owns its eventual removal, so live v2 repositories carry the
+        # same closed migration object in both supported index modes.
+        repo = _closed(repository, {"id", "path", "kind", "layer", "facets", "migration"}, f"registry v2 repositories[{index}]")
         _identifier(repo["id"], f"registry v2 repositories[{index}].id")
         _canonical_path(repo["path"], f"registry v2 repositories[{index}].path")
         if "/" in repo["path"]:
@@ -236,9 +256,8 @@ def validate_registry_v2(value: Any, *, index_mode: str | None = None) -> None:
         if repo["layer"] not in {"platform", "service", "client", "shared"}:
             _fail(f"registry v2 repositories[{index}].layer is invalid")
         _ordered_ids(repo["facets"], f"registry v2 repositories[{index}].facets")
-        if index_mode == "transitional-v1-bundles":
-            migration = _closed(repo["migration"], {"v1_bundle"}, f"registry v2 repositories[{index}].migration")
-            _identifier(migration["v1_bundle"], f"registry v2 repositories[{index}].migration.v1_bundle")
+        migration = _closed(repo["migration"], {"v1_bundle"}, f"registry v2 repositories[{index}].migration")
+        _identifier(migration["v1_bundle"], f"registry v2 repositories[{index}].migration.v1_bundle")
         ids.append(repo["id"])
         paths.append(repo["path"])
     if ids != sorted(ids):
@@ -261,7 +280,7 @@ def _id_to_ordered_ids_map(value: Any, field: str, *, paths: bool = False) -> No
 
 def validate_policy_index_v2(value: Any, *, v1_policy_index: Any | None = None) -> None:
     index = _object(value, "policy index v2")
-    base_fields = {"schema_version", "mode", "budgets", "always", "facets", "tasks", "exclusions"}
+    base_fields = {"schema_version", "mode", "budgets", "always", "facet_ids", "facets", "tasks", "exclusions"}
     mode = index.get("mode")
     if mode == "transitional-v1-bundles":
         expected = base_fields | {"compatibility_bundles"}
@@ -276,7 +295,10 @@ def validate_policy_index_v2(value: Any, *, v1_policy_index: Any | None = None) 
     if budgets["preferred_bytes"] != 24_576 or budgets["hard_bytes"] != 32_768:
         _fail("policy index v2 budgets must be the frozen 24576/32768 values")
     _ordered_ids(index["always"], "policy index v2 always")
+    _canonical_set(index["facet_ids"], "policy index v2 facet_ids")
     _id_to_ordered_ids_map(index["facets"], "policy index v2 facets")
+    if not set(index["facets"]).issubset(index["facet_ids"]):
+        _fail("policy index v2 facets must be declared in facet_ids")
     tasks = _object(index["tasks"], "policy index v2 tasks")
     if list(tasks) != sorted(tasks):
         _fail("policy index v2 tasks keys must be sorted by Unicode code point")
@@ -288,7 +310,7 @@ def validate_policy_index_v2(value: Any, *, v1_policy_index: Any | None = None) 
             _fail(f"policy index v2 tasks.{task_id}.authorization is invalid")
     _id_to_ordered_ids_map(index["exclusions"], "policy index v2 exclusions")
     if mode == "transitional-v1-bundles":
-        if any(index[field] for field in ("always", "facets", "tasks", "exclusions")):
+        if any(index[field] for field in ("always", "facet_ids", "facets", "tasks", "exclusions")):
             _fail("transitional-v1-bundles policy fields must be empty")
         _id_to_ordered_ids_map(index["compatibility_bundles"], "policy index v2 compatibility_bundles", paths=True)
         if v1_policy_index is not None:
@@ -310,6 +332,14 @@ def validate_workspace_configuration_v2(registry_value: Any, index_value: Any) -
     validate_policy_index_v2(index)
     validate_registry_v2(registry_value, index_mode=mode)
     if mode != "transitional-v1-bundles":
+        known_facets = set(index["facet_ids"])
+        for repository in registry_value["repositories"]:
+            unknown = set(repository["facets"]) - known_facets
+            if unknown:
+                _fail(
+                    f"registry v2 repository has undeclared facets: {repository['id']}",
+                    code="E_UNKNOWN_ID",
+                )
         return
     bundles = index["compatibility_bundles"]
     for repository in registry_value["repositories"]:
@@ -350,7 +380,8 @@ def validate_policy_unit(value: Any) -> None:
     scope = _closed(unit["scope"], {"repository_id", "prefix"}, "policy unit scope")
     _identifier(scope["repository_id"], "policy unit scope.repository_id")
     _scope_prefix(scope["prefix"], "policy unit scope.prefix")
-    for field in ("invariant_ids", "conflicts_with", "may_override", "capabilities_granted"):
+    _canonical_invariant_set(unit["invariant_ids"], "policy unit invariant_ids")
+    for field in ("conflicts_with", "may_override", "capabilities_granted"):
         _canonical_set(unit[field], f"policy unit {field}")
     if not isinstance(unit["required"], bool):
         _fail("policy unit required must be boolean")
@@ -470,8 +501,30 @@ ACCOUNTING_FIELDS = {
 }
 
 
+def _authorization_provenance(value: Any, field: str) -> list[str]:
+    if not isinstance(value, list):
+        _fail(f"{field} must be an array")
+    identifiers: list[str] = []
+    for index, supplied in enumerate(value):
+        item = _closed(
+            supplied,
+            {"authorization_id", "authorization_sha256", "source_sha256"},
+            f"{field}[{index}]",
+        )
+        _identifier(item["authorization_id"], f"{field}[{index}].authorization_id")
+        _sha256(
+            item["authorization_sha256"],
+            f"{field}[{index}].authorization_sha256",
+        )
+        _sha256(item["source_sha256"], f"{field}[{index}].source_sha256")
+        identifiers.append(item["authorization_id"])
+    if identifiers != sorted(set(identifiers)):
+        _fail(f"{field} must have unique authorization IDs in canonical order")
+    return identifiers
+
+
 def validate_manifest(value: Any, *, verify_identifier: bool = True) -> None:
-    fields = {"schema_version", "manifest_id", "reviewed_tree", "agent", "platform", "mode", "capability_evidence_id", "repositories", "tasks", "authorization_ids", "entries", "accounting"}
+    fields = {"schema_version", "manifest_id", "reviewed_tree", "agent", "platform", "mode", "capability_evidence_id", "repositories", "tasks", "operations", "authorization_ids", "authorization_provenance", "entries", "accounting"}
     manifest = _closed(value, fields, "manifest")
     if manifest["schema_version"] != 2:
         _fail("manifest schema_version must be 2")
@@ -480,8 +533,15 @@ def validate_manifest(value: Any, *, verify_identifier: bool = True) -> None:
     if manifest["agent"] not in {"codex", "claude"} or manifest["platform"] not in {"windows", "posix", "devcontainer"} or manifest["mode"] not in {"interactive", "non-interactive"}:
         _fail("manifest agent/platform/mode is invalid")
     _sha256(manifest["capability_evidence_id"], "manifest capability_evidence_id")
-    for field in ("repositories", "tasks", "authorization_ids"):
+    for field in ("repositories", "tasks", "operations", "authorization_ids"):
         _canonical_set(manifest[field], f"manifest {field}")
+    provenance_ids = _authorization_provenance(
+        manifest["authorization_provenance"], "manifest authorization_provenance"
+    )
+    if provenance_ids != manifest["authorization_ids"]:
+        _fail("manifest authorization provenance does not match authorization_ids")
+    if bool(manifest["authorization_ids"]) != bool(manifest["operations"]):
+        _fail("manifest operations and authorization provenance must coexist")
     if not isinstance(manifest["entries"], list):
         _fail("manifest entries must be an array")
     for entry in manifest["entries"]:
@@ -496,7 +556,8 @@ def validate_manifest(value: Any, *, verify_identifier: bool = True) -> None:
 
 SESSION_FIELDS = {
     "schema_version", "launch_id", "client_session_id", "generation", "state", "manifest_id", "envelope_sha256",
-    "capability_evidence_id", "native_evidence_ids", "authorization_ids", "created_at", "updated_at", "previous_receipt_sha256",
+    "capability_evidence_id", "native_evidence_ids", "repositories", "tasks", "operations", "authorization_ids",
+    "authorization_provenance", "created_at", "updated_at", "previous_receipt_sha256",
 }
 
 
@@ -512,14 +573,23 @@ def validate_session(value: Any) -> None:
     for field in ("manifest_id", "envelope_sha256", "capability_evidence_id", "previous_receipt_sha256"):
         _sha256(session[field], f"session {field}")
     _canonical_sha256_set(session["native_evidence_ids"], "session native_evidence_ids")
-    _canonical_set(session["authorization_ids"], "session authorization_ids")
+    for field in ("repositories", "tasks", "operations", "authorization_ids"):
+        _canonical_set(session[field], f"session {field}")
+    provenance_ids = _authorization_provenance(
+        session["authorization_provenance"], "session authorization_provenance"
+    )
+    if provenance_ids != session["authorization_ids"]:
+        _fail("session authorization provenance does not match authorization_ids")
+    if bool(session["authorization_ids"]) != bool(session["operations"]):
+        _fail("session operations and authorization provenance must coexist")
     _timestamp(session["created_at"], "session created_at")
     _timestamp(session["updated_at"], "session updated_at")
 
 
 RECEIPT_FIELDS = {
     "schema_version", "receipt_id", "launch_id", "client_session_id", "generation", "manifest_id", "envelope_sha256",
-    "capability_evidence_id", "native_evidence_ids", "authorization_ids", "previous_state", "state", "channel_id",
+    "capability_evidence_id", "native_evidence_ids", "repositories", "tasks", "operations", "authorization_ids",
+    "authorization_provenance", "previous_state", "state", "channel_id",
     "delivered_bytes", "failure_code", "recorded_at",
 }
 
@@ -535,7 +605,15 @@ def validate_receipt(value: Any, *, verify_identifier: bool = True) -> None:
     for field in ("manifest_id", "envelope_sha256", "capability_evidence_id"):
         _sha256(receipt[field], f"receipt {field}")
     _canonical_sha256_set(receipt["native_evidence_ids"], "receipt native_evidence_ids")
-    _canonical_set(receipt["authorization_ids"], "receipt authorization_ids")
+    for field in ("repositories", "tasks", "operations", "authorization_ids"):
+        _canonical_set(receipt[field], f"receipt {field}")
+    provenance_ids = _authorization_provenance(
+        receipt["authorization_provenance"], "receipt authorization_provenance"
+    )
+    if provenance_ids != receipt["authorization_ids"]:
+        _fail("receipt authorization provenance does not match authorization_ids")
+    if bool(receipt["authorization_ids"]) != bool(receipt["operations"]):
+        _fail("receipt operations and authorization provenance must coexist")
     if receipt["previous_state"] not in STATES or receipt["state"] not in STATES:
         _fail("receipt state is invalid")
     _identifier(receipt["channel_id"], "receipt channel_id")

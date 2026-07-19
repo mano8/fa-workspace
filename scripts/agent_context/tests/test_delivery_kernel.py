@@ -55,7 +55,8 @@ class DeliveryKernelTests(unittest.TestCase):
             "reviewed_tree": {"algorithm": "git-sha1", "value": "b" * 40},
             "agent": "codex", "platform": "devcontainer", "mode": "non-interactive",
             "capability_evidence_id": w2b1.canonical_sha256(self.capability),
-            "repositories": [], "tasks": [], "authorization_ids": [],
+            "repositories": [], "tasks": [], "operations": [],
+            "authorization_ids": [], "authorization_provenance": [],
             "entries": [{
                 "policy_id": entry["policy_id"], "repository_id": entry["repository_id"],
                 "scope_prefix": entry["scope_prefix"], "path": entry["path"], "delivery": "inject",

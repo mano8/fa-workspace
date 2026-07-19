@@ -5,7 +5,8 @@
 * Every service MUST define `.env.example`.
 * All required keys MUST exist there.
 * Placeholder values MUST be `changethis`.
-* No secrets in git.
+* Workspace invariant:
+  [`SEC-NO-TRACKED-SECRETS`](../architecture.md#sec-no-tracked-secrets).
 
 ## Runtime Rule
 
@@ -26,14 +27,13 @@ The workspace root uses two tool-only environment profiles:
 * `.env.local` for Windows, Linux, or macOS host-local paths.
 * `.env.devcontainer` for paths and commands inside the dev container.
 
-Both real profiles are local-only and MUST remain ignored by Git. Their safe,
-committed templates are `.env.local.example` and
-`.env.devcontainer.example`.
+Profile tracking follows
+[`CFG-LOCAL-PROFILES-UNTRACKED`](../architecture.md#cfg-local-profiles-untracked).
+The safe templates are `.env.local.example` and `.env.devcontainer.example`.
 
 These profiles may contain workspace paths and tool locations only. Application
-and service secrets belong in each service repository's ignored environment
-files. GitHub credentials belong in the system credential manager, never in a
-workspace environment file.
+and service secret placement and credential handling follow
+[`SEC-NO-TRACKED-SECRETS`](../architecture.md#sec-no-tracked-secrets).
 
 `M8_RUNTIME` identifies `local` versus `devcontainer`. `M8_HOST_OS` identifies
 the operating system as `windows`, `linux`, or `macos`. Tool values may be
@@ -90,8 +90,8 @@ source scripts/import-workspace-env.sh local
 ```
 
 Codex and Claude must prefer the configured `M8_*` values over remembered or
-hardcoded machine paths. They must never print the contents of real environment
-profiles.
+hardcoded machine paths. Profile output follows
+[`SEC-NO-SECRET-DISCLOSURE`](../architecture.md#sec-no-secret-disclosure).
 
 ## AI Runtime
 
@@ -123,13 +123,13 @@ Usage rules:
 * Use `headroom_compress` for large non-secret outputs: logs, test output, grep results, JSON, stack traces, long file excerpts, and build output.
 * Use `headroom_retrieve` only when exact original details are needed after compression.
 * Use `headroom_stats` when token savings or compression state matters.
-* Never send `.env`, credentials, tokens, private keys, OAuth files, SSH keys, production secrets, or signing keys to Headroom.
+* External processing follows
+  [`SEC-NO-SECRET-DISCLOSURE`](../architecture.md#sec-no-secret-disclosure).
 * Do not use Headroom as `ANTHROPIC_BASE_URL` or `OPENAI_BASE_URL` unless explicitly requested.
 * Do not use `headroom wrap claude` or `headroom wrap codex` unless explicitly requested.
 Verification:
 
 * In Codex, use the MCP/tool listing available in the active environment.
 * In Claude Code, use `claude mcp list` or `/mcp`.
-
 
 

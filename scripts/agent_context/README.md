@@ -24,17 +24,28 @@ source scripts/import-workspace-env.sh devcontainer
 "$M8_PYTHON" scripts/agent_context/validate_w2b1.py registry-v2 path/to/registry.json
 ```
 
-The W3 migration makes the v2 registry and tagged transitional policy index
-authoritative. It retains the current ordered path arrays only as
-`compatibility_bundles`; each repository selects one with
-`migration.v1_bundle`. The default resolver mode returns those exact paths and
-does not activate faceted policy units, transport, or runtime state:
+Phase 4.3 activates the faceted v2 policy index. The registry retains its W3
+`migration.v1_bundle` selectors until Phase 9.2, but the active resolver does
+not select them. The historical W3 compatibility arrays remain test-only
+rollback evidence; policy selection now uses the active `always`, `facets`, and
+explicitly selected task overlays. A declared facet with no workspace slice is
+an intentional no-op, never an empty policy file.
+
+Phase 4.4 adds opt-in environment, testing, per-operation Git, pull-request,
+release, Headroom, and cross-repository overlays. Default resolution selects
+none of them. Mutating and cross-repository tasks require a closed human
+authorization record whose repository and operation sets match exactly;
+manifests, sessions, and receipts retain only its identifier, canonical record
+hash, and source hash alongside the selected repository/task/operation sets.
 
 ```bash
 "$M8_PYTHON" scripts/agent_context/resolve-context.py \
   --registry .workspace/repo-types.json \
   --policy-index .workspace/policy.index.json \
-  --repository auth-sdk-m8
+  --format resolution --root . --policy-metadata .workspace/policy.metadata.json \
+  --capability-row path/to/capability-row.json --reviewed-tree path/to/reviewed-tree.json \
+  --agent codex --platform devcontainer --mode non-interactive \
+  --injection-evidence path/to/injection-evidence.json --repository auth-sdk-m8
 ```
 
 Validate the coupled active workspace files with:
@@ -42,6 +53,14 @@ Validate the coupled active workspace files with:
 ```bash
 "$M8_PYTHON" scripts/agent_context/validate_w2b1.py workspace-v2 \
   .workspace/repo-types.json --policy-index .workspace/policy.index.json
+```
+
+Phase 4 Step 4.2 establishes the canonical workspace-invariant catalog and
+definition ownership. Validate unique definitions, resolved references, and the
+absence of tracked authoritative copies under tool-specific directories with:
+
+```bash
+"$M8_PYTHON" scripts/agent_context/validate_invariants.py --workspace .
 ```
 
 The faceted resolver mode in [`resolve-context.py`](resolve-context.py) remains

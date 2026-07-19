@@ -1,49 +1,41 @@
 {
   "schema_version": 2,
-  "mode": "transitional-v1-bundles",
+  "mode": "faceted",
   "budgets": {
     "preferred_bytes": 24576,
     "hard_bytes": 32768
   },
-  "always": [],
-  "facets": {},
-  "tasks": {},
-  "exclusions": {},
-  "compatibility_bundles": {
-    "astro-plugin": [
-      "context/typescript.md",
-      "context/astro-plugin.md",
-      "context/env.md",
-      "context/git.md",
-      "contracts/workspace.contract.md"
-    ],
-    "astro-ui": [
-      "context/typescript.md",
-      "context/astro-plugin.md",
-      "context/env.md",
-      "context/git.md",
-      "contracts/workspace.contract.md"
-    ],
-    "contracts": [
-      "contracts/workspace.contract.md"
-    ],
-    "docker": [
-      "context/docker.md",
-      "context/env.md",
-      "context/git.md",
-      "contracts/workspace.contract.md"
-    ],
-    "python": [
-      "context/python.md",
-      "context/env.md",
-      "context/git.md",
-      "contracts/workspace.contract.md"
-    ],
-    "typescript": [
-      "context/typescript.md",
-      "context/env.md",
-      "context/git.md",
-      "contracts/workspace.contract.md"
-    ]
-  }
+  "always": ["always.security", "always.workspace"],
+  "facet_ids": ["api-service", "arq", "astro", "astro-host", "astro-plugin", "auth-client", "auth-security", "client", "fastapi", "framework", "image-processing", "library", "media", "media-client", "platform", "prompt", "prompt-client", "pytest", "python", "sdk", "security-testing", "service", "shared", "shared-ui", "starlight", "teaching-assignment", "teaching-assignment-client", "test-suite", "typescript", "ui-library", "worker"],
+  "facets": {
+    "api-service": ["facet.kind.api-service"],
+    "astro": ["facet.framework.astro"],
+    "astro-plugin": ["facet.kind.astro-plugin"],
+    "auth-client": ["facet.domain.auth-client"],
+    "client": ["facet.layer.client"],
+    "media-client": ["facet.domain.media-client"],
+    "prompt-client": ["facet.domain.prompt-client"],
+    "python": ["facet.language.python"],
+    "shared-ui": ["facet.domain.shared-ui"],
+    "teaching-assignment-client": ["facet.domain.teaching-assignment-client"],
+    "typescript": ["facet.language.typescript"],
+    "ui-library": ["facet.kind.ui-library"]
+  },
+  "tasks": {
+    "astro-auth-adapter": {"policies": [], "authorization": "none"},
+    "astro-host": {"policies": [], "authorization": "none"},
+    "astro-plugin-testing": {"policies": [], "authorization": "none"},
+    "astro-registry-scaffolding": {"policies": [], "authorization": "none"},
+    "branch": {"policies": ["task.git.branch"], "authorization": "mutating"},
+    "commit": {"policies": ["task.git.commit"], "authorization": "mutating"},
+    "cross-repository": {"policies": ["task.cross-repository"], "authorization": "cross-repository"},
+    "environment": {"policies": ["task.environment"], "authorization": "none"},
+    "headroom": {"policies": ["task.headroom"], "authorization": "none"},
+    "headroom-wrapper": {"policies": ["task.headroom-wrapper"], "authorization": "mutating"},
+    "pull-request": {"policies": ["task.git.pull-request"], "authorization": "mutating"},
+    "push": {"policies": ["task.git.push"], "authorization": "mutating"},
+    "release": {"policies": ["task.release"], "authorization": "mutating"},
+    "testing": {"policies": ["task.testing"], "authorization": "none"}
+  },
+  "exclusions": {}
 }

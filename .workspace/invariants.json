@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "invariants": [
+    {
+      "id": "ARCH-LAYER-DIRECTION",
+      "owner": "architecture.md"
+    },
+    {
+      "id": "ARCH-NO-CROSS-SERVICE-DATA",
+      "owner": "architecture.md"
+    },
+    {
+      "id": "CFG-LOCAL-PROFILES-UNTRACKED",
+      "owner": "architecture.md"
+    },
+    {
+      "id": "CFG-SINGLE-WORKSPACE-OWNER",
+      "owner": "architecture.md"
+    },
+    {
+      "id": "PORTABLE-NO-WORKSPACE-PATHS",
+      "owner": "architecture.md"
+    },
+    {
+      "id": "SEC-NO-SECRET-DISCLOSURE",
+      "owner": "architecture.md"
+    },
+    {
+      "id": "SEC-NO-TRACKED-SECRETS",
+      "owner": "architecture.md"
+    },
+    {
+      "id": "SEC-VALIDATE-UNTRUSTED-INPUT",
+      "owner": "architecture.md"
+    },
+    {
+      "id": "STANDALONE-CHILD-USABILITY",
+      "owner": "architecture.md"
+    }
+  ]
+}

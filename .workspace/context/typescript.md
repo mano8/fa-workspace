@@ -26,7 +26,8 @@
 - content scripts = UI only
 
 ## Safety
-- all external inputs must be validated
+- Workspace invariant:
+  [`SEC-VALIDATE-UNTRUSTED-INPUT`](../architecture.md#sec-validate-untrusted-input).
 
 ## Testing
 - Vitest required
@@ -38,4 +39,3 @@
 - Fix order: formatting -> type errors -> linting
 - Run `tsc --noEmit` before committing
 - ESLint must report zero issues
-

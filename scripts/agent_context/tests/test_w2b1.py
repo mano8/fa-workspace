@@ -94,7 +94,7 @@ class SchemaTests(unittest.TestCase):
             "schema_version": 2,
             "mode": "transitional-v1-bundles",
             "budgets": {"preferred_bytes": 24576, "hard_bytes": 32768},
-            "always": [], "facets": {}, "tasks": {}, "exclusions": {},
+            "always": [], "facet_ids": [], "facets": {}, "tasks": {}, "exclusions": {},
             "compatibility_bundles": v1,
         }
         w2b1.validate_policy_index_v2(index, v1_policy_index=v1)
@@ -107,7 +107,7 @@ class SchemaTests(unittest.TestCase):
             "schema_version": 2,
             "repositories": [{
                 "id": "fa-ui-m8", "path": "fa-ui-m8/app", "kind": "typescript",
-                "layer": "client", "facets": [],
+                "layer": "client", "facets": [], "migration": {"v1_bundle": "typescript"},
             }],
         }
         with self.assertRaisesRegex(w2b1.AgentContextError, "direct-child"):
@@ -125,8 +125,7 @@ class SchemaTests(unittest.TestCase):
             }],
         }
         w2b1.validate_registry_v2(registry, index_mode="transitional-v1-bundles")
-        with self.assertRaisesRegex(w2b1.AgentContextError, "unknown fields"):
-            w2b1.validate_registry_v2(registry)
+        w2b1.validate_registry_v2(registry, index_mode="faceted")
 
     def test_v1_and_v2_mode_fixture_table(self) -> None:
         v1_registry = {"repo-a": "python"}
@@ -135,14 +134,14 @@ class SchemaTests(unittest.TestCase):
             "schema_version": 2,
             "mode": "transitional-v1-bundles",
             "budgets": {"preferred_bytes": 24576, "hard_bytes": 32768},
-            "always": [], "facets": {}, "tasks": {}, "exclusions": {},
+            "always": [], "facet_ids": [], "facets": {}, "tasks": {}, "exclusions": {},
             "compatibility_bundles": v1_index,
         }
         faceted = {
             "schema_version": 2,
             "mode": "faceted",
             "budgets": {"preferred_bytes": 24576, "hard_bytes": 32768},
-            "always": ["workspace.root"], "facets": {"python": ["repo.context"]},
+            "always": ["workspace.root"], "facet_ids": ["python"], "facets": {"python": ["repo.context"]},
             "tasks": {"analyze": {"policies": [], "authorization": "none"}},
             "exclusions": {"without-context": ["repo.context"]},
         }
@@ -167,7 +166,9 @@ class SchemaTests(unittest.TestCase):
             "schema_version": 2, "manifest_id": SHA,
             "reviewed_tree": {"algorithm": "git-sha1", "value": "b" * 40},
             "agent": "codex", "platform": "devcontainer", "mode": "non-interactive",
-            "capability_evidence_id": SHA, "repositories": [], "tasks": [], "authorization_ids": [], "entries": [],
+            "capability_evidence_id": SHA, "repositories": [], "tasks": [],
+            "operations": [], "authorization_ids": [],
+            "authorization_provenance": [], "entries": [],
             "accounting": {
                 "policy_hard_limit": 32768, "verified_channel_limit": 32768,
                 "client_context_allowance": 65536, "reserved_margin": 32768,

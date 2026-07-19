@@ -10,10 +10,14 @@ and `CLAUDE.md`/`.claude/`.
 ## Ownership
 
 - `architecture.md`: workspace layers and dependency rules
-- `repo-types.json`: v2 direct-child repository classification and transitional
-  compatibility selectors
-- `policy.index.json`: active v2 policy index; it temporarily retains ordered
-  legacy path bundles under `compatibility_bundles`
+- `invariants.json`: canonical workspace-invariant IDs and definition owners
+- `repo-types.json`: v2 direct-child repository classification and retained W3
+  rollback selectors
+- `policy.index.json`: active faceted v2 policy index, including the complete
+  evidenced facet/task identifier set
+- `policy.metadata.json`: closed metadata for active workspace policy units
+- `policies/`: non-empty workspace invariant references plus facet and opt-in
+  task policy slices
 - `context/`: shared language, environment, Git, and framework policies
 - `contracts/`: shared validation contracts
 - `plans/`: canonical plans; migrated from `.claude/plans`

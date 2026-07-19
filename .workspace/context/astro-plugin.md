@@ -67,10 +67,10 @@ range), never on its Python source — see Contract pinning below.
   `*AuthAdapter` interface / the `fa-auth-astro` provider — never by importing
   auth internals.
 - **No plugin imports another optional plugin.** No circular dependencies.
-- Plugins talk to their service over HTTP only. No service-layer imports, no
-  cross-repo source imports (published package deps only).
-- No hardcoded workspace paths — a plugin must work when installed from npm
-  into any host, outside this workspace.
+- Dependency direction follows
+  [`ARCH-LAYER-DIRECTION`](../architecture.md#arch-layer-direction).
+- Package portability follows
+  [`PORTABLE-NO-WORKSPACE-PATHS`](../architecture.md#portable-no-workspace-paths).
 
 ---
 
@@ -119,10 +119,11 @@ its auth adapter is backed by fa-auth-m8 tokens.
 Each `package.json` carries a metadata block (`faAuthM8`, `mediaServiceM8`,
 `promptEngineM8`, `repartoDocenteM8`) with `contract`, `testedServiceVersion`,
 and `serviceVersionRange`. Keep it in sync with `schemas.ts` and
-`compatibility.ts`; never widen the range silently. Model only public backend
-responses — never expose secret/session fields to the browser. Public modules
-are reached through explicit `package.json` `exports` subpaths; update `exports`
-whenever a public module is added.
+`compatibility.ts`; never widen the range silently. Browser-facing responses
+follow
+[`SEC-NO-SECRET-DISCLOSURE`](../architecture.md#sec-no-secret-disclosure).
+Public modules are reached through explicit `package.json` `exports` subpaths;
+update `exports` whenever a public module is added.
 
 ---
 
@@ -171,8 +172,10 @@ ones as follow-ups.
 
 ## Canonical UI layer — `astro-ui-m8` (extend-not-fork)
 
-`astro-ui-m8` is the **sole owner** of the shared shadcn blocks and recipes.
-Business plugins consume them via `shadcn add` against
+Shared-block ownership follows
+[`CFG-SINGLE-WORKSPACE-OWNER`](../architecture.md#cfg-single-workspace-owner),
+with `astro-ui-m8` as the declared owner. Business plugins consume the blocks
+via `shadcn add` against
 `./node_modules/@mano8/astro-ui-m8/registry/r/{name}.json`; files are **copied**
 into the consumer app at install/setup time. `astro-ui-m8` is a build/registry
 source — plugins do **not** runtime-import the copied components from it.
@@ -214,8 +217,9 @@ Every business plugin must provide **both modes**:
 
 Additional rules:
 
-- **`fa-ui-m8` is never a prerequisite for plugin usability.** Every plugin must
-  be installable, buildable, and testable standalone in a bare Starlight host.
+- [`STANDALONE-CHILD-USABILITY`](../architecture.md#standalone-child-usability)
+  applies to every business plugin; a bare Starlight host is its standalone
+  fixture.
 - Configurable `basePath` per plugin (e.g. `auth`→`/account`, `media`→`/media`,
   `prompt`→`/prompt`, `reparto`→`/reparto`); two plugins must not register the
   same route path.
@@ -233,9 +237,11 @@ Additional rules:
 
 - Stateless client — no business logic beyond the service contract.
 - Depend on `astro-auth-m8`; never re-implement auth. Couple via the adapter.
-- HTTP only to the backing service; no service-layer or cross-repo imports.
-- No secret/session fields exposed to the browser.
-- No duplicated workspace configuration; no hardcoded workspace paths.
+- [`ARCH-LAYER-DIRECTION`](../architecture.md#arch-layer-direction).
+- [`SEC-NO-SECRET-DISCLOSURE`](../architecture.md#sec-no-secret-disclosure).
+- [`CFG-SINGLE-WORKSPACE-OWNER`](../architecture.md#cfg-single-workspace-owner)
+  and
+  [`PORTABLE-NO-WORKSPACE-PATHS`](../architecture.md#portable-no-workspace-paths).
 - Preserve each repository's existing coverage gate; where it is 100%, it must
   remain 100%. New features need tests.
 

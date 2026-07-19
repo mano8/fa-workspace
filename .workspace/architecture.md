@@ -34,30 +34,69 @@
 
 ---
 
-## Dependency Rule
+## Canonical Workspace Invariants
 
-Clients -> Services -> Platform
+`.workspace/invariants.json` indexes these definitions. Each identifier below
+has exactly one normative definition in the workspace.
 
-NEVER reverse.
+### `ARCH-LAYER-DIRECTION`
 
-No service may import another service directly.
+Dependencies flow from clients to services to platform, never in reverse.
+Services do not import other services directly; cross-service communication
+uses contracts or HTTP APIs. Platform code remains reusable and has no service
+awareness.
 
-All cross-service communication must use contracts or HTTP APIs.
+### `ARCH-NO-CROSS-SERVICE-DATA`
+
+A service never reads or writes another service's database or private storage
+directly. Cross-service data access uses an owned contract or HTTP API.
+
+### `CFG-LOCAL-PROFILES-UNTRACKED`
+
+Real host and devcontainer tool profiles remain local and ignored. Only safe,
+secret-free profile templates may be tracked.
+
+### `CFG-SINGLE-WORKSPACE-OWNER`
+
+Every workspace-shared configuration or shared asset has one declared
+canonical owner. Children and agent-specific directories consume or reference
+that owner; they do not create authoritative duplicates or runtime forks.
+
+### `PORTABLE-NO-WORKSPACE-PATHS`
+
+An installable or published child artifact never depends on a hard-coded
+workspace path or the presence of the parent checkout.
+
+### `SEC-NO-SECRET-DISCLOSURE`
+
+Agents, tools, logs, public browser contracts, and external processors never
+disclose credentials, secrets, private keys, tokens, or private session
+material. Secret-bearing local profiles are never printed.
+
+### `SEC-NO-TRACKED-SECRETS`
+
+Credentials, secrets, private keys, tokens, and other secret material are never
+committed. They come from an ignored child-owned environment file, an approved
+secret store or vault, or the system credential manager.
+
+### `SEC-VALIDATE-UNTRUSTED-INPUT`
+
+External or otherwise untrusted input is validated at its trust boundary before
+it is used by application or infrastructure logic.
+
+### `STANDALONE-CHILD-USABILITY`
+
+When a repository kind requires standalone use, the child remains installable,
+buildable, testable, and usable without the workspace host checkout.
 
 ---
 
-## Shared Workspace Context
+## Ownership Allocation
 
-The canonical storage for architecture, repository classification, policies,
-contracts, plans, analyses, and status is `.workspace/`.
-
-Codex and Claude may use different tools and execution workflows, but both must
-load the same shared facts from `.workspace/`. Tool-specific configuration must
-not redefine or copy shared workspace truth.
-
----
-
-## Configuration Boundary
+Shared workspace truth follows
+[`CFG-SINGLE-WORKSPACE-OWNER`](#cfg-single-workspace-owner) and lives in
+`.workspace/`. Codex and Claude may use different tools and execution workflows,
+but both load the same shared facts from that owner.
 
 `fa-workspace` owns shared agent configuration, repository classification,
 cross-repository architecture, shared policies and contracts, workspace

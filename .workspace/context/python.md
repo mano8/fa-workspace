@@ -89,7 +89,9 @@ Bash:
 - **Functional Code**: Use functional and stateless approaches where they improve clarity
 - **Clean logic**: Keep core logic clean and push implementation details to the edges
 - **File Organsiation**: Balance file organization with simplicity - use an appropriate number of files for the project scale
-- **potential hardcoded secret**: be aware to never expose secrets, and to resolve false positive secrets directly if any detected.
+- Secret handling follows
+  [`SEC-NO-SECRET-DISCLOSURE`](../architecture.md#sec-no-secret-disclosure);
+  resolve suspected scanner false positives without printing the value.
 
 ## Migrations
 
@@ -109,7 +111,8 @@ Bash:
 ## Architecture
 - business logic isolated from transport layer
 - migrations via Alembic only
-- no cross-service DB access
+- Workspace invariant:
+  [`ARCH-NO-CROSS-SERVICE-DATA`](../architecture.md#arch-no-cross-service-data).
 
 ## Pre-commit Checklist (REQUIRED before every commit)
 

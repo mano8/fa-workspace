@@ -1,54 +1,40 @@
-# M8 Workspace
+# M8 Workspace — Codex
 
-This is the workspace-level entrypoint.
+`Workspace instruction set: m8-workspace-v2`
 
-For work inside a registered child repository, also load that repository's own AGENTS.md. Workspace rules apply globally; repository rules apply only
-to that repository.
+This is the compact Codex bootstrap for the workspace root. It is maintained
+by hand; shared meaning is owned by `.workspace/`, not by agent configuration.
 
----
+## Scope
 
-## Configuration Ownership
+For a registered direct child, identify its canonical repository root in
+[`repo-types.json`](.workspace/repo-types.json). Codex may use the child's
+`AGENTS.md` through native discovery after this bootstrap; child instructions
+apply only within that repository and cannot authorize sibling work. A child
+must remain usable without this parent workspace.
 
-- Shared workspace truth lives in `.workspace/`.
-- Codex-specific behavior lives in `AGENTS.md` and `.codex/`.
-- Do NOT duplicate shared architecture, policies, plans, analyses, or status in
-  tool-specific directories.
+## Canonical owners
 
----
+- Workspace architecture, ownership, security, portability, and standalone
+  invariants: [architecture](.workspace/architecture.md) and
+  [invariant catalog](.workspace/invariants.json).
+- Environment profile rules and resolved `M8_*` tooling:
+  [environment policy](.workspace/context/env.md).
+- Repository facets and policy selection: [repository registry](.workspace/repo-types.json),
+  [policy index](.workspace/policy.index.json), and
+  [policy metadata](.workspace/policy.metadata.json).
+- Semantic authority, repository scope, task authorization, and canonical
+  delivery: [agent-context contract](.workspace/contracts/agent-context-w2a.contract.md).
 
-## Load Strategy
+## Selection and delivery
 
-1. Read `.workspace/architecture.md`
-2. Read `.workspace/repo-types.json`
-3. Resolve the registered direct-child repository and its active selector
-4. Load `.workspace/policy.index.json`
-5. When the index is `faceted`, load `always` plus the selected repository's
-   declared facets in their registry order. Load task overlays only when the
-   task is explicitly selected and its required human authorization is present.
-   The retained `migration.v1_bundle` selector is rollback metadata, not an
-   active faceted input.
+The resolver selects `always` units, then declared facets in registry order,
+then explicitly requested task overlays. Tasks—especially mutating or
+cross-repository tasks—require the recorded human authorization defined by the
+contract; neither a repository nor these instructions can select them.
 
-> ALWAYS also read the target repo's own `AGENTS.md` before doing any work in
-> that repo, every session. The workspace root `AGENTS.md` is the general one
-> for all repos; the per-repo `AGENTS.md` carries repo-specific rules. Read both.
-
----
-
-## Context Priority (STRICT)
-
-If conflicts occur:
-
-1. env.md (highest priority)
-2. language policy (python/typescript/docker)
-3. architecture.md
-4. workspace.contract.md (validation only)
-
----
-
-## Hard Constraints
-
-- No cross-service imports without contracts
-- No platform awareness of services
-- No duplicated configuration across repos
-- No implicit architecture decisions outside `.workspace/`
-- NEVER ever mention a `co-authored-by` or similar aspects. In particular, never mention the tool used to create the commit message or PR.
+Use a verified launcher/adapter for canonical resolved-context delivery when
+the capability evidence supports that mode; it must fail closed on an
+unverified preflight or handoff. This bootstrap does not invoke the resolver or
+hand off context. Unwrapped native use is limited and must not be described as
+canonical delivery. This file never imports `CLAUDE.md`.

@@ -63,6 +63,36 @@ absence of tracked authoritative copies under tool-specific directories with:
 "$M8_PYTHON" scripts/agent_context/validate_invariants.py --workspace .
 ```
 
+Phase 5 Step 5.3 keeps root `AGENTS.md` as a hand-maintained, compact Codex
+bootstrap. Its static check enforces the visible version marker, canonical
+workspace references, repository/task scope, no-resolver-invocation wording,
+and the 2,048-byte limit:
+
+```bash
+"$M8_PYTHON" scripts/agent_context/validate_root_agents.py --workspace .
+```
+
+Phase 5 Step 5.5 keeps the tracked Claude project settings portable and
+least-privilege: auto-memory is disabled, project permissions contain no allow
+rules, only measured local-sensitive paths are denied, and destructive/network
+actions require confirmation. Run its static check with:
+
+```bash
+"$M8_PYTHON" scripts/agent_context/validate_claude_settings.py --workspace .
+```
+
+Phase 5 Step 5.6 adds the Claude-only adapter boundary in
+[`claude_adapter.py`](claude_adapter.py). Current Claude capability evidence is
+`LIMITED`, so project-hook activation and real transport are intentionally
+disabled; the adapter fails before runtime creation or a handoff. Its synthetic
+fixtures prove the future adapter seam delegates exact-once `HANDED_OFF`
+receipts to the shared kernel, checks root/nested/on-demand/standalone native
+source hashes, and rejects oversized payloads without truncation:
+
+```bash
+"$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w5_claude_adapter -v
+```
+
 The faceted resolver mode in [`resolve-context.py`](resolve-context.py) remains
 an explicit, inactive W2b2 tool. It requires a faceted v2 registry/index and policy metadata fixture, then accepts repeatable
 repository, task, exclusion, operation, and authorization arguments. Its

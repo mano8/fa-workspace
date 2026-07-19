@@ -27,7 +27,10 @@ class W4MeasurementTests(unittest.TestCase):
         self.assertEqual({item["fixture_id"] for item in measured}, {"sdk-implementation", "worker-environment", "astro-host-implementation", "astro-plugin-implementation"})
         for record in measured:
             with self.subTest(fixture=record["fixture_id"]):
-                self.assertEqual(record["baseline_native_evidence"]["bytes"], 1809)
+                self.assertEqual(
+                    record["baseline_native_evidence"]["bytes"],
+                    len((WORKSPACE / "AGENTS.md").read_bytes()),
+                )
                 self.assertEqual(record["other_model_visible_bootstrap_bytes"], 0)
                 self.assertEqual(
                     record["model_visible_total"],

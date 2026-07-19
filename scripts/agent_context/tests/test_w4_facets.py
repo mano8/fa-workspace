@@ -95,15 +95,14 @@ class W4FacetTests(unittest.TestCase):
                 source = WORKSPACE / units[policy_id]["path"]
                 self.assertTrue(source.is_file())
                 self.assertTrue(source.read_text(encoding="utf-8").strip())
-        deferred_astro_tasks = {
-            "astro-auth-adapter",
-            "astro-host",
-            "astro-plugin-testing",
-            "astro-registry-scaffolding",
+        astro_tasks = {
+            "astro-auth-adapter": ["task.astro-auth-adapter"],
+            "astro-host": ["task.astro-host"],
+            "astro-plugin-testing": ["task.astro-plugin-testing"],
+            "astro-registry-scaffolding": ["task.astro-registry-scaffolding"],
         }
-        self.assertTrue(
-            all(not self.index["tasks"][task]["policies"] for task in deferred_astro_tasks)
-        )
+        for task, policies in astro_tasks.items():
+            self.assertEqual(self.index["tasks"][task]["policies"], policies)
 
     def test_representative_selections_preserve_scope_and_sdk_neutrality(self) -> None:
         expected = {

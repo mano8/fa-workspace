@@ -84,3 +84,17 @@ adapter handoff, runtime collisions/substitution/permissions, and safe interrupt
 cleanup/retention. The only capability-supported canonical row is Codex
 non-interactive in the devcontainer; Windows and host-POSIX client rows remain
 explicitly unsupported rather than being inferred from these kernel fixtures.
+
+Phase 4.6 measures active workspace-controlled context without activating a
+client transport. It separately accounts for current verified Codex-native root
+bootstrap and the resolver's JCS injected-policy envelope; raw injected bytes
+remain diagnostic and are never double-counted. Run it with:
+
+```bash
+source scripts/import-workspace-env.sh devcontainer
+"$M8_PYTHON" scripts/agent_context/measure_w4_context.py \
+  --workspace . --captured-at 2026-07-19T15:10:00Z
+```
+
+The report keeps unsupported, limited, child-owned, and authorization-blocked
+fixtures explicit rather than treating them as successful canonical delivery.

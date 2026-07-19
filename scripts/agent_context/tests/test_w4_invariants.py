@@ -46,7 +46,10 @@ class W4InvariantTests(unittest.TestCase):
         self.assertEqual({item["id"] for item in catalog["invariants"]}, EXPECTED_IDS)
         self.assertEqual(report.invariant_count, 9)
         self.assertEqual(report.definition_count, 9)
-        self.assertGreaterEqual(report.reference_count, 20)
+        # Astro's retained compatibility core now omits task procedures and
+        # their duplicate invariant links; the active task metadata carries
+        # task-specific invariant relationships instead.
+        self.assertGreaterEqual(report.reference_count, 11)
         self.assertEqual(report.tracked_tool_copy_count, 0)
 
     def test_duplicate_definition_fails(self) -> None:

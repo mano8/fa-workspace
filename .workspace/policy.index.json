@@ -22,10 +22,10 @@
     "ui-library": ["facet.kind.ui-library"]
   },
   "tasks": {
-    "astro-auth-adapter": {"policies": [], "authorization": "none"},
-    "astro-host": {"policies": [], "authorization": "none"},
-    "astro-plugin-testing": {"policies": [], "authorization": "none"},
-    "astro-registry-scaffolding": {"policies": [], "authorization": "none"},
+    "astro-auth-adapter": {"policies": ["task.astro-auth-adapter"], "authorization": "none"},
+    "astro-host": {"policies": ["task.astro-host"], "authorization": "none"},
+    "astro-plugin-testing": {"policies": ["task.astro-plugin-testing"], "authorization": "none"},
+    "astro-registry-scaffolding": {"policies": ["task.astro-registry-scaffolding"], "authorization": "none"},
     "branch": {"policies": ["task.git.branch"], "authorization": "mutating"},
     "commit": {"policies": ["task.git.commit"], "authorization": "mutating"},
     "cross-repository": {"policies": ["task.cross-repository"], "authorization": "cross-repository"},

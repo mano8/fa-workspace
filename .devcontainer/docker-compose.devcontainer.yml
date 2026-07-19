@@ -21,8 +21,8 @@ services:
     init: true
 
     # Required for Codex's Bubblewrap sandbox to create user namespaces.
-    security_opt:
-      - seccomp=unconfined
+    #security_opt:
+    #  - seccomp=unconfined
 
     command: sleep infinity
 

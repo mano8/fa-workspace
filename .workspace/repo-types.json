@@ -6,128 +6,112 @@
       "path": "astro-auth-m8",
       "kind": "astro-plugin",
       "layer": "client",
-      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "auth-client"],
-      "migration": {"v1_bundle": "astro-plugin"}
+      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "auth-client"]
     },
     {
       "id": "astro-media-m8",
       "path": "astro-media-m8",
       "kind": "astro-plugin",
       "layer": "client",
-      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "media-client"],
-      "migration": {"v1_bundle": "astro-plugin"}
+      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "media-client"]
     },
     {
       "id": "astro-prompt-m8",
       "path": "astro-prompt-m8",
       "kind": "astro-plugin",
       "layer": "client",
-      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "prompt-client"],
-      "migration": {"v1_bundle": "astro-plugin"}
+      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "prompt-client"]
     },
     {
       "id": "astro-reparto-m8",
       "path": "astro-reparto-m8",
       "kind": "astro-plugin",
       "layer": "client",
-      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "teaching-assignment-client"],
-      "migration": {"v1_bundle": "astro-plugin"}
+      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "teaching-assignment-client"]
     },
     {
       "id": "astro-ui-m8",
       "path": "astro-ui-m8",
       "kind": "ui-library",
       "layer": "shared",
-      "facets": ["typescript", "shared", "ui-library", "shared-ui"],
-      "migration": {"v1_bundle": "astro-ui"}
+      "facets": ["typescript", "shared", "ui-library", "shared-ui"]
     },
     {
       "id": "auth-sdk-m8",
       "path": "auth-sdk-m8",
       "kind": "sdk",
       "layer": "platform",
-      "facets": ["python", "platform", "sdk", "auth-security"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "platform", "sdk", "auth-security"]
     },
     {
       "id": "fa-auth-m8",
       "path": "fa-auth-m8",
       "kind": "api-service",
       "layer": "service",
-      "facets": ["python", "service", "api-service", "fastapi", "auth-security"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "service", "api-service", "fastapi", "auth-security"]
     },
     {
       "id": "fa-ui-m8",
       "path": "fa-ui-m8",
       "kind": "astro-host",
       "layer": "client",
-      "facets": ["typescript", "client", "astro-host", "astro", "starlight", "shared-ui"],
-      "migration": {"v1_bundle": "typescript"}
+      "facets": ["typescript", "client", "astro-host", "astro", "starlight", "shared-ui"]
     },
     {
       "id": "fastapi-m8",
       "path": "fastapi-m8",
       "kind": "framework",
       "layer": "platform",
-      "facets": ["python", "platform", "framework", "fastapi", "auth-security"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "platform", "framework", "fastapi", "auth-security"]
     },
     {
       "id": "imgtools_m8",
       "path": "imgtools_m8",
       "kind": "library",
       "layer": "platform",
-      "facets": ["python", "platform", "library", "image-processing"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "platform", "library", "image-processing"]
     },
     {
       "id": "media-sdk-m8",
       "path": "media-sdk-m8",
       "kind": "sdk",
       "layer": "platform",
-      "facets": ["python", "platform", "sdk", "media"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "platform", "sdk", "media"]
     },
     {
       "id": "media-service-m8",
       "path": "media-service-m8",
       "kind": "api-service",
       "layer": "service",
-      "facets": ["python", "service", "api-service", "fastapi", "media"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "service", "api-service", "fastapi", "media"]
     },
     {
       "id": "media-worker-m8",
       "path": "media-worker-m8",
       "kind": "worker",
       "layer": "service",
-      "facets": ["python", "service", "worker", "arq", "media"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "service", "worker", "arq", "media"]
     },
     {
       "id": "prompt-engine-m8",
       "path": "prompt-engine-m8",
       "kind": "api-service",
       "layer": "service",
-      "facets": ["python", "service", "api-service", "fastapi", "prompt"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "service", "api-service", "fastapi", "prompt"]
     },
     {
       "id": "reparto-docente-m8",
       "path": "reparto-docente-m8",
       "kind": "api-service",
       "layer": "service",
-      "facets": ["python", "service", "api-service", "fastapi", "teaching-assignment"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "service", "api-service", "fastapi", "teaching-assignment"]
     },
     {
       "id": "security-tests-m8",
       "path": "security-tests-m8",
       "kind": "test-suite",
       "layer": "platform",
-      "facets": ["python", "platform", "test-suite", "pytest", "security-testing"],
-      "migration": {"v1_bundle": "python"}
+      "facets": ["python", "platform", "test-suite", "pytest", "security-testing"]
     }
   ]
 }

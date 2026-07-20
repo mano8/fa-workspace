@@ -13,8 +13,6 @@ from agent_context import w2b1
 
 
 VALIDATORS = {
-    "registry-v1": w2b1.validate_registry_v1,
-    "policy-index-v1": w2b1.validate_policy_index_v1,
     "registry-v2": w2b1.validate_registry_v2,
     "policy-index-v2": w2b1.validate_policy_index_v2,
     "workspace-v2": w2b1.validate_workspace_configuration_v2,
@@ -30,7 +28,6 @@ def main() -> int:
     parser.add_argument("kind", choices=sorted((*VALIDATORS, "envelope")))
     parser.add_argument("input", type=Path, help="strict UTF-8 JSON input")
     parser.add_argument("--policy-index", type=Path, help="required for workspace-v2")
-    parser.add_argument("--v1-policy-index", type=Path, help="required only to compare transitional v2 compatibility bundles")
     arguments = parser.parse_args()
     try:
         value = w2b1.parse_strict_json(arguments.input.read_bytes())
@@ -49,8 +46,6 @@ def main() -> int:
             VALIDATORS[arguments.kind](
                 value, w2b1.parse_strict_json(arguments.policy_index.read_bytes())
             )
-        elif arguments.kind == "policy-index-v2" and arguments.v1_policy_index:
-            VALIDATORS[arguments.kind](value, v1_policy_index=w2b1.parse_strict_json(arguments.v1_policy_index.read_bytes()))
         else:
             VALIDATORS[arguments.kind](value)
         return 0

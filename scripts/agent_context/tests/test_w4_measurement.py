@@ -64,6 +64,23 @@ class W4MeasurementTests(unittest.TestCase):
                 self.assertIsNone(record["model_visible_total"])
                 self.assertIsNone(record["effective_hard_limit"])
 
+    def test_phase_9_report_exposes_delivery_and_invariant_accounting(self) -> None:
+        self.assertEqual(self.report["phase"], "9.1")
+        self.assertEqual(len(self.report["required_rows"]), 1)
+        measured = next(item for item in self.report["codex_records"] if item["fixture_id"] == "sdk-implementation")
+        for field in (
+            "client_identity", "client_config_sha256", "capability_evidence_id",
+            "native_evidence_id", "launch_id", "client_session_id", "generation",
+            "channel_id", "selected_policy_count", "selected_invariant_ids",
+            "invariant_delta", "runtime_ms",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, measured)
+        self.assertIsNone(measured["launch_id"])
+        self.assertIsNone(measured["client_session_id"])
+        self.assertEqual(measured["generation"], 0)
+        self.assertEqual(measured["model_visible_total"], measured["baseline_native_evidence"]["bytes"] + measured["serialized_injected_envelope_bytes"])
+
 
 if __name__ == "__main__":
     unittest.main()

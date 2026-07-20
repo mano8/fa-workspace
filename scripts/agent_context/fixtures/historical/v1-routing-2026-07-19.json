@@ -1,0 +1,30 @@
+{
+  "fixture_type": "historical-v1-routing",
+  "archived_at": "2026-07-20T00:00:00Z",
+  "registry": {
+    "astro-auth-m8": "astro-plugin",
+    "astro-media-m8": "astro-plugin",
+    "astro-prompt-m8": "astro-plugin",
+    "astro-reparto-m8": "astro-plugin",
+    "astro-ui-m8": "astro-ui",
+    "auth-sdk-m8": "python",
+    "fa-auth-m8": "python",
+    "fa-ui-m8": "typescript",
+    "fastapi-m8": "python",
+    "imgtools_m8": "python",
+    "media-sdk-m8": "python",
+    "media-service-m8": "python",
+    "media-worker-m8": "python",
+    "prompt-engine-m8": "python",
+    "reparto-docente-m8": "python",
+    "security-tests-m8": "python"
+  },
+  "policy_index": {
+    "astro-plugin": ["context/typescript.md", "context/astro-plugin.md", "context/env.md", "context/git.md", "contracts/workspace.contract.md"],
+    "astro-ui": ["context/typescript.md", "context/astro-plugin.md", "context/env.md", "context/git.md", "contracts/workspace.contract.md"],
+    "contracts": ["contracts/workspace.contract.md"],
+    "docker": ["context/docker.md", "context/env.md", "context/git.md", "contracts/workspace.contract.md"],
+    "python": ["context/python.md", "context/env.md", "context/git.md", "contracts/workspace.contract.md"],
+    "typescript": ["context/typescript.md", "context/env.md", "context/git.md", "contracts/workspace.contract.md"]
+  }
+}

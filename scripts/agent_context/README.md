@@ -1,7 +1,7 @@
 # W2b1 agent-context schemas
 
 This additive, inactive package implements Phases 2.2 through 2.5. It validates the
-v1 and frozen v2 registry/index shapes, policy units, manifests, sessions, and
+frozen faceted v2 registry/index shape, policy units, manifests, sessions, and
 receipts; it also creates RFC 8785 JCS UTF-8 injected envelopes from supplied
 source bytes. The scoped resolver consumes explicit v2 fixture inputs, performs
 authority/scope/authorization/native-evidence checks, and emits deterministic
@@ -24,12 +24,11 @@ source scripts/import-workspace-env.sh devcontainer
 "$M8_PYTHON" scripts/agent_context/validate_w2b1.py registry-v2 path/to/registry.json
 ```
 
-Phase 4.3 activates the faceted v2 policy index. The registry retains its W3
-`migration.v1_bundle` selectors until Phase 9.2, but the active resolver does
-not select them. The historical W3 compatibility arrays remain test-only
-rollback evidence; policy selection now uses the active `always`, `facets`, and
-explicitly selected task overlays. A declared facet with no workspace slice is
-an intentional no-op, never an empty policy file.
+Phase 9.2 removes the W3 compatibility adapter. The historical routing record
+remains a fixture only; restoring it requires a Git rollback. Policy selection
+uses the active `always`, `facets`, and explicitly selected task overlays. A
+declared facet with no workspace slice is an intentional no-op, never an empty
+policy file.
 
 Phase 4.4 adds opt-in environment, testing, per-operation Git, pull-request,
 release, Headroom, and cross-repository overlays. Default resolution selects
@@ -188,8 +187,8 @@ state, source-drift rehashing, receipt transitions, stable exit mapping, and a
 fake exact-payload adapter. It has no Codex/Claude hook, launcher, or real
 transport adapter, and must remain disabled until W2b4 fixtures pass.
 
-W2b4 keeps that boundary client-neutral. Its deterministic fixtures exercise v1/v2
-schema modes, scoped multi-repository authorization and authority failures, native
+W2b4 keeps that boundary client-neutral. Its deterministic fixtures exercise
+strict faceted-schema failures, scoped multi-repository authorization and authority failures, native
 evidence drift, exact accounting, delimiter/JSON/Unicode/CRLF/BOM/NUL framing,
 exact channel limits, lifecycle/receipt terminality, source drift, concurrent fake
 adapter handoff, runtime collisions/substitution/permissions, and safe interrupted

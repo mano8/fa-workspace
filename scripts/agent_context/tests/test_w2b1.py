@@ -88,26 +88,12 @@ class CanonicalSerializationTests(unittest.TestCase):
 
 
 class SchemaTests(unittest.TestCase):
-    def test_transitional_index_mirrors_v1(self) -> None:
-        v1 = {"python": ["context/python.md", "context/env.md"]}
-        index = {
-            "schema_version": 2,
-            "mode": "transitional-v1-bundles",
-            "budgets": {"preferred_bytes": 24576, "hard_bytes": 32768},
-            "always": [], "facet_ids": [], "facets": {}, "tasks": {}, "exclusions": {},
-            "compatibility_bundles": v1,
-        }
-        w2b1.validate_policy_index_v2(index, v1_policy_index=v1)
-        index["compatibility_bundles"] = {"python": ["context/env.md", "context/python.md"]}
-        with self.assertRaisesRegex(w2b1.AgentContextError, "exactly mirror"):
-            w2b1.validate_policy_index_v2(index, v1_policy_index=v1)
-
     def test_registry_rejects_internal_paths_and_unknown_fields(self) -> None:
         registry = {
             "schema_version": 2,
             "repositories": [{
                 "id": "fa-ui-m8", "path": "fa-ui-m8/app", "kind": "typescript",
-                "layer": "client", "facets": [], "migration": {"v1_bundle": "typescript"},
+                "layer": "client", "facets": [],
             }],
         }
         with self.assertRaisesRegex(w2b1.AgentContextError, "direct-child"):
@@ -116,7 +102,7 @@ class SchemaTests(unittest.TestCase):
         with self.assertRaisesRegex(w2b1.AgentContextError, "unknown fields"):
             w2b1.validate_registry_v2(registry)
 
-    def test_transitional_registry_requires_the_only_allowed_migration_shape(self) -> None:
+    def test_final_schemas_reject_compatibility_and_migration_fields(self) -> None:
         registry = {
             "schema_version": 2,
             "repositories": [{
@@ -124,36 +110,20 @@ class SchemaTests(unittest.TestCase):
                 "layer": "client", "facets": [], "migration": {"v1_bundle": "typescript"},
             }],
         }
-        w2b1.validate_registry_v2(registry, index_mode="transitional-v1-bundles")
-        w2b1.validate_registry_v2(registry, index_mode="faceted")
-
-    def test_v1_and_v2_mode_fixture_table(self) -> None:
-        v1_registry = {"repo-a": "python"}
-        v1_index = {"python": ["context/python.md"]}
-        transitional = {
+        with self.assertRaisesRegex(w2b1.AgentContextError, "unknown fields"):
+            w2b1.validate_registry_v2(registry)
+        index = {
             "schema_version": 2,
             "mode": "transitional-v1-bundles",
             "budgets": {"preferred_bytes": 24576, "hard_bytes": 32768},
-            "always": [], "facet_ids": [], "facets": {}, "tasks": {}, "exclusions": {},
-            "compatibility_bundles": v1_index,
+            "always": [], "facet_ids": [], "facets": {}, "tasks": {}, "exclusions": {}
         }
-        faceted = {
-            "schema_version": 2,
-            "mode": "faceted",
-            "budgets": {"preferred_bytes": 24576, "hard_bytes": 32768},
-            "always": ["workspace.root"], "facet_ids": ["python"], "facets": {"python": ["repo.context"]},
-            "tasks": {"analyze": {"policies": [], "authorization": "none"}},
-            "exclusions": {"without-context": ["repo.context"]},
-        }
-        fixtures = (
-            ("v1-registry", lambda: w2b1.validate_registry_v1(v1_registry)),
-            ("v1-index", lambda: w2b1.validate_policy_index_v1(v1_index)),
-            ("v2-transitional", lambda: w2b1.validate_policy_index_v2(transitional, v1_policy_index=v1_index)),
-            ("v2-faceted", lambda: w2b1.validate_policy_index_v2(faceted)),
-        )
-        for name, validator in fixtures:
-            with self.subTest(name=name):
-                validator()
+        with self.assertRaisesRegex(w2b1.AgentContextError, "mode must be faceted"):
+            w2b1.validate_policy_index_v2(index)
+        index["mode"] = "faceted"
+        index["compatibility_bundles"] = {}
+        with self.assertRaisesRegex(w2b1.AgentContextError, "unknown fields"):
+            w2b1.validate_policy_index_v2(index)
 
     def test_strict_parser_rejects_duplicate_keys_and_floats(self) -> None:
         with self.assertRaisesRegex(w2b1.AgentContextError, "duplicate key"):

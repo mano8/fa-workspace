@@ -11,62 +11,6 @@ from agent_context import w2b1
 
 WORKSPACE = Path(__file__).resolve().parents[3]
 
-V1_REGISTRY = {
-    "auth-sdk-m8": "python",
-    "media-sdk-m8": "python",
-    "fastapi-m8": "python",
-    "imgtools_m8": "python",
-    "security-tests-m8": "python",
-    "fa-auth-m8": "python",
-    "media-service-m8": "python",
-    "media-worker-m8": "python",
-    "prompt-engine-m8": "python",
-    "reparto-docente-m8": "python",
-    "fa-ui-m8": "typescript",
-    "astro-ui-m8": "astro-ui",
-    "astro-auth-m8": "astro-plugin",
-    "astro-media-m8": "astro-plugin",
-    "astro-prompt-m8": "astro-plugin",
-    "astro-reparto-m8": "astro-plugin",
-}
-
-V1_BUNDLES = {
-    "python": [
-        "context/python.md",
-        "context/env.md",
-        "context/git.md",
-        "contracts/workspace.contract.md",
-    ],
-    "typescript": [
-        "context/typescript.md",
-        "context/env.md",
-        "context/git.md",
-        "contracts/workspace.contract.md",
-    ],
-    "astro-plugin": [
-        "context/typescript.md",
-        "context/astro-plugin.md",
-        "context/env.md",
-        "context/git.md",
-        "contracts/workspace.contract.md",
-    ],
-    "astro-ui": [
-        "context/typescript.md",
-        "context/astro-plugin.md",
-        "context/env.md",
-        "context/git.md",
-        "contracts/workspace.contract.md",
-    ],
-    "docker": [
-        "context/docker.md",
-        "context/env.md",
-        "context/git.md",
-        "contracts/workspace.contract.md",
-    ],
-    "contracts": ["contracts/workspace.contract.md"],
-}
-
-
 class W3MigrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -75,6 +19,12 @@ class W3MigrationTests(unittest.TestCase):
         )
         cls.index = w2b1.parse_strict_json(
             (WORKSPACE / ".workspace/policy.index.json").read_bytes()
+        )
+        cls.historical = w2b1.parse_strict_json(
+            (
+                WORKSPACE
+                / "scripts/agent_context/fixtures/historical/v1-routing-2026-07-19.json"
+            ).read_bytes()
         )
 
     def test_w4_activates_the_closed_faceted_v2_pair(self) -> None:
@@ -87,12 +37,12 @@ class W3MigrationTests(unittest.TestCase):
     def test_registry_contains_only_classified_direct_child_repositories(self) -> None:
         """The root fixture is sufficient; no child clone is a test dependency."""
         registered = {item["id"] for item in self.registry["repositories"]}
-        self.assertEqual(registered, set(V1_REGISTRY))
+        self.assertEqual(registered, set(self.historical["registry"]))
         self.assertNotIn("docker_compose", registered)
         self.assertNotIn("traefik", registered)
         self.assertNotIn("fa-ui-m8/app", registered)
 
-    def test_registry_preserves_the_step_3_1_classification(self) -> None:
+    def test_registry_preserves_the_step_3_1_classification_without_migration_metadata(self) -> None:
         classification = w2b1.parse_strict_json(
             (
                 WORKSPACE
@@ -106,18 +56,30 @@ class W3MigrationTests(unittest.TestCase):
                 "kind": repository["kind"],
                 "layer": repository["layer"],
                 "facets": repository["facets"],
-                "migration": {"v1_bundle": repository["migration_v1_bundle"]},
             }
             for repository in classification["repositories"]
         ]
         self.assertEqual(self.registry["repositories"], expected)
 
-    def test_w3_selectors_remain_present_but_are_not_active_faceted_input(self) -> None:
-        self.assertEqual(
-            {item["id"]: item["migration"]["v1_bundle"] for item in self.registry["repositories"]},
-            V1_REGISTRY,
-        )
+    def test_historical_fixture_is_non_authoritative_and_live_schemas_reject_it(self) -> None:
+        self.assertEqual(self.historical["fixture_type"], "historical-v1-routing")
+        expected_bundles = {
+            item["id"]: item["migration_v1_bundle"]
+            for item in w2b1.parse_strict_json(
+                (
+                    WORKSPACE
+                    / "scripts/agent_context/fixtures/evidence/w3-repository-classification-2026-07-19.json"
+                ).read_bytes()
+            )["repositories"]
+        }
+        self.assertEqual(self.historical["registry"], expected_bundles)
+        self.assertNotIn("migration", self.registry["repositories"][0])
         self.assertNotIn("compatibility_bundles", self.index)
+        with self.assertRaisesRegex(w2b1.AgentContextError, "unknown fields"):
+            w2b1.validate_policy_index_v2({
+                **self.index,
+                "compatibility_bundles": self.historical["policy_index"],
+            })
 
 
 if __name__ == "__main__":

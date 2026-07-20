@@ -65,13 +65,17 @@ Les répertoires ci-dessus sont des enfants directs de `fa-workspace` ; ils ne s
 
 Utilisez [`.workspace/README.md`](.workspace/README.md) comme point d'entrée. Les fichiers importants sont [`architecture.md`](.workspace/architecture.md), [`repo-types.json`](.workspace/repo-types.json), [`policy.index.json`](.workspace/policy.index.json), [`context/`](.workspace/context/) et [`contracts/`](.workspace/contracts/).
 
-Avant de travailler dans un dépôt, lisez aussi son propre `AGENTS.md`. Pendant le mode transitoire actif, résolvez son sélecteur `migration.v1_bundle` avec `repo-types.json`, puis chargez uniquement le lot de compatibilité ordonné correspondant. La politique d'environnement est prioritaire sur la politique de langage, l'architecture et les contrats de validation. Les plans, analyses et états appartiennent à `.workspace/` ; ne les dupliquez pas dans `.codex/` ou `.claude/`.
+Avant de travailler dans un dépôt, lisez aussi son propre `AGENTS.md`. La résolution sélectionne `always`, les facettes du dépôt dans l'ordre, puis les tâches explicitement demandées. Le format actif est v2 facetté ; l'ancien analyseur et les sélecteurs transitoires ne subsistent que comme preuve historique de rollback. La politique d'environnement est prioritaire sur la politique de langage, l'architecture et les contrats de validation. Les plans, analyses et états appartiennent à `.workspace/` ; ne les dupliquez pas dans `.codex/` ou `.claude/`.
+
+Le guide opérationnel complet se trouve dans [`.workspace/README.md`](.workspace/README.md) : propriété sémantique, périmètre et autorisation des dépôts/tâches, preuves de capacité, livraison native ou injectée, modes standalone, runtime et reçus sécurisés, formule exacte des octets, overrides, budgets, et distinction entre contexte d'instructions, effort de raisonnement, compression de sortie et prix. La livraison canonique actuelle est vérifiée uniquement pour Codex non interactif dans le Dev Container ; les modes interactifs Codex/Claude sont `LIMITED` et Windows/POSIX hôte est `UNSUPPORTED`.
 
 <a id="configuration-propre-aux-outils"></a>
 
 ### Configuration propre aux outils
 
 Codex utilise [`AGENTS.md`](AGENTS.md) et [`.codex/README.md`](.codex/README.md) ; Claude Code utilise [`CLAUDE.md`](CLAUDE.md) et [`.claude/README.md`](.claude/README.md). Ces emplacements peuvent contenir des flux de travail et un état local propres à chaque outil, mais ne doivent pas redéfinir les informations partagées.
+
+Le chargement natif et la livraison injectée dépendent de preuves propres au client, à la plateforme et au mode. Le chargement natif exige des hashes correspondants ; l'injection exige que la découverte native soit désactivée et qu'un reçu prouve une livraison exacte unique. Les reçus prouvent la remise par le launcher, pas le comportement du modèle. Le runtime isolé reste sous `.workspace/.runtime/` et les journaux normaux ne contiennent pas de politiques brutes.
 
 Le Dev Container installe Codex CLI et la fonctionnalité Claude Code. Connectez-vous dans le conteneur lorsque vous voulez utiliser ces outils. Leur configuration est conservée dans des volumes Docker et n'est pas copiée depuis les répertoires de votre machine hôte.
 

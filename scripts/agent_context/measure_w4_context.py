@@ -13,6 +13,7 @@ import hashlib
 import json
 import re
 import sys
+import time
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -157,6 +158,18 @@ def _unmeasured(fixture: Mapping[str, Any], reason: str) -> dict[str, Any]:
         "reserved_margin": None,
         "effective_hard_limit": None,
         "gate": None,
+        "client_identity": None,
+        "client_config_sha256": None,
+        "capability_evidence_id": None,
+        "native_evidence_id": None,
+        "launch_id": None,
+        "client_session_id": None,
+        "generation": None,
+        "channel_id": None,
+        "selected_policy_count": None,
+        "selected_invariant_ids": None,
+        "invariant_delta": "not measured: no canonical row or delivery",
+        "runtime_ms": None,
     }
 
 
@@ -165,6 +178,7 @@ def _measured(
     index: Mapping[str, Any], metadata: Mapping[str, Any], native: Mapping[str, Any],
     gates: Mapping[str, Mapping[str, int | str]], source_set: Sequence[Mapping[str, str]],
 ) -> dict[str, Any]:
+    started = time.perf_counter()
     tasks, operations = _task_request(fixture)
     repository = fixture["owner_repository"]
     resolved = resolve_context(
@@ -207,6 +221,15 @@ def _measured(
         result = "FAIL_HARD_LIMIT"
     elif total > index["budgets"]["preferred_bytes"]:
         result = "PASS_PREFERRED_WARNING"
+    selected_invariants = sorted({
+        invariant
+        for entry in resolved.manifest["entries"]
+        for invariant in metadata["units"]
+        if invariant["id"] == entry["policy_id"]
+        for invariant in invariant["invariant_ids"]
+    })
+    capability_evidence_id = w2b1.canonical_sha256(CAPABILITY_ROW)
+    native_evidence_id = _sha256(root / NATIVE_EVIDENCE)
     return {
         "fixture_id": fixture["fixture_id"],
         "agent": "codex",
@@ -251,6 +274,18 @@ def _measured(
         "reserved_margin": CAPABILITY_ROW["reserved_margin"],
         "effective_hard_limit": accounting["effective_hard_limit"],
         "gate": gate_result,
+        "client_identity": "134063e133f0b4244fa3b251acf973d4fe4b4aeeacbdc135211bf480f59f1477",
+        "client_config_sha256": _sha256(root / ".codex/config.toml"),
+        "capability_evidence_id": capability_evidence_id,
+        "native_evidence_id": native_evidence_id,
+        "launch_id": None,
+        "client_session_id": None,
+        "generation": resolved.manifest["generation"] if "generation" in resolved.manifest else 0,
+        "channel_id": CAPABILITY_ROW["channel_id"],
+        "selected_policy_count": len(resolved.manifest["entries"]),
+        "selected_invariant_ids": selected_invariants,
+        "invariant_delta": "no invariant loss; resolver metadata retained for every selected policy",
+        "runtime_ms": round((time.perf_counter() - started) * 1000, 3),
     }
 
 
@@ -283,7 +318,7 @@ def build_report(root: Path, captured_at: str) -> dict[str, Any]:
         claude_records.append(record)
     return {
         "schema_version": 1,
-        "phase": "4.6",
+        "phase": "9.1",
         "captured_at": captured_at,
         "status": "PASS_WITH_NONBLOCKING_UNMEASURED_FIXTURES",
         "measurement_formula": "verified_native_bytes + serialized_injected_envelope_bytes + other_model_visible_bootstrap_bytes; raw injected bytes are diagnostic only",
@@ -291,6 +326,8 @@ def build_report(root: Path, captured_at: str) -> dict[str, Any]:
         "baseline_evidence": {"path": BASELINE_EVIDENCE, "sha256": _sha256(root / BASELINE_EVIDENCE)},
         "replacement_gates": gates,
         "excluded_layers": ["receipts", "session state", "global client instructions"],
+        "delivery_disposition": "measurement is resolver-only; no launch, client session, receipt, or model acknowledgement was created",
+        "required_rows": [CAPABILITY_ROW],
         "codex_records": records,
         "claude_records": claude_records,
     }

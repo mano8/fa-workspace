@@ -65,13 +65,17 @@ Los directorios anteriores son hijos directos de `fa-workspace`; no son reposito
 
 Usa [`.workspace/README.md`](.workspace/README.md) como punto de entrada. Los archivos principales son [`architecture.md`](.workspace/architecture.md), [`repo-types.json`](.workspace/repo-types.json), [`policy.index.json`](.workspace/policy.index.json), [`context/`](.workspace/context/) y [`contracts/`](.workspace/contracts/).
 
-Antes de trabajar en un repositorio, lee también su propio `AGENTS.md`. Mientras esté activo el modo transitorio, resuelve su selector `migration.v1_bundle` con `repo-types.json` y carga solamente el paquete de compatibilidad ordenado correspondiente. La política de entorno tiene prioridad sobre la política de lenguaje, la arquitectura y los contratos de validación. Los planes, análisis y estados pertenecen a `.workspace/`; no los dupliques en `.codex/` ni `.claude/`.
+Antes de trabajar en un repositorio, lee también su propio `AGENTS.md`. La resolución selecciona `always`, las facetas del repositorio en orden y las tareas explícitas. El formato activo es v2 facetado; el analizador y los selectores transitorios antiguos solo existen como evidencia histórica de rollback. La política de entorno tiene prioridad sobre la política de lenguaje, la arquitectura y los contratos de validación. Los planes, análisis y estados pertenecen a `.workspace/`; no los dupliques en `.codex/` ni `.claude/`.
+
+La guía operativa completa está en [`.workspace/README.md`](.workspace/README.md): propiedad semántica, alcance y autorización de repositorios/tareas, evidencia de capacidades, entrega nativa o inyectada, modos standalone, runtime y recibos seguros, fórmula exacta de bytes, overrides, presupuestos y la diferencia entre contexto de instrucciones, esfuerzo de razonamiento, compresión de salida y precio. La entrega canónica actual solo está verificada para Codex no interactivo en Dev Container; Codex/Claude interactivos son `LIMITED` y Windows/POSIX externo es `UNSUPPORTED`.
 
 <a id="configuracion-especifica-de-herramientas"></a>
 
 ### Configuración específica de herramientas
 
 Codex usa [`AGENTS.md`](AGENTS.md) y [`.codex/README.md`](.codex/README.md); Claude Code usa [`CLAUDE.md`](CLAUDE.md) y [`.claude/README.md`](.claude/README.md). Esas ubicaciones pueden contener flujos de trabajo y estado local propios de cada herramienta, pero no deben redefinir información compartida.
+
+La carga nativa y la entrega inyectada dependen de evidencia por cliente, plataforma y modo. La carga nativa exige hashes coincidentes; la inyección exige desactivar el descubrimiento nativo y un recibo de entrega exacta una sola vez. Los recibos prueban la entrega del launcher, no el comportamiento del modelo. El runtime aislado vive bajo `.workspace/.runtime/` y los logs normales no contienen políticas sin procesar.
 
 El Dev Container instala Codex CLI y la característica de Claude Code. Inicia sesión dentro del contenedor cuando quieras usar cada herramienta. Sus configuraciones se guardan en volúmenes Docker y no se copian de las carpetas de tu equipo anfitrión.
 

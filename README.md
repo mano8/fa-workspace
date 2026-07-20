@@ -60,18 +60,22 @@ Within `fa-workspace`:
 Use [`.workspace/README.md`](.workspace/README.md) as the entry point. The key files are:
 
 - [`architecture.md`](.workspace/architecture.md) — layers and dependency direction;
-- [`repo-types.json`](.workspace/repo-types.json) — v2 direct-child repository classification and its active selector;
-- [`policy.index.json`](.workspace/policy.index.json) — the active v2 policy index and transitional compatibility bundles;
-- [`context/`](.workspace/context/) — language, environment, Git, Docker, and Astro guidance; and
-- [`contracts/`](.workspace/contracts/) — validation-only shared contracts.
+- [`repo-types.json`](.workspace/repo-types.json) — faceted v2 direct-child repository classification;
+- [`policy.index.json`](.workspace/policy.index.json) — the active faceted policy index;
+- [`context/env.md`](.workspace/context/env.md) — environment-profile rules; and
+- [`contracts/`](.workspace/contracts/) — shared delivery and rollout contracts.
 
-When working in a repository, read its own `AGENTS.md` as well as the root workspace entry point. During the active transitional index mode, resolve its `migration.v1_bundle` through `repo-types.json` and load only that ordered compatibility bundle. The environment policy has priority over language policy, architecture, and validation contracts.
+When working in a repository, read its own `AGENTS.md` as well as the root workspace entry point. Resolution selects `always` units, ordered repository facets, then explicitly selected task overlays. The active format is faceted v2; the old transitional parser and selectors are retained only as a historical rollback fixture. The environment policy has priority over language policy, architecture, and validation contracts.
+
+The full operating contract is in [`.workspace/README.md`](.workspace/README.md). It documents semantic ownership, repository/task scope and authorization, capability evidence, native versus injected delivery, standalone modes, secure runtime/receipts, byte accounting, overrides, budgets, and the distinction between instruction context, reasoning effort, output compression, and price. Current canonical delivery is limited to the verified Codex devcontainer non-interactive row; interactive Claude/Codex rows are `LIMITED`, and unavailable Windows/host-POSIX rows are `UNSUPPORTED`.
 
 Plans, analyses, and status artifacts belong in `.workspace/`. Do not duplicate them under `.codex/` or `.claude/`.
 
 ### Tool-specific configuration
 
 Codex uses [`AGENTS.md`](AGENTS.md) and [`.codex/README.md`](.codex/README.md); Claude Code uses [`CLAUDE.md`](CLAUDE.md) and [`.claude/README.md`](.claude/README.md). These locations may contain tool-specific workflows and local state, but they must not redefine shared workspace facts.
+
+Native loading and injected delivery are evidence-backed per client/platform/mode. A native source is accepted only with a matching current native-evidence record; injection requires native discovery to be disabled and an exact-once handoff receipt. Receipts prove launcher handoff, not model behavior. Runtime artifacts are isolated below ignored `.workspace/.runtime/` and normal logs contain metadata/hashes, never raw policies.
 
 The Dev Container installs Codex CLI and the Claude Code feature. Sign in to either tool inside the container when you want to use it. Their container configuration is held in named Docker volumes, not copied from your host account directories.
 

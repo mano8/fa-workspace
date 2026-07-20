@@ -75,7 +75,6 @@ class ScopedResolverTests(unittest.TestCase):
                     "kind": "python",
                     "layer": "platform",
                     "facets": ["a"],
-                    "migration": {"v1_bundle": "python"},
                 },
                 {
                     "id": "repo-b",
@@ -83,7 +82,6 @@ class ScopedResolverTests(unittest.TestCase):
                     "kind": "python",
                     "layer": "platform",
                     "facets": ["b"],
-                    "migration": {"v1_bundle": "python"},
                 },
             ],
         }

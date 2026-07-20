@@ -216,25 +216,7 @@ def _identified_digest(value: dict[str, Any], identifier_field: str) -> str:
     return canonical_sha256(without_identifier)
 
 
-def validate_registry_v1(value: Any) -> None:
-    registry = _object(value, "registry v1")
-    if not registry:
-        _fail("registry v1 must not be empty")
-    for repository_id, bundle in registry.items():
-        _identifier(repository_id, "registry v1 repository id")
-        _identifier(bundle, f"registry v1 bundle for {repository_id}")
-
-
-def validate_policy_index_v1(value: Any) -> None:
-    index = _object(value, "policy index v1")
-    if not index:
-        _fail("policy index v1 must not be empty")
-    for bundle, paths in index.items():
-        _identifier(bundle, "policy index v1 bundle id")
-        _ordered_paths(paths, f"policy index v1 bundle {bundle}")
-
-
-def validate_registry_v2(value: Any, *, index_mode: str | None = None) -> None:
+def validate_registry_v2(value: Any) -> None:
     registry = _closed(value, {"schema_version", "repositories"}, "registry v2")
     if registry["schema_version"] != 2:
         _fail("registry v2 schema_version must be 2")
@@ -244,10 +226,7 @@ def validate_registry_v2(value: Any, *, index_mode: str | None = None) -> None:
     ids: list[str] = []
     paths: list[str] = []
     for index, repository in enumerate(repositories):
-        # W4 keeps the rollback selector while the faceted index is activated.
-        # Phase 9.2 owns its eventual removal, so live v2 repositories carry the
-        # same closed migration object in both supported index modes.
-        repo = _closed(repository, {"id", "path", "kind", "layer", "facets", "migration"}, f"registry v2 repositories[{index}]")
+        repo = _closed(repository, {"id", "path", "kind", "layer", "facets"}, f"registry v2 repositories[{index}]")
         _identifier(repo["id"], f"registry v2 repositories[{index}].id")
         _canonical_path(repo["path"], f"registry v2 repositories[{index}].path")
         if "/" in repo["path"]:
@@ -256,8 +235,6 @@ def validate_registry_v2(value: Any, *, index_mode: str | None = None) -> None:
         if repo["layer"] not in {"platform", "service", "client", "shared"}:
             _fail(f"registry v2 repositories[{index}].layer is invalid")
         _ordered_ids(repo["facets"], f"registry v2 repositories[{index}].facets")
-        migration = _closed(repo["migration"], {"v1_bundle"}, f"registry v2 repositories[{index}].migration")
-        _identifier(migration["v1_bundle"], f"registry v2 repositories[{index}].migration.v1_bundle")
         ids.append(repo["id"])
         paths.append(repo["path"])
     if ids != sorted(ids):
@@ -278,19 +255,16 @@ def _id_to_ordered_ids_map(value: Any, field: str, *, paths: bool = False) -> No
             _ordered_ids(items, f"{field}.{key}")
 
 
-def validate_policy_index_v2(value: Any, *, v1_policy_index: Any | None = None) -> None:
-    index = _object(value, "policy index v2")
-    base_fields = {"schema_version", "mode", "budgets", "always", "facet_ids", "facets", "tasks", "exclusions"}
-    mode = index.get("mode")
-    if mode == "transitional-v1-bundles":
-        expected = base_fields | {"compatibility_bundles"}
-    elif mode == "faceted":
-        expected = base_fields
-    else:
-        _fail("policy index v2 mode must be transitional-v1-bundles or faceted")
-    _closed(index, expected, "policy index v2")
+def validate_policy_index_v2(value: Any) -> None:
+    index = _closed(
+        value,
+        {"schema_version", "mode", "budgets", "always", "facet_ids", "facets", "tasks", "exclusions"},
+        "policy index v2",
+    )
     if index["schema_version"] != 2:
         _fail("policy index v2 schema_version must be 2")
+    if index["mode"] != "faceted":
+        _fail("policy index v2 mode must be faceted")
     budgets = _closed(index["budgets"], {"preferred_bytes", "hard_bytes"}, "policy index v2 budgets")
     if budgets["preferred_bytes"] != 24_576 or budgets["hard_bytes"] != 32_768:
         _fail("policy index v2 budgets must be the frozen 24576/32768 values")
@@ -309,66 +283,19 @@ def validate_policy_index_v2(value: Any, *, v1_policy_index: Any | None = None) 
         if task_object["authorization"] not in AUTHORIZATION:
             _fail(f"policy index v2 tasks.{task_id}.authorization is invalid")
     _id_to_ordered_ids_map(index["exclusions"], "policy index v2 exclusions")
-    if mode == "transitional-v1-bundles":
-        if any(index[field] for field in ("always", "facet_ids", "facets", "tasks", "exclusions")):
-            _fail("transitional-v1-bundles policy fields must be empty")
-        _id_to_ordered_ids_map(index["compatibility_bundles"], "policy index v2 compatibility_bundles", paths=True)
-        if v1_policy_index is not None:
-            validate_policy_index_v1(v1_policy_index)
-            if index["compatibility_bundles"] != v1_policy_index:
-                _fail("compatibility_bundles must exactly mirror the supplied v1 policy index")
-
-
 def validate_workspace_configuration_v2(registry_value: Any, index_value: Any) -> None:
-    """Validate the coupled active v2 registry and policy-index configuration.
-
-    W3 keeps the legacy policy bundles only as data inside the transitional v2
-    index.  This cross-file check is the migration boundary: each repository
-    selector must resolve to one of those embedded bundles, and selectors are
-    forbidden once the faceted index is active.
-    """
+    """Validate the sole active faceted v2 registry and policy-index pair."""
     index = _object(index_value, "policy index v2")
-    mode = index.get("mode")
     validate_policy_index_v2(index)
-    validate_registry_v2(registry_value, index_mode=mode)
-    if mode != "transitional-v1-bundles":
-        known_facets = set(index["facet_ids"])
-        for repository in registry_value["repositories"]:
-            unknown = set(repository["facets"]) - known_facets
-            if unknown:
-                _fail(
-                    f"registry v2 repository has undeclared facets: {repository['id']}",
-                    code="E_UNKNOWN_ID",
-                )
-        return
-    bundles = index["compatibility_bundles"]
+    validate_registry_v2(registry_value)
+    known_facets = set(index["facet_ids"])
     for repository in registry_value["repositories"]:
-        bundle = repository["migration"]["v1_bundle"]
-        if bundle not in bundles:
+        unknown = set(repository["facets"]) - known_facets
+        if unknown:
             _fail(
-                f"registry v2 migration selector has no compatibility bundle: {repository['id']}",
+                f"registry v2 repository has undeclared facets: {repository['id']}",
                 code="E_UNKNOWN_ID",
             )
-
-
-def project_transitional_v1_configuration(
-    registry_value: Any, index_value: Any
-) -> tuple[dict[str, str], dict[str, list[str]]]:
-    """Return the reversible W3 v1 projection without changing authoritative files."""
-    validate_workspace_configuration_v2(registry_value, index_value)
-    if index_value["mode"] != "transitional-v1-bundles":
-        _fail("only a transitional v2 configuration has a v1 compatibility projection")
-    registry = {
-        repository["id"]: repository["migration"]["v1_bundle"]
-        for repository in registry_value["repositories"]
-    }
-    bundles = {
-        bundle: list(paths)
-        for bundle, paths in index_value["compatibility_bundles"].items()
-    }
-    validate_registry_v1(registry)
-    validate_policy_index_v1(bundles)
-    return registry, bundles
 
 
 def validate_policy_unit(value: Any) -> None:

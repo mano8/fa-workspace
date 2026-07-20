@@ -3,7 +3,7 @@
 This module deliberately has no client hooks, launcher, or real transport
 adapter.  It turns a W2b2 faceted ``ResolvedContext`` into an isolated prepared
 runtime state and accepts a transport callback only for the exact final
-handoff.  The active v2 transitional resolver remains path-selection only
+handoff. The active faceted resolver remains path-selection only
 until a later adapter explicitly enables a demonstrated client mode.
 """
 

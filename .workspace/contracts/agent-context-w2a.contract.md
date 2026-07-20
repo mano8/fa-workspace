@@ -91,23 +91,12 @@ obligations merely by appearing in the matrix.
 
 ## 3. Registry and policy-index shapes
 
-### 3.1 Historical v1 compatibility shape
+### 3.1 Historical migration fixture
 
-Before the completed atomic W3 migration, the registry and index used these
-flat v1 shapes:
-
-- `.workspace/repo-types.json` is a closed JSON object mapping a repository
-  identifier directly to one policy-bundle identifier string.
-- `.workspace/policy.index.json` is a closed JSON object mapping a policy-bundle
-  identifier to an ordered, non-empty array of unique workspace-relative policy
-  paths.
-- Every v1 registry bundle must exist in the v1 policy index. Unknown bundles,
-  missing files, duplicate paths, non-string values, and unregistered targets
-  fail.
-
-They remain only as the exact rollback projection and compatibility fixture.
-The active workspace configuration is now the coupled transitional v2 registry
-and index in Sections 3.2 and 3.3; there is no second authoritative v1 file.
+`scripts/agent_context/fixtures/historical/v1-routing-2026-07-19.json` is a
+read-only historical record of the pre-W3 routing data. It is not parsed by a
+production validator, resolver, adapter, or launcher. Restoring the W3 adapter
+requires a Git rollback; no active configuration accepts the historical shape.
 
 ### 3.2 Registry v2
 
@@ -122,8 +111,7 @@ Registry v2 is one closed object with exactly these fields:
       "path": "direct-child-path",
       "kind": "repository-kind",
       "layer": "platform|service|client|shared",
-      "facets": ["ordered-facet-id"],
-      "migration": {"v1_bundle": "bundle-id"}
+      "facets": ["ordered-facet-id"]
     }
   ]
 }
@@ -132,18 +120,16 @@ Registry v2 is one closed object with exactly these fields:
 `repositories` is sorted by `id`; `id` and `path` are unique. `path` must name a
 direct child Git repository and must equal its canonical repository root.
 Internal paths and infrastructure directories owned by a child are rejected.
-`migration` remains required while W3 rollback compatibility is retained,
-including the interim faceted W4 index, and is removed only in Step 9.2. It
-contains only `v1_bundle`; the active faceted resolver does not select it.
+The registry rejects all migration and compatibility fields.
 
 ### 3.3 Policy-index v2
 
-Both variants share this exact closed prefix:
+The active policy index is one closed object with this exact shape:
 
 ```json
 {
   "schema_version": 2,
-  "mode": "transitional-v1-bundles|faceted",
+  "mode": "faceted",
   "budgets": {
     "preferred_bytes": 24576,
     "hard_bytes": 32768
@@ -162,19 +148,10 @@ least one policy unit; a declared-but-unmapped facet intentionally contributes
 no shared policy, avoiding empty slices. Every registered repository facet must
 be declared in `facet_ids`.
 
-In `transitional-v1-bundles` mode, `always`, `facet_ids`, `facets`, `tasks`, and `exclusions`
-must be empty and one additional field is required:
-
-```json
-{"compatibility_bundles": {"v1-bundle-id": ["policy-unit"]}}
-```
-
-Its keys and ordered file arrays must exactly match the historical v1 rollback
-projection. Every active registry `migration.v1_bundle` selector must name one
-of these embedded bundles. In `faceted` mode, `compatibility_bundles` is
-forbidden. Map keys are serialized in JCS order. Policy arrays retain declared order; selected facet, task,
+All map keys are serialized in JCS order. Policy arrays retain declared order; selected facet, task,
 repository, exclusion, conflict, invariant, override, and capability sets use
-`canonical_set` ordering.
+`canonical_set` ordering. The index rejects all compatibility-bundle and
+transitional-mode fields.
 
 ### 3.4 Policy unit and authority
 
@@ -514,8 +491,8 @@ duplicate handoff, and unsafe interrupted cleanup.
 
 The 2026-07-19 capability artifact satisfies the W2a activation gate for the
 single required row. Steps 2.2-2.5 may implement that row within their separate
-W2b boundaries. The completed W3 switch makes the transitional v2
-configuration authoritative; it does not enable a transport or canonical
+W2b boundaries. The completed W3 switch makes the faceted v2 configuration
+authoritative; it does not enable a transport or canonical
 delivery adapter.
 
 Any change to the required Codex binary/version, devcontainer lock, project

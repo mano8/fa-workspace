@@ -113,7 +113,7 @@ def validate_rollout_record(
     if record["frozen_on"] != "2026-07-20":
         _fail("rollout record frozen date is unexpected")
     try:
-        w2b1.validate_registry_v2(registry, index_mode="faceted")
+        w2b1.validate_registry_v2(registry)
     except w2b1.AgentContextError as error:
         _fail(f"registry is invalid for child rollout: {error}")
 
@@ -237,7 +237,7 @@ def resolve_child_instruction_context(
                 workspace_root, ".workspace/repo-types.json", "workspace registry"
             ).read_bytes()
         )
-        w2b1.validate_registry_v2(registry, index_mode="faceted")
+        w2b1.validate_registry_v2(registry)
     except w2b1.AgentContextError as error:
         _fail(f"workspace registry is invalid: {error}")
     matches = [item for item in registry["repositories"] if item["id"] == repository_id]

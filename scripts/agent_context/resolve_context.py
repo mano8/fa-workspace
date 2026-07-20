@@ -1,9 +1,8 @@
-"""Inactive W2b2 scoped context resolver.
+"""Inactive W2b2 scoped context resolver for the active faceted v2 schema.
 
-The resolver reads explicit v2 fixture inputs and produces deterministic
-manifests plus injected envelopes.  Its default mode resolves active v2
-transitional compatibility selectors; its faceted mode intentionally does not
-activate a client transport or write runtime state.
+The resolver reads explicit fixture inputs and produces deterministic manifests
+plus injected envelopes. It does not activate a client transport or write
+runtime state.
 """
 
 from __future__ import annotations
@@ -105,26 +104,6 @@ class ResolvedContext:
     envelope_sha256: str
 
 
-@dataclass(frozen=True)
-class CompatibilityResolution:
-    """Exact legacy-bundle selection from the active transitional v2 files.
-
-    This is intentionally source-path selection only.  Phase 4 owns policy
-    units, authority metadata, and faceted manifest/envelope resolution.
-    """
-
-    repositories: tuple[str, ...]
-    entries: tuple[dict[str, Any], ...]
-
-    def as_dict(self) -> dict[str, Any]:
-        return {
-            "schema_version": 2,
-            "mode": "transitional-v1-bundles",
-            "repositories": list(self.repositories),
-            "entries": list(self.entries),
-        }
-
-
 def _fail(message: str, code: str) -> NoReturn:
     raise w2b1.AgentContextError(code, message)
 
@@ -171,41 +150,6 @@ def _canonical_input(values: Sequence[str], field: str) -> tuple[str, ...]:
     for value in result:
         _identifier(value, field, "E_USAGE")
     return result
-
-
-def resolve_compatibility_context(
-    registry: Mapping[str, Any], policy_index: Mapping[str, Any], repositories: Sequence[str]
-) -> CompatibilityResolution:
-    """Resolve v2 transitional selectors to their unchanged ordered paths.
-
-    The repository set is canonicalized independently of CLI argument order;
-    the paths inside every selected bundle retain their declared legacy order.
-    """
-    try:
-        w2b1.validate_workspace_configuration_v2(registry, policy_index)
-    except w2b1.AgentContextError as error:
-        _fail(error.message, error.code)
-    if policy_index["mode"] != "transitional-v1-bundles":
-        _fail(
-            "compatibility resolution is unavailable once the faceted policy index is active",
-            "E_SCOPE_UNAVAILABLE",
-        )
-    repository_ids = _canonical_input(repositories, "repository")
-    by_id = {item["id"]: item for item in registry["repositories"]}
-    entries: list[dict[str, Any]] = []
-    for repository_id in repository_ids:
-        repository = by_id.get(repository_id)
-        if repository is None:
-            _fail(f"unknown repository: {repository_id}", "E_UNKNOWN_ID")
-        bundle = repository["migration"]["v1_bundle"]
-        entries.append(
-            {
-                "repository_id": repository_id,
-                "bundle": bundle,
-                "paths": list(policy_index["compatibility_bundles"][bundle]),
-            }
-        )
-    return CompatibilityResolution(repository_ids, tuple(entries))
 
 
 def _read_source(root: Path, path: str) -> bytes:
@@ -275,7 +219,7 @@ def _validate_registry_scope(
     registry: Mapping[str, Any], units: Mapping[str, Mapping[str, Any]]
 ) -> dict[str, str]:
     try:
-        w2b1.validate_registry_v2(registry, index_mode="faceted")
+        w2b1.validate_registry_v2(registry)
     except w2b1.AgentContextError as error:
         _fail(error.message, error.code)
     paths = {item["id"]: item["path"] for item in registry["repositories"]}
@@ -852,7 +796,7 @@ def _load_json(path: str) -> Mapping[str, Any]:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Resolve v2 transitional bundle paths or inactive W2b2 agent context.")
+    parser = argparse.ArgumentParser(description="Resolve inactive W2b2 faceted agent context.")
     parser.add_argument("--root")
     parser.add_argument("--registry", required=True)
     parser.add_argument("--policy-index", required=True)
@@ -876,7 +820,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--generation", type=int, default=0)
     parser.add_argument("--other-visible-bootstrap-bytes", type=int, default=0)
     parser.add_argument(
-        "--format", choices=("compatibility", "manifest", "envelope", "resolution"), default="compatibility"
+        "--format", choices=("manifest", "envelope", "resolution"), default="resolution"
     )
     return parser
 
@@ -887,13 +831,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         registry = _load_json(args.registry)
         policy_index = _load_json(args.policy_index)
-        if args.format == "compatibility":
-            sys.stdout.buffer.write(
-                w2b1.canonical_bytes(
-                    resolve_compatibility_context(registry, policy_index, args.repository).as_dict()
-                )
-            )
-            return 0
         required = {
             "--root": args.root,
             "--policy-metadata": args.policy_metadata,
@@ -905,7 +842,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         }
         missing = [option for option, value in required.items() if value is None]
         if missing:
-            _fail(f"{', '.join(missing)} is required for inactive faceted resolution", "E_USAGE")
+            _fail(f"{', '.join(missing)} is required for faceted resolution", "E_USAGE")
         request = ResolutionRequest(
             root=Path(args.root),
             registry=registry,

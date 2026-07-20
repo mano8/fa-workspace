@@ -55,9 +55,9 @@ class W6CodexAdapterTests(unittest.TestCase):
         (workspace / "repo-types.json").write_text(json.dumps({
             "schema_version": 2, "repositories": [
                 {"id": "repo-a", "path": "repo-a", "kind": "sdk", "layer": "platform",
-                 "facets": ["python"], "migration": {"v1_bundle": "python"}},
+                 "facets": ["python"]},
                 {"id": "repo-b", "path": "repo-b", "kind": "sdk", "layer": "platform",
-                 "facets": ["python-b"], "migration": {"v1_bundle": "python"}},
+                 "facets": ["python-b"]},
             ],
         }), encoding="utf-8")
         (workspace / "policy.index.json").write_text(json.dumps({
@@ -107,13 +107,17 @@ class W6CodexAdapterTests(unittest.TestCase):
             if self.mutate_before_transport and self.version_calls == 2:
                 (self.repo / "AGENTS.md").write_text("changed after inspection\n", encoding="utf-8")
             return CommandResult(0, b"codex-cli fixture\n")
-        if command[1:3] == ("debug", "prompt-input"):
-            marker = command[3]
+        if command[3:5] == ("debug", "prompt-input"):
+            self.assertEqual(command[1], "-c")
+            self.assertTrue(command[2].startswith("developer_instructions="))
+            marker = command[5]
             source = (cwd / "AGENTS.md").read_text()
             texts = [marker, f"# AGENTS.md instructions\n\n<INSTRUCTIONS>\n{source}</INSTRUCTIONS>"]
             messages = [{"content": [{"type": "input_text", "text": text}]} for text in texts]
             return CommandResult(0, json.dumps(messages).encode())
-        if command[1:3] == ("exec", "--strict-config"):
+        if command[3:5] == ("exec", "--strict-config"):
+            self.assertEqual(command[1], "-c")
+            self.assertTrue(command[2].startswith("developer_instructions="))
             self.exec_calls += 1
             return CommandResult(0, b'{"type":"thread.started","thread_id":"thread.fixture"}\n')
         self.fail(f"unexpected Codex command: {command}")

@@ -35,8 +35,6 @@ class W4InvariantTests(unittest.TestCase):
         shared.mkdir(parents=True)
         for name in ("architecture.md", "invariants.json"):
             shutil.copy2(WORKSPACE / ".workspace" / name, shared / name)
-        shutil.copytree(WORKSPACE / ".workspace/context", shared / "context")
-        shutil.copytree(WORKSPACE / ".workspace/contracts", shared / "contracts")
 
     def test_current_workspace_has_one_definition_per_step_4_1_candidate(self) -> None:
         report = validate_workspace_invariants(WORKSPACE)
@@ -49,14 +47,14 @@ class W4InvariantTests(unittest.TestCase):
         # Astro's retained compatibility core now omits task procedures and
         # their duplicate invariant links; the active task metadata carries
         # task-specific invariant relationships instead.
-        self.assertGreaterEqual(report.reference_count, 11)
+        self.assertGreaterEqual(report.reference_count, 6)
         self.assertEqual(report.tracked_tool_copy_count, 0)
 
     def test_duplicate_definition_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self._copy_policy_tree(root)
-            source = root / ".workspace/context/python.md"
+            source = root / ".workspace/architecture.md"
             source.write_text(
                 source.read_text(encoding="utf-8")
                 + "\n### `SEC-NO-TRACKED-SECRETS`\n\nDuplicate.\n",
@@ -70,7 +68,7 @@ class W4InvariantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self._copy_policy_tree(root)
-            source = root / ".workspace/context/python.md"
+            source = root / ".workspace/architecture.md"
             source.write_text(
                 source.read_text(encoding="utf-8")
                 + "\n[`SEC-UNKNOWN-INVARIANT`](../architecture.md#sec-unknown-invariant).\n",

@@ -370,7 +370,9 @@ class CodexDeliveryAdapter:
         visible_parts: list[str] = []
         for directory in (root, *repositories):
             result = self.runner(
-                (self.codex_command, "debug", "prompt-input", marker, "-c", override), directory,
+                # ``-c`` is a top-level Codex option.  Keeping it before the
+                # debug subcommand is required by the evidence-pinned CLI.
+                (self.codex_command, "-c", override, "debug", "prompt-input", marker), directory,
             )
             if result.returncode != 0:
                 _fail("E_NATIVE_EVIDENCE", "Codex native prompt inspection did not complete")
@@ -478,8 +480,8 @@ class CodexExecTransport(TransportAdapter):
                 _fail("E_NATIVE_EVIDENCE", "native instruction source changed before transport")
         override = f"developer_instructions={json.dumps(content, ensure_ascii=False)}"
         result = self.runner(
-            (self.codex_command, "exec", "--strict-config", "--json", "-C", str(self.repository),
-             "-c", override, self.prompt), self.repository,
+            (self.codex_command, "-c", override, "exec", "--strict-config", "--json",
+             "-C", str(self.repository), self.prompt), self.repository,
         )
         self.output = result.stdout
         if result.returncode != 0:

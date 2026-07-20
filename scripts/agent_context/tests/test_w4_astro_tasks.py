@@ -80,12 +80,12 @@ class W4AstroTaskTests(unittest.TestCase):
             )
         )
 
-    def test_core_has_no_opt_in_procedure(self) -> None:
-        core = (WORKSPACE / ".workspace/context/astro-plugin.md").read_text(
+    def test_active_plugin_policy_has_no_opt_in_procedure(self) -> None:
+        core = (WORKSPACE / ".workspace/policies/facets/kind-astro-plugin.md").read_text(
             encoding="utf-8"
         )
-        self.assertIn("Core invariants", core)
-        self.assertIn("does not prescribe those procedures", core)
+        self.assertIn("business integration and headless client package", core)
+        self.assertIn("package shape independent", core)
         for heading in (
             "Host-registration contract",
             "UI delivery",

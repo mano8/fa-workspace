@@ -155,6 +155,18 @@ back by removing that one command-line flag.
 "$M8_PYTHON" scripts/agent_context/budget_promotion.py --workspace . --enforce-preferred
 ```
 
+Phase 8 freezes the standalone child instruction template and the exact
+C01--C16 three-path allowlists in the root-owned child rollout contract. The
+validator checks the closed record without requiring child clones; the focused
+fixture rehashes each pending classified input and validates any completed
+boundary's three-file local owner, plus parent-found optional enhancement and
+parent-absent local-only selection for Codex and Claude. It does not run child
+CI or authorize any child edit:
+
+```bash
+"$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w8_child_rollout -v
+```
+
 ```bash
 scripts/codex-repo.sh --repository auth-sdk-m8 "inspect the repository"
 scripts/codex-repo.sh --repository auth-sdk-m8 --repository media-sdk-m8 \

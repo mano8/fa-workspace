@@ -63,6 +63,18 @@ class WorkspaceValidatorTests(unittest.TestCase):
         with self.assertRaisesRegex(WorkspaceValidationError, "capability-evidence hash"):
             validate_workspace(self.root)
 
+    def test_child_rollout_contract_drift_fails_without_child_execution(self) -> None:
+        contract = self.root / ".workspace/contracts/child-repository-rollout-v1.boundaries.json"
+        contract.write_text(
+            contract.read_text(encoding="utf-8").replace(
+                '"REPOSITORY_CONTEXT.md"]', '"REPOSITORY_CONTEXT.md", "pyproject.toml"]', 1
+            ),
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(WorkspaceValidationError, "three-path allowlist"):
+            validate_workspace(self.root)
+
     def test_partial_runtime_artifacts_are_never_accepted_as_canonical_parity(self) -> None:
         artifact = self.root / "manifest.json"
         artifact.write_text("{}\n", encoding="utf-8", newline="\n")

@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "contract_id": "m8-child-repository-rollout-v1",
+  "frozen_on": "2026-07-20",
+  "source_evidence": [
+    {
+      "path": ".workspace/policy.index.json",
+      "sha256": "9b88858a809c28012539ca260109e8c534c36381661fadcd1b3b728312c5540e"
+    },
+    {
+      "path": ".workspace/policy.metadata.json",
+      "sha256": "6a8a03d2c7e85d34aae44b3f7f3a30e775b9b5974d99342890aa70be18fe0705"
+    },
+    {
+      "path": ".workspace/repo-types.json",
+      "sha256": "69698bc2af3b50e8566fedc89e5fc475a772d8d808abec1c2d7199cbbc00b823"
+    }
+  ],
+  "boundaries": [
+    {
+      "boundary_id": "C01",
+      "phase_step": "8.2",
+      "repository_id": "auth-sdk-m8",
+      "classification": "neutral-semantic-duplicate",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 636, "sha256": "52d489275b03a45edd63a634dccde190f35d80ba0d9604a9e7d170ef5fe98cc1"},
+        {"path": "CLAUDE.md", "bytes": 633, "sha256": "754ccd9b7810ba4f75d849df80de5fe04e92f02146e532a419aca5d02c4d7147"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["remove leading BOM", "replace singular Python bundle wording with optional faceted enhancement"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C02",
+      "phase_step": "8.3",
+      "repository_id": "media-sdk-m8",
+      "classification": "neutral-semantic-duplicate",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 2420, "sha256": "8b50d9dda37740f71429d763a4009e7d2c0e86a9eac0e71f3ce09ecdb3f0c599"},
+        {"path": "CLAUDE.md", "bytes": 2419, "sha256": "294336e3e5db9741d9bcfda3402de4c9b51d15fb994abe993957cb44ff749352"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["remove absolute parent and root-agent paths", "keep release and quality procedures conditional", "normalize typography without semantic change"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C03",
+      "phase_step": "8.4",
+      "repository_id": "fastapi-m8",
+      "classification": "neutral-semantic-duplicate",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 643, "sha256": "642b4efd85ab99f886ca859e1dcbdefa1a5958885b6c243a4fb396a7371c259e"},
+        {"path": "CLAUDE.md", "bytes": 639, "sha256": "1b46e98c62be1012e92bf69e35ac5f01dc8aa26b082dc687de0569f41588fa71"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["remove stray terminal backtick", "preserve indirect SDK integration without direct service coupling"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C04",
+      "phase_step": "8.5",
+      "repository_id": "imgtools_m8",
+      "classification": "neutral-semantic-duplicate",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 355, "sha256": "af1f429b00784580f6665d9dde1a30b86e3bdf2594f02d7357f14ee77133c7ac"},
+        {"path": "CLAUDE.md", "bytes": 350, "sha256": "768e230c06e1e3033c7a08fe98c13e6f32f70b65952f37fb56f25f5677683998"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["remove leading BOM", "replace absolute parent authority with optional enhancement"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C05",
+      "phase_step": "8.6",
+      "repository_id": "security-tests-m8",
+      "classification": "neutral-semantic-duplicate",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 698, "sha256": "3776e9029b7187b508c8d6ff20ee5bd05e5a80e770f86e39c6a4d2dcaed126d5"},
+        {"path": "CLAUDE.md", "bytes": 695, "sha256": "7c706e437f61c030d3200cc9713b557aa318a3e8ea489a0b95a5ffdca668f61a"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["perform security-sensitive semantic review", "preserve child-owned test boundaries", "remove absolute parent authority"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C06",
+      "phase_step": "8.7",
+      "repository_id": "fa-auth-m8",
+      "classification": "neutral-asymmetric",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 427, "sha256": "14916437c172e684ea64b1f6e297b787a6a87a79cb040f69197d21e84021eea5"},
+        {"path": "CLAUDE.md", "bytes": 728, "sha256": "a978ab15a7e6f2bef16554f29d0afabcbb49abadc1d6ad4112f646479a3d1ae5"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["re-review current two-byte drift from Step 5.1 evidence", "preserve example version alignment in repository-relative form", "perform auth-sensitive semantic review"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C07",
+      "phase_step": "8.8",
+      "repository_id": "media-service-m8",
+      "classification": "neutral-semantic-duplicate",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 346, "sha256": "0e32c766cdef7f15e2894ecb1a886320d5ef7388246587a985da87241ab1a345"},
+        {"path": "CLAUDE.md", "bytes": 341, "sha256": "7fcfd9eb03cc62aebfbf70500ca2608d2206307e89376e267c2c97aedf675540"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["replace absolute parent authority with optional enhancement"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C08",
+      "phase_step": "8.9",
+      "repository_id": "media-worker-m8",
+      "classification": "neutral-semantic-duplicate",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 997, "sha256": "88ca4cfeb851979e2fdd4a27725073a53fafcdf901f24afb01b8c1f6a58524d4"},
+        {"path": "CLAUDE.md", "bytes": 998, "sha256": "957107801bd735e985397da4c542d6832c6b9d38527fb2d9aeb588b3d25308df"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["preserve contract and HTTP reporting implications", "preserve worker-only dependency boundaries", "remove absolute parent authority"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C09",
+      "phase_step": "8.10",
+      "repository_id": "prompt-engine-m8",
+      "classification": "neutral-semantic-duplicate",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 345, "sha256": "35b406358e5becca08190d1ae69d5040fb361ddf1a447200d2f23fa7ab873553"},
+        {"path": "CLAUDE.md", "bytes": 342, "sha256": "b3b310d2f15a7ca979b1f3c4d54231b9e49c773d650873fb98203a0076981dfe"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["replace absolute parent authority with optional enhancement"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C10",
+      "phase_step": "8.11",
+      "repository_id": "reparto-docente-m8",
+      "classification": "neutral-asymmetric",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 800, "sha256": "eb1cd6cca3c847b3100a952ce89d37016acd5598af503b1ea8809c6cfaca2e10"},
+        {"path": "CLAUDE.md", "bytes": 2069, "sha256": "e84ce8293ec5b9494cc0cd0eb2ae356bb74409ce826d2b46387ab78fd8e1fc40"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["remove host-specific environment and user-profile assumptions", "merge asymmetric domain facts", "preserve portable conditional quality guidance"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C11",
+      "phase_step": "8.12",
+      "repository_id": "fa-ui-m8",
+      "classification": "neutral-asymmetric",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 2025, "sha256": "7c4ca8805bd42d3354c926c4a9c4359e145f0a44b9c4a3fc151c70f11ae7c7f4"},
+        {"path": "CLAUDE.md", "bytes": 3542, "sha256": "9127b0c9b54116b6410c9330de57c3edd8ed9f5494d92e24ce2a3a7d4f3d8353"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["use live app layout and reject nonexistent root layout", "keep app internal and unregistered", "keep host procedures task-conditional"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C12",
+      "phase_step": "8.13",
+      "repository_id": "astro-ui-m8",
+      "classification": "neutral-asymmetric",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 1912, "sha256": "9f42c20d30ee3a364062f0e8224c1a13d2325f2ee9a596f74013a96527f6af13"},
+        {"path": "CLAUDE.md", "bytes": 2009, "sha256": "1aa3c5021cbe45e9770b8961550cc6573e72d4e44e8e6175dfce289bcab81873"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["use active ui-library classification", "remove retired type and direct parent policy references", "merge shared-UI facts once"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C13",
+      "phase_step": "8.14",
+      "repository_id": "astro-auth-m8",
+      "classification": "neutral-asymmetric",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 1337, "sha256": "6175a617fb24c1d9194aa84e08f1acf378a699825fa371d6770779885fcc8c12"},
+        {"path": "CLAUDE.md", "bytes": 1793, "sha256": "998df4d069f4de55851c46673bdb02fede5528b6edbd6507c7a805ef6860e9a6"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["perform auth-sensitive asymmetric merge", "remove mandatory parent and direct policy references", "preserve stable adapter and token implications"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C14",
+      "phase_step": "8.15",
+      "repository_id": "astro-media-m8",
+      "classification": "neutral-asymmetric",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 1474, "sha256": "5d65ca62cee1965deeb46528fe7ee861c999dadd4aac665173349523d4c9c6c2"},
+        {"path": "CLAUDE.md", "bytes": 1987, "sha256": "ab8685150044ba086604dd7d25043abc8d1d063bf5addce4a4ee8a916bb4b969"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["merge asymmetric media plugin facts", "remove mandatory parent and direct policy references", "preserve server-only and admin boundaries"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C15",
+      "phase_step": "8.16",
+      "repository_id": "astro-prompt-m8",
+      "classification": "neutral-asymmetric",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 1473, "sha256": "0f934b8fbd92aca4a0c7d84db8b0a98da560c69664f24301d63474fad9c7f580"},
+        {"path": "CLAUDE.md", "bytes": 2371, "sha256": "13f17833347a029ff4021f1855188f3ddcbc0d828ae1f5ecd32a6d58448b9e36"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["merge asymmetric prompt plugin facts", "remove mandatory parent and direct policy references", "preserve server-only and registry boundaries"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C16",
+      "phase_step": "8.17",
+      "repository_id": "astro-reparto-m8",
+      "classification": "neutral-asymmetric",
+      "decision": "extract-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 1239, "sha256": "2aabbba69cb61b881b1e4a5b9d0ae4e8af124710346ce2deb77c534cbacc7719"},
+        {"path": "CLAUDE.md", "bytes": 3979, "sha256": "7d121be3fa1e28995b8019b5a08f9a626296a9793d0c1b90aed6d14c2f04447e"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["merge detailed asymmetric reparto plugin facts", "remove mandatory parent and direct policy references", "preserve consumer-owned configuration"],
+      "observed_auxiliary_sources": []
+    }
+  ]
+}

@@ -37,6 +37,7 @@ jobs:
               '.workspace/policy.index.json',
               '.workspace/policy.metadata.json',
               '.workspace/invariants.json',
+              '.workspace/contracts/child-repository-rollout-v1.boundaries.json',
               '.claude/settings.json',
           ):
               json.loads((root / relative_path).read_text(encoding='utf-8'))

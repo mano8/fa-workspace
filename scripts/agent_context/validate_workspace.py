@@ -23,6 +23,7 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from agent_context import w2b1
+from agent_context import child_rollout
 from agent_context import codex_adapter
 from agent_context import resolve_context
 from agent_context.validate_claude_settings import validate_claude_settings
@@ -40,6 +41,8 @@ ROOT_INPUTS = (
     Path(".workspace/repo-types.json"), Path(".workspace/policy.index.json"),
     Path(".workspace/policy.metadata.json"), Path(".workspace/invariants.json"),
     Path(".workspace/contracts/agent-context-w2a.contract.md"),
+    Path(".workspace/contracts/child-repository-rollout-v1.contract.md"),
+    Path(".workspace/contracts/child-repository-rollout-v1.boundaries.json"),
     Path("scripts/codex-repo.sh"), Path("scripts/codex-repo.ps1"),
 )
 
@@ -267,8 +270,12 @@ def validate_workspace(
         registry = w2b1.parse_strict_json((workspace / ".workspace/repo-types.json").read_bytes())
         index = w2b1.parse_strict_json((workspace / ".workspace/policy.index.json").read_bytes())
         metadata = w2b1.parse_strict_json((workspace / ".workspace/policy.metadata.json").read_bytes())
+        rollout_record = w2b1.parse_strict_json(
+            (workspace / child_rollout.ROLLOUT_RECORD).read_bytes()
+        )
         w2b1.validate_workspace_configuration_v2(registry, index)
-    except (OSError, w2b1.AgentContextError) as error:
+        child_rollout.validate_rollout_record(workspace, registry, rollout_record)
+    except (OSError, w2b1.AgentContextError, child_rollout.ChildRolloutError) as error:
         _fail(f"registry/index validation failed: {error}")
     policy_count = _validate_policy_sources(workspace, registry, index, metadata)
     diagnostics: list[str] = []

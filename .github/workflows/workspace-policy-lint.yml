@@ -51,6 +51,8 @@ jobs:
           python scripts/agent_context/validate_migration_guards.py --workspace .
       - name: Validate root-owned workspace policy
         run: python scripts/agent_context/validate_workspace.py --workspace .
+      - name: Enforce reviewed preferred context budget
+        run: python scripts/agent_context/budget_promotion.py --workspace . --enforce-preferred
       - name: Run root agent-context unit tests
         run: python -m unittest discover -s scripts/agent_context/tests -v
       - name: Lint root agent-context tooling

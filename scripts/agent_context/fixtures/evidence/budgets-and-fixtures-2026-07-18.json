@@ -1,0 +1,402 @@
+{
+  "schema_version": 1,
+  "fixture_set_id": "agent-configuration-token-efficiency-phase-0-2026-07-18",
+  "defined_on": "2026-07-18",
+  "scope": "Phase 0 byte budgets and repository/task fixtures defined before policy splitting. No child repository file is changed by this artifact.",
+  "sources": [
+    {
+      "path": ".workspace/status/fa-workspace/agent-configuration-token-efficiency-baseline-2026-07-17.json",
+      "sha256": "50adc78dcc0c1adffd7debc0da9e2721fa6c498b3b86ff6ab8af59ff1744facd"
+    },
+    {
+      "path": ".workspace/status/fa-workspace/agent-configuration-token-efficiency-repository-inventory-2026-07-18.json",
+      "sha256": "341cf1691686255ac135c274b4af77322be0b332333f203ccb5b3adde4b338bb"
+    },
+    {
+      "path": ".workspace/status/fa-workspace/agent-configuration-token-efficiency-configuration-check-2026-07-18.md",
+      "sha256": "8ffd5fb95741a53769b58ff2741ab961ba6b0ed3a70f90f154c4b1130ce00e9b"
+    }
+  ],
+  "measurement_contract": {
+    "required_metric": "raw_utf8_bytes",
+    "required_metric_definition": "For every selected instruction file, count the exact bytes stored on disk. Sum each normalized workspace-relative path once. Do not normalize line endings, Unicode, or whitespace before counting.",
+    "bundle_boundary": "The shared workspace instruction manifest, including the root agent entrypoint and selected shared routing/policy files, before repository-local AGENTS.md or CLAUDE.md content.",
+    "path_normalization": "Convert separators to '/', remove redundant '.' segments, resolve the path inside the workspace, and compare normalized paths case-insensitively on Windows before de-duplication.",
+    "required_output_fields": [
+      "fixture_id",
+      "ordered_unique_paths",
+      "raw_utf8_bytes",
+      "budget_id",
+      "budget_max_raw_utf8_bytes",
+      "within_budget"
+    ],
+    "supplementary_token_telemetry": {
+      "field": "estimated_model_tokens",
+      "method": "ceil(raw_utf8_bytes / 4)",
+      "status": "informational_only",
+      "rule": "Token estimates must be reported next to raw bytes but must never determine a budget result. A model-specific tokenizer may add separately named telemetry later without replacing raw_utf8_bytes."
+    },
+    "excluded_from_shared_bundle_measurement": [
+      "repository-local AGENTS.md and CLAUDE.md content",
+      "resolver JSON or human-readable output",
+      "tool schemas and command output",
+      "source files opened while performing the task",
+      "policies not selected by the repository/task fixture"
+    ]
+  },
+  "v1_baseline_profiles": [
+    {
+      "profile_id": "v1-python-default",
+      "repo_type": "python",
+      "ordered_unique_paths": [
+        "AGENTS.md",
+        ".workspace/architecture.md",
+        ".workspace/repo-types.json",
+        ".workspace/policy.index.json",
+        ".workspace/context/python.md",
+        ".workspace/context/env.md",
+        ".workspace/context/git.md",
+        ".workspace/contracts/workspace.contract.md"
+      ],
+      "raw_utf8_bytes": 16194,
+      "estimated_model_tokens": 4049
+    },
+    {
+      "profile_id": "v1-typescript-default",
+      "repo_type": "typescript",
+      "ordered_unique_paths": [
+        "AGENTS.md",
+        ".workspace/architecture.md",
+        ".workspace/repo-types.json",
+        ".workspace/policy.index.json",
+        ".workspace/context/typescript.md",
+        ".workspace/context/env.md",
+        ".workspace/context/git.md",
+        ".workspace/contracts/workspace.contract.md"
+      ],
+      "raw_utf8_bytes": 10970,
+      "estimated_model_tokens": 2743
+    },
+    {
+      "profile_id": "v1-astro-default",
+      "repo_type": "astro-plugin-or-ui",
+      "ordered_unique_paths": [
+        "AGENTS.md",
+        ".workspace/architecture.md",
+        ".workspace/repo-types.json",
+        ".workspace/policy.index.json",
+        ".workspace/context/typescript.md",
+        ".workspace/context/astro-plugin.md",
+        ".workspace/context/env.md",
+        ".workspace/context/git.md",
+        ".workspace/contracts/workspace.contract.md"
+      ],
+      "raw_utf8_bytes": 22406,
+      "estimated_model_tokens": 5602
+    },
+    {
+      "profile_id": "v1-docker-default",
+      "repo_type": "docker",
+      "ordered_unique_paths": [
+        "AGENTS.md",
+        ".workspace/architecture.md",
+        ".workspace/repo-types.json",
+        ".workspace/policy.index.json",
+        ".workspace/context/docker.md",
+        ".workspace/context/env.md",
+        ".workspace/context/git.md",
+        ".workspace/contracts/workspace.contract.md"
+      ],
+      "raw_utf8_bytes": 10139,
+      "estimated_model_tokens": 2535
+    }
+  ],
+  "budgets": [
+    {
+      "budget_id": "auth-sdk-implementation-target",
+      "baseline_profile_id": "v1-python-default",
+      "baseline_raw_utf8_bytes": 16194,
+      "minimum_reduction_percent": 35,
+      "max_raw_utf8_bytes": 10526,
+      "max_estimated_model_tokens": 2632,
+      "enforcement": "required_phase_2_bundle_gate",
+      "derivation": "floor(16194 * 0.65)"
+    },
+    {
+      "budget_id": "astro-plugin-implementation-target",
+      "baseline_profile_id": "v1-astro-default",
+      "baseline_raw_utf8_bytes": 22406,
+      "minimum_reduction_percent": 35,
+      "max_raw_utf8_bytes": 14563,
+      "max_estimated_model_tokens": 3641,
+      "enforcement": "required_phase_2_bundle_gate",
+      "derivation": "floor(22406 * 0.65)"
+    },
+    {
+      "budget_id": "python-task-non-regression",
+      "baseline_profile_id": "v1-python-default",
+      "baseline_raw_utf8_bytes": 16194,
+      "minimum_reduction_percent": 0,
+      "max_raw_utf8_bytes": 16194,
+      "max_estimated_model_tokens": 4049,
+      "enforcement": "migration_warning_until_two_consecutive_clean_runs",
+      "derivation": "Phase 0 v1 profile ceiling"
+    },
+    {
+      "budget_id": "typescript-task-non-regression",
+      "baseline_profile_id": "v1-typescript-default",
+      "baseline_raw_utf8_bytes": 10970,
+      "minimum_reduction_percent": 0,
+      "max_raw_utf8_bytes": 10970,
+      "max_estimated_model_tokens": 2743,
+      "enforcement": "migration_warning_until_two_consecutive_clean_runs",
+      "derivation": "Phase 0 v1 profile ceiling"
+    },
+    {
+      "budget_id": "astro-task-non-regression",
+      "baseline_profile_id": "v1-astro-default",
+      "baseline_raw_utf8_bytes": 22406,
+      "minimum_reduction_percent": 0,
+      "max_raw_utf8_bytes": 22406,
+      "max_estimated_model_tokens": 5602,
+      "enforcement": "migration_warning_until_two_consecutive_clean_runs",
+      "derivation": "Phase 0 v1 profile ceiling"
+    },
+    {
+      "budget_id": "standalone-child-entrypoint-advisory",
+      "baseline_profile_id": null,
+      "baseline_raw_utf8_bytes": null,
+      "minimum_reduction_percent": null,
+      "max_raw_utf8_bytes": 4096,
+      "max_estimated_model_tokens": 1024,
+      "enforcement": "advisory_until_phase_6_standalone_validation",
+      "derivation": "4 KiB ceiling leaves room for locally sufficient child guidance while preserving a small entrypoint"
+    }
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "sdk-implementation",
+      "repository": "auth-sdk-m8",
+      "owner_repository": "auth-sdk-m8",
+      "lifecycle": "present",
+      "coverage_role": "sdk-library",
+      "task": "implementation",
+      "mode": "workspace",
+      "baseline_profile_id": "v1-python-default",
+      "phase_0_raw_utf8_bytes": 16194,
+      "phase_0_estimated_model_tokens": 4049,
+      "budget_id": "auth-sdk-implementation-target",
+      "phase_0_within_budget": false,
+      "phase_0_result": "expected_pre_split_baseline",
+      "required_context_topics": [
+        "workspace ownership",
+        "dependency direction",
+        "platform SDK boundaries",
+        "framework neutrality",
+        "authentication security"
+      ],
+      "forbidden_default_topics": [
+        "FastAPI service implementation",
+        "SQLAlchemy or Alembic persistence",
+        "environment provisioning",
+        "commit or pull-request workflow"
+      ]
+    },
+    {
+      "fixture_id": "api-service-commit",
+      "repository": "fa-auth-m8",
+      "owner_repository": "fa-auth-m8",
+      "lifecycle": "present",
+      "coverage_role": "api-service",
+      "task": "commit",
+      "mode": "workspace",
+      "baseline_profile_id": "v1-python-default",
+      "phase_0_raw_utf8_bytes": 16194,
+      "phase_0_estimated_model_tokens": 4049,
+      "budget_id": "python-task-non-regression",
+      "phase_0_within_budget": true,
+      "required_context_topics": [
+        "service isolation",
+        "service-owned persistence",
+        "authentication security",
+        "commit safety"
+      ]
+    },
+    {
+      "fixture_id": "worker-environment",
+      "repository": "media-worker-m8",
+      "owner_repository": "media-worker-m8",
+      "lifecycle": "present",
+      "coverage_role": "worker",
+      "task": "environment",
+      "mode": "workspace",
+      "baseline_profile_id": "v1-python-default",
+      "phase_0_raw_utf8_bytes": 16194,
+      "phase_0_estimated_model_tokens": 4049,
+      "budget_id": "python-task-non-regression",
+      "phase_0_within_budget": true,
+      "required_context_topics": [
+        "service isolation",
+        "async worker boundaries",
+        "contract-only cross-service communication",
+        "repository-native environment configuration"
+      ]
+    },
+    {
+      "fixture_id": "astro-host-implementation",
+      "repository": "fa-ui-m8/app",
+      "owner_repository": "fa-ui-m8",
+      "lifecycle": "present",
+      "coverage_role": "astro-host-nested-application",
+      "task": "implementation",
+      "mode": "workspace",
+      "baseline_profile_id": "v1-typescript-default",
+      "phase_0_raw_utf8_bytes": 10970,
+      "phase_0_estimated_model_tokens": 2743,
+      "budget_id": "typescript-task-non-regression",
+      "phase_0_within_budget": true,
+      "required_context_topics": [
+        "client-to-service boundary",
+        "host composition",
+        "nested mapping ownership"
+      ]
+    },
+    {
+      "fixture_id": "astro-plugin-implementation",
+      "repository": "astro-auth-m8",
+      "owner_repository": "astro-auth-m8",
+      "lifecycle": "present",
+      "coverage_role": "astro-business-plugin",
+      "task": "implementation",
+      "mode": "workspace",
+      "baseline_profile_id": "v1-astro-default",
+      "phase_0_raw_utf8_bytes": 22406,
+      "phase_0_estimated_model_tokens": 5602,
+      "budget_id": "astro-plugin-implementation-target",
+      "phase_0_within_budget": false,
+      "phase_0_result": "expected_pre_split_baseline",
+      "required_context_topics": [
+        "client-to-service boundary",
+        "HTTP contract ownership",
+        "authentication and browser-secret safety",
+        "plugin versus host ownership",
+        "standalone usability"
+      ],
+      "forbidden_default_topics": [
+        "registry scaffolding procedure",
+        "host integration procedure",
+        "release procedure",
+        "environment provisioning",
+        "commit or pull-request workflow"
+      ]
+    },
+    {
+      "fixture_id": "shared-ui-release",
+      "repository": "astro-ui-m8",
+      "owner_repository": "astro-ui-m8",
+      "lifecycle": "present",
+      "coverage_role": "shared-ui-package",
+      "task": "release",
+      "mode": "workspace",
+      "baseline_profile_id": "v1-astro-default",
+      "phase_0_raw_utf8_bytes": 22406,
+      "phase_0_estimated_model_tokens": 5602,
+      "budget_id": "astro-task-non-regression",
+      "phase_0_within_budget": true,
+      "required_context_topics": [
+        "shared UI ownership",
+        "registry compatibility",
+        "package release safety"
+      ]
+    },
+    {
+      "fixture_id": "host-cross-repository",
+      "repository": "fa-ui-m8/app",
+      "owner_repository": "fa-ui-m8",
+      "lifecycle": "present",
+      "coverage_role": "astro-host-nested-application",
+      "task": "cross-repository",
+      "mode": "workspace",
+      "baseline_profile_id": "v1-typescript-default",
+      "phase_0_raw_utf8_bytes": 10970,
+      "phase_0_estimated_model_tokens": 2743,
+      "budget_id": "typescript-task-non-regression",
+      "phase_0_within_budget": true,
+      "required_context_topics": [
+        "workspace architecture",
+        "published package dependency boundaries",
+        "independent repository delivery"
+      ]
+    },
+    {
+      "fixture_id": "sdk-standalone-implementation",
+      "repository": "auth-sdk-m8",
+      "owner_repository": "auth-sdk-m8",
+      "lifecycle": "present",
+      "coverage_role": "sdk-library",
+      "task": "implementation",
+      "mode": "standalone",
+      "baseline_profile_id": null,
+      "phase_0_raw_utf8_bytes": 429,
+      "phase_0_estimated_model_tokens": 108,
+      "budget_id": "standalone-child-entrypoint-advisory",
+      "phase_0_within_budget": true,
+      "required_context_topics": [
+        "local SDK purpose",
+        "local dependency boundaries",
+        "standalone configuration authority",
+        "optional workspace enhancement"
+      ]
+    },
+    {
+      "fixture_id": "optional-repository-classification",
+      "repository": "vite-auth-m8",
+      "owner_repository": "vite-auth-m8",
+      "lifecycle": "optional",
+      "coverage_role": "optional-typescript-package",
+      "task": "implementation",
+      "mode": "workspace",
+      "baseline_profile_id": null,
+      "phase_0_raw_utf8_bytes": null,
+      "phase_0_estimated_model_tokens": null,
+      "budget_id": null,
+      "phase_0_within_budget": null,
+      "expected_resolution": "explicit_optional_lifecycle_without_manifest"
+    },
+    {
+      "fixture_id": "infrastructure-classification",
+      "repository": "docker_compose",
+      "owner_repository": null,
+      "lifecycle": "infrastructure",
+      "coverage_role": "workspace-infrastructure",
+      "task": "environment",
+      "mode": "workspace",
+      "baseline_profile_id": "v1-docker-default",
+      "phase_0_raw_utf8_bytes": 10139,
+      "phase_0_estimated_model_tokens": 2535,
+      "budget_id": null,
+      "phase_0_within_budget": null,
+      "expected_resolution": "explicit_infrastructure_lifecycle_without_child_repository_assumption"
+    }
+  ],
+  "success_gates": {
+    "phase_0": [
+      "All required byte and supplementary token telemetry fields are populated for manifest-producing fixtures.",
+      "The v1 baseline profiles reproduce 16194 Python, 10970 TypeScript, 22406 Astro, and 10139 Docker raw bytes.",
+      "Named fixtures cover SDK, API service, worker, Astro host, Astro plugin, shared UI, nested application, standalone, optional, and infrastructure behavior.",
+      "No child repository file is modified."
+    ],
+    "phase_2": [
+      "sdk-implementation is at or below 10526 raw UTF-8 bytes.",
+      "astro-plugin-implementation is at or below 14563 raw UTF-8 bytes.",
+      "Required architecture, repository-boundary, and security topics remain present."
+    ],
+    "phase_7": [
+      "Budget overflow is reported as a warning during migration.",
+      "A budget becomes blocking only after two consecutive clean baseline runs."
+    ],
+    "phase_8": [
+      "Every fixture is re-measured with before/after raw bytes, supplementary token estimates, selected policy count, and invariant retention results."
+    ]
+  }
+}

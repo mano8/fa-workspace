@@ -84,14 +84,10 @@ class W3MigrationTests(unittest.TestCase):
         self.assertEqual(self.index["mode"], "faceted")
         self.assertEqual(len(self.registry["repositories"]), 16)
 
-    def test_registry_contains_only_live_direct_child_repositories(self) -> None:
+    def test_registry_contains_only_classified_direct_child_repositories(self) -> None:
+        """The root fixture is sufficient; no child clone is a test dependency."""
         registered = {item["id"] for item in self.registry["repositories"]}
-        direct_git_children = {
-            child.name
-            for child in WORKSPACE.iterdir()
-            if child.is_dir() and (child / ".git").is_dir()
-        }
-        self.assertEqual(registered, direct_git_children)
+        self.assertEqual(registered, set(V1_REGISTRY))
         self.assertNotIn("docker_compose", registered)
         self.assertNotIn("traefik", registered)
         self.assertNotIn("fa-ui-m8/app", registered)
@@ -100,7 +96,7 @@ class W3MigrationTests(unittest.TestCase):
         classification = w2b1.parse_strict_json(
             (
                 WORKSPACE
-                / ".workspace/status/fa-workspace/agent-configuration-token-efficiency-w3-repository-classification-2026-07-19.json"
+                / "scripts/agent_context/fixtures/evidence/w3-repository-classification-2026-07-19.json"
             ).read_bytes()
         )
         expected = [

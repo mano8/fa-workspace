@@ -19,6 +19,10 @@
 
 # Directories owned by fa-workspace.
 
+# Root-only workspace policy CI. Child repositories own their own workflows.
+!/.github/
+!/.github/**
+
 # Shared tool-neutral workspace truth.
 !/.workspace/
 !/.workspace/**

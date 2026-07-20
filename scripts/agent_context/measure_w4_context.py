@@ -42,20 +42,16 @@ CAPABILITY_ROW = {
     "blocks_closeout": True,
 }
 CAPABILITY_EVIDENCE = (
-    ".workspace/status/fa-workspace/"
-    "agent-configuration-token-efficiency-capability-evidence-2026-07-19.md"
+    "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md"
 )
 BASELINE_EVIDENCE = (
-    ".workspace/status/fa-workspace/"
-    "agent-configuration-token-efficiency-capability-evidence-2026-07-18.md"
+    "scripts/agent_context/fixtures/evidence/baseline-evidence-2026-07-18.md"
 )
 FIXTURE_CATALOG = (
-    ".workspace/status/fa-workspace/"
-    "agent-configuration-token-efficiency-budgets-and-fixtures-2026-07-18.json"
+    "scripts/agent_context/fixtures/evidence/budgets-and-fixtures-2026-07-18.json"
 )
 NATIVE_EVIDENCE = (
-    ".workspace/status/fa-workspace/"
-    "agent-configuration-token-efficiency-w4-native-evidence-2026-07-19.json"
+    "scripts/agent_context/fixtures/evidence/w4-native-evidence-2026-07-19.json"
 )
 SOURCE_SHA = "a" * 64
 

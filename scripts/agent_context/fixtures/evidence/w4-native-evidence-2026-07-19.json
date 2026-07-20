@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-07-19T15:12:45Z",
+  "status": "VERIFIED_CURRENT",
+  "agent": "codex",
+  "client_version": "codex-cli 0.144.6",
+  "platform": "devcontainer",
+  "mode": "non-interactive",
+  "inspection_mechanism": "codex debug prompt-input",
+  "inspection_output_sha256": "39f4c785d414bed269e79da6860b5782b147c60f921ecfdab5416a0464bbf7ce",
+  "inspection_message_count": 4,
+  "source": {
+    "path": "AGENTS.md",
+    "source_bytes": 1965,
+    "source_sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b",
+    "exact_source_substring_occurrences": 1,
+    "model_visible_part_bytes": 2037,
+    "source_offset_in_model_visible_part": 56
+  },
+  "disposition": "The root AGENTS.md is verified native workspace-controlled context for the Codex devcontainer non-interactive measurement row. The captured prompt input is transient runtime evidence and is not tracked because it contains full model input."
+}

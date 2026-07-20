@@ -121,6 +121,40 @@ source-drift checks, receipt validation, collision handling, and `HANDED_OFF`
 terminality to the W2b3 kernel; no printed/model response is treated as
 delivery proof.
 
+Phase 7 adds a root-only control-plane validator. Its default strict pass reads
+tracked workspace inputs only and never checks out, runs, or interprets child
+CI/tests. Missing child checkouts or `AGENTS.md` files are static diagnostics.
+The optional manifest/envelope/session/receipt arguments validate an existing
+delivery generation's exact JCS framing and linkage; they do not invoke an
+agent or create runtime state:
+
+```bash
+"$M8_PYTHON" scripts/agent_context/validate_workspace.py --workspace .
+"$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w7_validate_workspace -v
+```
+
+The Phase 7 migration guard is intentionally narrow: it checks the portable
+root agent/configuration files, rejects direct cross-agent imports and
+prohibited `co-authored-by` metadata, and confirms the existing ignored
+TODO-plan hook protection. It does not add generic secret detection; dedicated
+secret-scanning tooling remains responsible for that concern.
+
+```bash
+"$M8_PYTHON" scripts/agent_context/validate_migration_guards.py --workspace .
+```
+
+Phase 7.5 preserves a reviewed, tracked baseline for the four workspace-owned
+Codex fixtures that can be measured without a child checkout or a new
+authorization record. It performs two independent measurements and compares
+their selected policy paths, source hashes, envelope/manifest hashes, and byte
+accounting to that baseline. Hard-limit overflow always fails; the preferred
+limit is enabled explicitly by the root CI promotion command and can be rolled
+back by removing that one command-line flag.
+
+```bash
+"$M8_PYTHON" scripts/agent_context/budget_promotion.py --workspace . --enforce-preferred
+```
+
 ```bash
 scripts/codex-repo.sh --repository auth-sdk-m8 "inspect the repository"
 scripts/codex-repo.sh --repository auth-sdk-m8 --repository media-sdk-m8 \

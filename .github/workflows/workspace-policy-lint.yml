@@ -1,0 +1,57 @@
+name: Workspace policy lint
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  workspace-policy-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          submodules: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          check-latest: false
+      - name: Install root lint dependency
+        run: python -m pip install --disable-pip-version-check ruff==0.15.22
+      - name: Parse root JSON and TOML configuration
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+          import tomllib
+
+          root = pathlib.Path('.')
+          for relative_path in (
+              '.workspace/repo-types.json',
+              '.workspace/policy.index.json',
+              '.workspace/policy.metadata.json',
+              '.workspace/invariants.json',
+              '.claude/settings.json',
+          ):
+              json.loads((root / relative_path).read_text(encoding='utf-8'))
+          tomllib.loads((root / '.codex/config.toml').read_text(encoding='utf-8'))
+          PY
+      - name: Validate root instruction entrypoints and migration guards
+        run: |
+          python scripts/agent_context/validate_root_agents.py --workspace .
+          python scripts/agent_context/validate_root_claude.py --workspace .
+          python scripts/agent_context/validate_claude_settings.py --workspace .
+          python scripts/agent_context/validate_codex_config.py --workspace .
+          python scripts/agent_context/validate_migration_guards.py --workspace .
+      - name: Validate root-owned workspace policy
+        run: python scripts/agent_context/validate_workspace.py --workspace .
+      - name: Run root agent-context unit tests
+        run: python -m unittest discover -s scripts/agent_context/tests -v
+      - name: Lint root agent-context tooling
+        run: python -m ruff check scripts/agent_context

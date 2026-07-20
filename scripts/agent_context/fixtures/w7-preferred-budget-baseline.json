@@ -1,0 +1,90 @@
+{
+  "baseline_evidence": {
+    "path": "scripts/agent_context/fixtures/evidence/baseline-evidence-2026-07-18.md",
+    "sha256": "dc74056956dbc96125fbec543b68ca56fb793c2ed384d08c8cc7498c0bb14c19"
+  },
+  "capability_evidence": {
+    "path": "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md",
+    "sha256": "3fce2371cada5b2cbe949b0398ba29a376ca1515c7577dc6881b62263ff7588b"
+  },
+  "fixtures": [
+    {
+      "effective_hard_limit": 32768,
+      "envelope_sha256": "f4c94dde7f404c16c487bcab4a2cd117f99b096a3f5f668efed3ddff5df5a33e",
+      "fixture_id": "sdk-implementation",
+      "manifest_sha256": "9fb056ccdd3492e233cb4a3262d53fc13c1ea896dbcba525907159188ca130d8",
+      "model_visible_total": 4988,
+      "native": {"bytes": 1965, "path": "AGENTS.md", "sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b"},
+      "policy_paths": [".workspace/policies/always/security.md", ".workspace/policies/always/workspace.md", ".workspace/policies/facets/language-python.md"],
+      "preferred_ceiling": 24576,
+      "raw_injected_source_bytes": 1866,
+      "serialized_injected_envelope_bytes": 3023,
+      "source_hashes": [
+        {"bytes": 321, "path": ".workspace/policies/always/security.md", "sha256": "f73a5e520bc237bb70851569ef039a549db65c28a580b2cdb95f5b9db11525f2"},
+        {"bytes": 573, "path": ".workspace/policies/always/workspace.md", "sha256": "23cbe65b8d93b8d6482c8a6f41a49bc6e7ac596b1435bb9d937775c0b4d5cea3"},
+        {"bytes": 972, "path": ".workspace/policies/facets/language-python.md", "sha256": "a1364f6478f3e185e1eabe1c5b4f32898cba9458addaca52a9e702bca0384302"}
+      ]
+    },
+    {
+      "effective_hard_limit": 32768,
+      "envelope_sha256": "f985ad7fb98fad87a1332d1f2e5cdc0c3ed5dc4e181121b6bee53df7349b1be3",
+      "fixture_id": "worker-environment",
+      "manifest_sha256": "d56de77a7fd2daddaefbbe7cbcd13475c4bc1e9394401708af155f630b908ab1",
+      "model_visible_total": 7663,
+      "native": {"bytes": 1965, "path": "AGENTS.md", "sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b"},
+      "policy_paths": [".workspace/policies/always/security.md", ".workspace/policies/always/workspace.md", ".workspace/policies/facets/language-python.md", ".workspace/policies/tasks/environment.md"],
+      "preferred_ceiling": 24576,
+      "raw_injected_source_bytes": 4171,
+      "serialized_injected_envelope_bytes": 5698,
+      "source_hashes": [
+        {"bytes": 321, "path": ".workspace/policies/always/security.md", "sha256": "f73a5e520bc237bb70851569ef039a549db65c28a580b2cdb95f5b9db11525f2"},
+        {"bytes": 573, "path": ".workspace/policies/always/workspace.md", "sha256": "23cbe65b8d93b8d6482c8a6f41a49bc6e7ac596b1435bb9d937775c0b4d5cea3"},
+        {"bytes": 972, "path": ".workspace/policies/facets/language-python.md", "sha256": "a1364f6478f3e185e1eabe1c5b4f32898cba9458addaca52a9e702bca0384302"},
+        {"bytes": 2305, "path": ".workspace/policies/tasks/environment.md", "sha256": "e1988d5d38c72a48a0955bc6c84f3010c8631d36e76ff33aaaf872a4f8a7bad2"}
+      ]
+    },
+    {
+      "effective_hard_limit": 32768,
+      "envelope_sha256": "24ff82b05536482464d8eb117d9345c8d3b1b95feabed140d2c9d45c6a65e859",
+      "fixture_id": "astro-host-implementation",
+      "manifest_sha256": "7476e3f90460c2735833c4befd85d35a3d9c0f76ed985a4f056fc3710d221d20",
+      "model_visible_total": 6176,
+      "native": {"bytes": 1965, "path": "AGENTS.md", "sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b"},
+      "policy_paths": [".workspace/policies/always/security.md", ".workspace/policies/always/workspace.md", ".workspace/policies/facets/language-typescript.md", ".workspace/policies/facets/layer-client.md", ".workspace/policies/facets/framework-astro.md", ".workspace/policies/facets/domain-shared-ui.md"],
+      "preferred_ceiling": 24576,
+      "raw_injected_source_bytes": 2035,
+      "serialized_injected_envelope_bytes": 4211,
+      "source_hashes": [
+        {"bytes": 321, "path": ".workspace/policies/always/security.md", "sha256": "f73a5e520bc237bb70851569ef039a549db65c28a580b2cdb95f5b9db11525f2"},
+        {"bytes": 573, "path": ".workspace/policies/always/workspace.md", "sha256": "23cbe65b8d93b8d6482c8a6f41a49bc6e7ac596b1435bb9d937775c0b4d5cea3"},
+        {"bytes": 88, "path": ".workspace/policies/facets/language-typescript.md", "sha256": "6d2ba0659e3bc51c28abc35030b138d396cdec2173b68d1384690f855b837aae"},
+        {"bytes": 224, "path": ".workspace/policies/facets/layer-client.md", "sha256": "9d1f5afc46470c75e03ae8a563a66a58819ad4e7d0c574f798ed35f9a4be10c0"},
+        {"bytes": 209, "path": ".workspace/policies/facets/framework-astro.md", "sha256": "e54aa3f2111ed23812ea6c685d688549569fa830306bd7878a058f532fe0632b"},
+        {"bytes": 620, "path": ".workspace/policies/facets/domain-shared-ui.md", "sha256": "51ac83ceafadc0ebbc62a94d980b60c8943830d0e8b65ee29d589bbfd29db0ea"}
+      ]
+    },
+    {
+      "effective_hard_limit": 32768,
+      "envelope_sha256": "41cb073d545648c914dcf2ee7e609330bc887adb21c086629d4d3d6a2d949922",
+      "fixture_id": "astro-plugin-implementation",
+      "manifest_sha256": "3a7fb651fadddc71790b8a951e55676b3dd259bddc7cf1fd5fb44b9c75a2ab35",
+      "model_visible_total": 7209,
+      "native": {"bytes": 1965, "path": "AGENTS.md", "sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b"},
+      "policy_paths": [".workspace/policies/always/security.md", ".workspace/policies/always/workspace.md", ".workspace/policies/facets/language-typescript.md", ".workspace/policies/facets/layer-client.md", ".workspace/policies/facets/kind-astro-plugin.md", ".workspace/policies/facets/framework-astro.md", ".workspace/policies/facets/domain-auth-client.md"],
+      "preferred_ceiling": 24576,
+      "raw_injected_source_bytes": 2709,
+      "serialized_injected_envelope_bytes": 5244,
+      "source_hashes": [
+        {"bytes": 321, "path": ".workspace/policies/always/security.md", "sha256": "f73a5e520bc237bb70851569ef039a549db65c28a580b2cdb95f5b9db11525f2"},
+        {"bytes": 573, "path": ".workspace/policies/always/workspace.md", "sha256": "23cbe65b8d93b8d6482c8a6f41a49bc6e7ac596b1435bb9d937775c0b4d5cea3"},
+        {"bytes": 88, "path": ".workspace/policies/facets/language-typescript.md", "sha256": "6d2ba0659e3bc51c28abc35030b138d396cdec2173b68d1384690f855b837aae"},
+        {"bytes": 224, "path": ".workspace/policies/facets/layer-client.md", "sha256": "9d1f5afc46470c75e03ae8a563a66a58819ad4e7d0c574f798ed35f9a4be10c0"},
+        {"bytes": 700, "path": ".workspace/policies/facets/kind-astro-plugin.md", "sha256": "00757620e36a3f676506a230fa5a760c50905e7251555743585093ac5683e9e9"},
+        {"bytes": 209, "path": ".workspace/policies/facets/framework-astro.md", "sha256": "e54aa3f2111ed23812ea6c685d688549569fa830306bd7878a058f532fe0632b"},
+        {"bytes": 594, "path": ".workspace/policies/facets/domain-auth-client.md", "sha256": "ac6aea67db70da6f4b299f93754d569851432e47af1fd9ac0f3aec131e88d5c4"}
+      ]
+    }
+  ],
+  "measurement_formula": "verified_native_bytes + serialized_injected_envelope_bytes + other_model_visible_bootstrap_bytes; raw injected bytes are diagnostic only",
+  "schema_version": 1
+}

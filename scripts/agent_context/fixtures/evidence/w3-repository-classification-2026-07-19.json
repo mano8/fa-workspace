@@ -1,0 +1,491 @@
+{
+  "schema_version": 1,
+  "step": "3.1",
+  "status": "COMPLETE",
+  "classification_date": "2026-07-19",
+  "scope": "Read-only classification of the 16 live direct child repositories for the W3 registry migration. No child file was changed.",
+  "validation": {
+    "source_sets_verified": 16,
+    "source_count_byte_and_hash_checks": "PASS",
+    "live_topology_and_v1_registry_reconciliation": "PASS",
+    "w2b4_deterministic_fixtures": {"passed": 29, "failed": 0},
+    "json_encoding": "UTF-8 without BOM, LF, final newline"
+  },
+  "inspection_boundary": {
+    "allowed_child_sources": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "README.md",
+      "pyproject.toml",
+      "package.json"
+    ],
+    "notes": [
+      "For fa-ui-m8, the repository-owned application README and package manifest are under app/ and were treated as evidence for the parent repository, not as a separate target.",
+      "A missing pyproject.toml or package.json was recorded as absence; no substitute child source was inspected.",
+      "Direct .git directory presence was checked only to establish repository-root topology. Child branch, remote, dirty, workflow, CI, release, and delivery state were not inspected or interpreted."
+    ],
+    "source_set_hash": "SHA-256 over the raw sha256sum output for the listed source_files, in listed order; source bytes were not normalized."
+  },
+  "target_decision_rule": {
+    "repository": "An independently versioned direct child with its own .git directory and canonical direct-child path.",
+    "workspace_target": "A non-repository root directory qualifies only when it needs independent selectable context, facets, tasks, or launcher targeting.",
+    "internal_path": "A nested application or infrastructure directory owned by a child is never a repository and is not a workspace target without an independent selection need.",
+    "result": "Keep exactly the 16 direct child repositories. Retire docker_compose and traefik as root registry aliases without creating workspace_targets. Keep fa-ui-m8/app internal and unregistered."
+  },
+  "architecture_reconciliation": {
+    "architecture_repository_ids": [
+      "astro-auth-m8",
+      "astro-media-m8",
+      "astro-prompt-m8",
+      "astro-reparto-m8",
+      "astro-ui-m8",
+      "auth-sdk-m8",
+      "fa-auth-m8",
+      "fa-ui-m8",
+      "fastapi-m8",
+      "imgtools_m8",
+      "media-sdk-m8",
+      "media-service-m8",
+      "media-worker-m8",
+      "prompt-engine-m8",
+      "reparto-docente-m8",
+      "security-tests-m8"
+    ],
+    "live_direct_git_roots": [
+      "astro-auth-m8",
+      "astro-media-m8",
+      "astro-prompt-m8",
+      "astro-reparto-m8",
+      "astro-ui-m8",
+      "auth-sdk-m8",
+      "fa-auth-m8",
+      "fa-ui-m8",
+      "fastapi-m8",
+      "imgtools_m8",
+      "media-sdk-m8",
+      "media-service-m8",
+      "media-worker-m8",
+      "prompt-engine-m8",
+      "reparto-docente-m8",
+      "security-tests-m8"
+    ],
+    "non_repository_shared_names": [
+      {
+        "id": "contracts",
+        "classification": "workspace-owned-shared-concept",
+        "registry_action": "Do not register; canonical workspace contracts live under .workspace/contracts/."
+      },
+      {
+        "id": "schemas",
+        "classification": "workspace-owned-shared-concept",
+        "registry_action": "Do not register; workspace-owned schemas are control-plane files, not an independently versioned child."
+      }
+    ],
+    "sets_match": true,
+    "repository_count": 16
+  },
+  "non_repository_decisions": [
+    {
+      "id": "docker_compose",
+      "classification": "retired-root-alias",
+      "root_path_exists": false,
+      "direct_git_root": false,
+      "workspace_target": false,
+      "evidence": [
+        "fa-auth-m8/README.md describes example stacks under the child-owned examples/docker_compose directory.",
+        "media-service-m8/README.md describes its child-owned docker_compose deployment.",
+        "prompt-engine-m8/README.md describes its child-owned Docker Compose development stack.",
+        "reparto-docente-m8/README.md describes its child-owned docker_compose development stack."
+      ],
+      "registry_action": "Remove the stale v1 key during the atomic Step 3.2/W3 registry and policy-index migration."
+    },
+    {
+      "id": "traefik",
+      "classification": "retired-root-alias",
+      "root_path_exists": false,
+      "direct_git_root": false,
+      "workspace_target": false,
+      "evidence": [
+        "fa-auth-m8/README.md identifies Traefik as a component of child-owned example stacks.",
+        "media-service-m8/README.md identifies Traefik inside its child-owned hardened stack.",
+        "prompt-engine-m8/README.md identifies Traefik inside its child-owned development stack.",
+        "reparto-docente-m8/README.md identifies Traefik inside its child-owned development stack."
+      ],
+      "registry_action": "Remove the stale v1 key during the atomic Step 3.2/W3 registry and policy-index migration."
+    },
+    {
+      "id": "fa-ui-m8/app",
+      "classification": "internal-application",
+      "root_path_exists": true,
+      "direct_git_root": false,
+      "workspace_target": false,
+      "evidence": [
+        "fa-ui-m8/AGENTS.md states that fa-ui-m8 is the deployable Astro and Starlight UI and that the actual app is in app/.",
+        "fa-ui-m8/app/package.json identifies the application package while remaining inside the fa-ui-m8 repository."
+      ],
+      "registry_action": "Remain unregistered; the W3 registry schema and fixtures must continue to reject internal paths."
+    }
+  ],
+  "facet_order": [
+    "language",
+    "layer",
+    "kind",
+    "framework",
+    "domain"
+  ],
+  "facet_definitions": {
+    "api-service": "HTTP API service that owns a service domain.",
+    "arq": "ARQ asynchronous worker framework.",
+    "astro": "Astro application or integration framework.",
+    "astro-host": "Deployable Astro host/composer application.",
+    "astro-plugin": "Astro integration and headless client package.",
+    "auth-client": "Client-side authentication contract and integration domain.",
+    "auth-security": "Authentication, token, authorization, or reusable auth-security domain.",
+    "client": "Workspace client layer.",
+    "fastapi": "FastAPI application or service framework.",
+    "framework": "Reusable application-framework package.",
+    "image-processing": "Image transformation and processing domain.",
+    "library": "Reusable computation library.",
+    "media": "Media storage, contracts, or processing domain.",
+    "media-client": "Client-side media service contract and integration domain.",
+    "platform": "Workspace platform layer.",
+    "prompt": "Prompt template and composition service domain.",
+    "prompt-client": "Client-side prompt service contract and integration domain.",
+    "pytest": "Pytest test framework or plugin.",
+    "python": "Python implementation language.",
+    "sdk": "Reusable software-development kit.",
+    "security-testing": "Live reusable security-test domain.",
+    "service": "Workspace service layer.",
+    "shared": "Workspace shared layer.",
+    "shared-ui": "Canonical shared UI and host composition domain.",
+    "starlight": "Astro Starlight documentation or route framework.",
+    "teaching-assignment": "Teaching-assignment service domain.",
+    "teaching-assignment-client": "Client-side teaching-assignment contract and integration domain.",
+    "test-suite": "Reusable test-suite package.",
+    "typescript": "TypeScript implementation language.",
+    "ui-library": "Shared UI registry, tokens, helpers, and test-harness package.",
+    "worker": "Asynchronous background worker.",
+    "workspace_target": "Reserved definition only; no live path qualified in this classification."
+  },
+  "repositories_without_package_manifest": [
+    "fa-auth-m8",
+    "media-service-m8",
+    "media-worker-m8",
+    "prompt-engine-m8",
+    "reparto-docente-m8"
+  ],
+  "repositories": [
+    {
+      "id": "astro-auth-m8",
+      "path": "astro-auth-m8",
+      "kind": "astro-plugin",
+      "layer": "client",
+      "facets": [
+        "typescript",
+        "client",
+        "astro-plugin",
+        "astro",
+        "starlight",
+        "auth-client"
+      ],
+      "migration_v1_bundle": "astro-plugin",
+      "source_files": [
+        "astro-auth-m8/AGENTS.md",
+        "astro-auth-m8/CLAUDE.md",
+        "astro-auth-m8/README.md",
+        "astro-auth-m8/package.json"
+      ],
+      "source_file_count": 4,
+      "source_bytes": 13921,
+      "source_set_sha256": "c3dc4f0fc337ff3615150a8b2716ebd2787682065e9b9411b808db8399b9c64a",
+      "evidence": {
+        "language": {"facets": ["typescript"], "sources": ["package.json"], "fact": "The package builds with TypeScript and publishes JavaScript module exports."},
+        "layer": {"facets": ["client"], "sources": ["AGENTS.md", "README.md"], "fact": "It owns the frontend contract for fa-auth-m8 and talks to the backend over HTTP."},
+        "kind": {"facets": ["astro-plugin"], "sources": ["AGENTS.md", "README.md", "package.json"], "fact": "It is the required baseline Astro integration and headless client package."},
+        "framework": {"facets": ["astro", "starlight"], "sources": ["README.md", "package.json"], "fact": "Astro integration exports and Astro/Starlight peer dependencies are explicit."},
+        "domain": {"facets": ["auth-client"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "It owns auth schemas, API wrappers, token handling, providers, hooks, routes, and compatibility checks."}
+      }
+    },
+    {
+      "id": "astro-media-m8",
+      "path": "astro-media-m8",
+      "kind": "astro-plugin",
+      "layer": "client",
+      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "media-client"],
+      "migration_v1_bundle": "astro-plugin",
+      "source_files": ["astro-media-m8/AGENTS.md", "astro-media-m8/CLAUDE.md", "astro-media-m8/README.md", "astro-media-m8/package.json"],
+      "source_file_count": 4,
+      "source_bytes": 18043,
+      "source_set_sha256": "2d09f95e7fe44e74a81b2b9b93ac61d10e48ae4fbc61dd4435d64c618c76f3e3",
+      "evidence": {
+        "language": {"facets": ["typescript"], "sources": ["package.json"], "fact": "The package builds with TypeScript and publishes JavaScript module exports."},
+        "layer": {"facets": ["client"], "sources": ["AGENTS.md", "README.md"], "fact": "It owns the frontend contract for media-service-m8 and communicates over HTTP."},
+        "kind": {"facets": ["astro-plugin"], "sources": ["AGENTS.md", "README.md", "package.json"], "fact": "It is an optional Astro integration and headless client package."},
+        "framework": {"facets": ["astro", "starlight"], "sources": ["README.md", "package.json"], "fact": "Astro integration exports and Astro/Starlight peer dependencies are explicit."},
+        "domain": {"facets": ["media-client"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "It owns media schemas, API wrappers, upload controls, auth adaptation, routes, and compatibility checks."}
+      }
+    },
+    {
+      "id": "astro-prompt-m8",
+      "path": "astro-prompt-m8",
+      "kind": "astro-plugin",
+      "layer": "client",
+      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "prompt-client"],
+      "migration_v1_bundle": "astro-plugin",
+      "source_files": ["astro-prompt-m8/AGENTS.md", "astro-prompt-m8/CLAUDE.md", "astro-prompt-m8/README.md", "astro-prompt-m8/package.json"],
+      "source_file_count": 4,
+      "source_bytes": 19174,
+      "source_set_sha256": "24623dcf69890a8f605ab8aef78f466670abf0b10a3ebfd1b27b3cf15ec0fec4",
+      "evidence": {
+        "language": {"facets": ["typescript"], "sources": ["package.json"], "fact": "The package builds with TypeScript and publishes JavaScript module exports."},
+        "layer": {"facets": ["client"], "sources": ["AGENTS.md", "README.md"], "fact": "It owns the frontend contract for prompt-engine-m8 and communicates over HTTP."},
+        "kind": {"facets": ["astro-plugin"], "sources": ["AGENTS.md", "README.md", "package.json"], "fact": "It is an optional Astro integration and headless client package."},
+        "framework": {"facets": ["astro", "starlight"], "sources": ["README.md", "package.json"], "fact": "Astro integration exports and Astro/Starlight peer dependencies are explicit."},
+        "domain": {"facets": ["prompt-client"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "It owns prompt schemas, API wrappers, composition helpers, auth adaptation, routes, and compatibility checks."}
+      }
+    },
+    {
+      "id": "astro-reparto-m8",
+      "path": "astro-reparto-m8",
+      "kind": "astro-plugin",
+      "layer": "client",
+      "facets": ["typescript", "client", "astro-plugin", "astro", "starlight", "teaching-assignment-client"],
+      "migration_v1_bundle": "astro-plugin",
+      "source_files": ["astro-reparto-m8/AGENTS.md", "astro-reparto-m8/CLAUDE.md", "astro-reparto-m8/README.md", "astro-reparto-m8/package.json"],
+      "source_file_count": 4,
+      "source_bytes": 12135,
+      "source_set_sha256": "db76ac7b2fcf8e27f8efac324cd78271578fb8af859ba15a5c96c8f7ff4b809c",
+      "evidence": {
+        "language": {"facets": ["typescript"], "sources": ["package.json"], "fact": "The package builds with TypeScript and publishes JavaScript module exports."},
+        "layer": {"facets": ["client"], "sources": ["AGENTS.md", "README.md"], "fact": "It owns the frontend contract for reparto-docente-m8 and communicates over HTTP."},
+        "kind": {"facets": ["astro-plugin"], "sources": ["AGENTS.md", "README.md", "package.json"], "fact": "It is an Astro integration and headless client package with optional starter routes."},
+        "framework": {"facets": ["astro", "starlight"], "sources": ["README.md", "package.json"], "fact": "Astro integration exports and Astro/Starlight peer dependencies are explicit."},
+        "domain": {"facets": ["teaching-assignment-client"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "It owns the reparto teaching-assignment client contract, routes, auth adapter, and UI integration."}
+      }
+    },
+    {
+      "id": "astro-ui-m8",
+      "path": "astro-ui-m8",
+      "kind": "ui-library",
+      "layer": "shared",
+      "facets": ["typescript", "shared", "ui-library", "shared-ui"],
+      "migration_v1_bundle": "astro-ui",
+      "source_files": ["astro-ui-m8/AGENTS.md", "astro-ui-m8/CLAUDE.md", "astro-ui-m8/README.md", "astro-ui-m8/package.json"],
+      "source_file_count": 4,
+      "source_bytes": 12005,
+      "source_set_sha256": "209ff51797b960cbcd32c55611dcecfc07848c7bd5c79c64c72f277653d6b029",
+      "evidence": {
+        "language": {"facets": ["typescript"], "sources": ["package.json"], "fact": "The package builds with TypeScript and publishes JavaScript module exports."},
+        "layer": {"facets": ["shared"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "It is the canonical shared UI layer and owns no backend or business domain."},
+        "kind": {"facets": ["ui-library"], "sources": ["AGENTS.md", "README.md", "package.json"], "fact": "It is a UI registry, token bridge, generic helper, and shared test-harness package, explicitly not an Astro integration."},
+        "domain": {"facets": ["shared-ui"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "It owns the canonical shared shadcn registry and UI primitives for the Astro package fleet."}
+      }
+    },
+    {
+      "id": "auth-sdk-m8",
+      "path": "auth-sdk-m8",
+      "kind": "sdk",
+      "layer": "platform",
+      "facets": ["python", "platform", "sdk", "auth-security"],
+      "migration_v1_bundle": "python",
+      "source_files": ["auth-sdk-m8/AGENTS.md", "auth-sdk-m8/CLAUDE.md", "auth-sdk-m8/README.md", "auth-sdk-m8/pyproject.toml"],
+      "source_file_count": 4,
+      "source_bytes": 58279,
+      "source_set_sha256": "3683890e5a23e8c3fe5ac7914e3c538447fcaaf3b9f4a040827c55c07fe1f89e",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["README.md", "pyproject.toml"], "fact": "The package declares Python 3.11 or newer and Python classifiers."},
+        "layer": {"facets": ["platform"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "Both instruction files classify it as the platform shared-authentication SDK."},
+        "kind": {"facets": ["sdk"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "It provides reusable shared auth schemas, JWT utilities, and optional integration components."},
+        "domain": {"facets": ["auth-security"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "Authentication, JWT validation, authorization primitives, and security extras are its declared purpose."}
+      }
+    },
+    {
+      "id": "fa-auth-m8",
+      "path": "fa-auth-m8",
+      "kind": "api-service",
+      "layer": "service",
+      "facets": ["python", "service", "api-service", "fastapi", "auth-security"],
+      "migration_v1_bundle": "python",
+      "source_files": ["fa-auth-m8/AGENTS.md", "fa-auth-m8/CLAUDE.md", "fa-auth-m8/README.md"],
+      "source_file_count": 3,
+      "source_bytes": 79076,
+      "source_set_sha256": "7ae54f129aed455d81685a5cadf6a84a00efbc5a1cf2ef5d3a6a0487409f213f",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["README.md"], "fact": "The README identifies a Python FastAPI microservice."},
+        "layer": {"facets": ["service"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "Both instruction files classify it as the central authentication service."},
+        "kind": {"facets": ["api-service"], "sources": ["AGENTS.md", "README.md"], "fact": "It exposes an authentication microservice API and owns its service database."},
+        "framework": {"facets": ["fastapi"], "sources": ["README.md"], "fact": "The README explicitly identifies the service as FastAPI."},
+        "domain": {"facets": ["auth-security"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "It owns authentication, token issuance, sessions, users, roles, and API keys."}
+      }
+    },
+    {
+      "id": "fa-ui-m8",
+      "path": "fa-ui-m8",
+      "kind": "astro-host",
+      "layer": "client",
+      "facets": ["typescript", "client", "astro-host", "astro", "starlight", "shared-ui"],
+      "migration_v1_bundle": "typescript",
+      "source_files": ["fa-ui-m8/AGENTS.md", "fa-ui-m8/CLAUDE.md", "fa-ui-m8/app/README.md", "fa-ui-m8/app/package.json"],
+      "source_file_count": 4,
+      "source_bytes": 21676,
+      "source_set_sha256": "cd0a157e9f6ded9febbdba89ff5206dc2350a652730d3d7279833e8c1421f77e",
+      "evidence": {
+        "language": {"facets": ["typescript"], "sources": ["CLAUDE.md", "app/package.json"], "fact": "The application declares TypeScript tooling and TypeScript client policy."},
+        "layer": {"facets": ["client"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "It is the client-layer UI host and consumes services only through plugins and HTTP contracts."},
+        "kind": {"facets": ["astro-host"], "sources": ["AGENTS.md", "CLAUDE.md", "app/package.json"], "fact": "It is the single deployable Astro host/composer application; app/ is its internal application directory."},
+        "framework": {"facets": ["astro", "starlight"], "sources": ["CLAUDE.md", "app/README.md", "app/package.json"], "fact": "Astro, Starlight, and React-island dependencies and commands are explicit."},
+        "domain": {"facets": ["shared-ui"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "It composes the shared plugin UI and registry skins without owning backend contracts."}
+      }
+    },
+    {
+      "id": "fastapi-m8",
+      "path": "fastapi-m8",
+      "kind": "framework",
+      "layer": "platform",
+      "facets": ["python", "platform", "framework", "fastapi", "auth-security"],
+      "migration_v1_bundle": "python",
+      "source_files": ["fastapi-m8/AGENTS.md", "fastapi-m8/CLAUDE.md", "fastapi-m8/README.md", "fastapi-m8/pyproject.toml"],
+      "source_file_count": 4,
+      "source_bytes": 62932,
+      "source_set_sha256": "8bfdc3cec28fad10272e75c3d729a37ea8a9fb3aaaec6014b5abce8cfe27a778",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["README.md", "pyproject.toml"], "fact": "The package requires Python 3.11 or newer and declares Python classifiers."},
+        "layer": {"facets": ["platform"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "Both instruction files classify it as a reusable platform framework."},
+        "kind": {"facets": ["framework"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "It is a reusable application factory and service-scaffolding framework without business logic."},
+        "framework": {"facets": ["fastapi"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "FastAPI is explicit in the package name, description, classifier, dependency, and application factory."},
+        "domain": {"facets": ["auth-security"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "It wires auth-sdk-m8 authentication and security plumbing into consumer services."}
+      }
+    },
+    {
+      "id": "imgtools_m8",
+      "path": "imgtools_m8",
+      "kind": "library",
+      "layer": "platform",
+      "facets": ["python", "platform", "library", "image-processing"],
+      "migration_v1_bundle": "python",
+      "source_files": ["imgtools_m8/AGENTS.md", "imgtools_m8/CLAUDE.md", "imgtools_m8/README.md", "imgtools_m8/pyproject.toml"],
+      "source_file_count": 4,
+      "source_bytes": 17679,
+      "source_set_sha256": "b268774be99567003bb42f4e5722f4b84fffbc7537f8109e6d17b34ca86f54ae",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["README.md", "pyproject.toml"], "fact": "The package is explicitly a Python package and declares Python classifiers."},
+        "layer": {"facets": ["platform"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "Both instruction files classify it as a platform image-processing library."},
+        "kind": {"facets": ["library"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "It is a reusable pure-computation package with no service-layer coupling."},
+        "domain": {"facets": ["image-processing"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "Image conversion, downscaling, upscaling, and deterministic processing are its declared purpose."}
+      }
+    },
+    {
+      "id": "media-sdk-m8",
+      "path": "media-sdk-m8",
+      "kind": "sdk",
+      "layer": "platform",
+      "facets": ["python", "platform", "sdk", "media"],
+      "migration_v1_bundle": "python",
+      "source_files": ["media-sdk-m8/AGENTS.md", "media-sdk-m8/CLAUDE.md", "media-sdk-m8/README.md", "media-sdk-m8/pyproject.toml"],
+      "source_file_count": 4,
+      "source_bytes": 11039,
+      "source_set_sha256": "a02a763c93cb94ca051edc6c2b3f4b360baa493137a4fe0756384f86d37b4a09",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["pyproject.toml"], "fact": "The package requires Python 3.11 or newer and declares Python classifiers."},
+        "layer": {"facets": ["platform"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "Both instruction files classify it as the platform shared-media SDK."},
+        "kind": {"facets": ["sdk"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "It provides reusable settings-agnostic object-storage primitives and producer-consumer contracts."},
+        "domain": {"facets": ["media"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md", "pyproject.toml"], "fact": "Media storage and media job contracts are its declared domain."}
+      }
+    },
+    {
+      "id": "media-service-m8",
+      "path": "media-service-m8",
+      "kind": "api-service",
+      "layer": "service",
+      "facets": ["python", "service", "api-service", "fastapi", "media"],
+      "migration_v1_bundle": "python",
+      "source_files": ["media-service-m8/AGENTS.md", "media-service-m8/CLAUDE.md", "media-service-m8/README.md"],
+      "source_file_count": 3,
+      "source_bytes": 29718,
+      "source_set_sha256": "ed5796de64b6f0f57f58a1a385ef503cd508ce2b380791b558fac6e884d127b8",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["README.md"], "fact": "The service is built on the Python fastapi-m8 framework."},
+        "layer": {"facets": ["service"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "Both instruction files classify it as the media storage service."},
+        "kind": {"facets": ["api-service"], "sources": ["AGENTS.md", "README.md"], "fact": "It exposes the media API and owns storage lifecycle and persistence."},
+        "framework": {"facets": ["fastapi"], "sources": ["README.md"], "fact": "The README explicitly states that it is built on fastapi-m8."},
+        "domain": {"facets": ["media"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "Uploads, object storage, presigned delivery, and asset lifecycle are its declared domain."}
+      }
+    },
+    {
+      "id": "media-worker-m8",
+      "path": "media-worker-m8",
+      "kind": "worker",
+      "layer": "service",
+      "facets": ["python", "service", "worker", "arq", "media"],
+      "migration_v1_bundle": "python",
+      "source_files": ["media-worker-m8/AGENTS.md", "media-worker-m8/CLAUDE.md", "media-worker-m8/README.md"],
+      "source_file_count": 3,
+      "source_bytes": 11964,
+      "source_set_sha256": "83b4e6fb3427a2f157a64b416f03e08f7dbae985f1558d85b46065954a57eabe",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["AGENTS.md", "README.md"], "fact": "The worker uses asyncio, Python package installation, and Python ARQ worker entry points."},
+        "layer": {"facets": ["service"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "Both instruction files classify it as the async media-processing service worker."},
+        "kind": {"facets": ["worker"], "sources": ["AGENTS.md", "README.md"], "fact": "It consumes background jobs, owns no database, and reports results to media-service-m8."},
+        "framework": {"facets": ["arq"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "ARQ is explicitly the async worker framework and job queue model."},
+        "domain": {"facets": ["media"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "Antivirus scanning and image variant processing are media-domain jobs."}
+      }
+    },
+    {
+      "id": "prompt-engine-m8",
+      "path": "prompt-engine-m8",
+      "kind": "api-service",
+      "layer": "service",
+      "facets": ["python", "service", "api-service", "fastapi", "prompt"],
+      "migration_v1_bundle": "python",
+      "source_files": ["prompt-engine-m8/AGENTS.md", "prompt-engine-m8/CLAUDE.md", "prompt-engine-m8/README.md"],
+      "source_file_count": 3,
+      "source_bytes": 15600,
+      "source_set_sha256": "8d7c708cdc96a6e1f690cdbb6839d3e52dcf402414c0507777ba73779ca4948b",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["README.md"], "fact": "The README identifies a FastAPI service and Python package directory."},
+        "layer": {"facets": ["service"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "It is explicitly a service-layer prompt-generation microservice."},
+        "kind": {"facets": ["api-service"], "sources": ["AGENTS.md", "README.md"], "fact": "It exposes authenticated APIs for prompt categories, blocks, templates, and composition."},
+        "framework": {"facets": ["fastapi"], "sources": ["README.md"], "fact": "The README explicitly identifies it as a FastAPI service built with fastapi-m8."},
+        "domain": {"facets": ["prompt"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md"], "fact": "Prompt templates, reusable blocks, and deterministic prompt composition are its declared domain."}
+      }
+    },
+    {
+      "id": "reparto-docente-m8",
+      "path": "reparto-docente-m8",
+      "kind": "api-service",
+      "layer": "service",
+      "facets": ["python", "service", "api-service", "fastapi", "teaching-assignment"],
+      "migration_v1_bundle": "python",
+      "source_files": ["reparto-docente-m8/AGENTS.md", "reparto-docente-m8/CLAUDE.md", "reparto-docente-m8/README.md"],
+      "source_file_count": 3,
+      "source_bytes": 11487,
+      "source_set_sha256": "d6ba20e707620d5b4c1ca7175f3fb03e017c3cd787b04b0e999379b8a61194c3",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["AGENTS.md", "README.md"], "fact": "The repository uses Python tooling and a Python service environment."},
+        "layer": {"facets": ["service"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "The instructions classify it under the workspace Python service policy and as a teaching-assignment domain service."},
+        "kind": {"facets": ["api-service"], "sources": ["CLAUDE.md", "README.md"], "fact": "It exposes a domain API, owns its database schema, and serves HTTP consumers."},
+        "framework": {"facets": ["fastapi"], "sources": ["CLAUDE.md", "README.md"], "fact": "Both files explicitly identify a local-first FastAPI service."},
+        "domain": {"facets": ["teaching-assignment"], "sources": ["CLAUDE.md", "README.md"], "fact": "Schools, teachers, assignment processes, capacities, meetings, versions, exports, and audit define the teaching-assignment domain."}
+      }
+    },
+    {
+      "id": "security-tests-m8",
+      "path": "security-tests-m8",
+      "kind": "test-suite",
+      "layer": "platform",
+      "facets": ["python", "platform", "test-suite", "pytest", "security-testing"],
+      "migration_v1_bundle": "python",
+      "source_files": ["security-tests-m8/AGENTS.md", "security-tests-m8/CLAUDE.md", "security-tests-m8/README.md", "security-tests-m8/pyproject.toml"],
+      "source_file_count": 4,
+      "source_bytes": 34364,
+      "source_set_sha256": "44bce0b7b41d1f1c96d35a81c2a4a8d915eff62287c73bf362d555c106726d5a",
+      "evidence": {
+        "language": {"facets": ["python"], "sources": ["README.md", "pyproject.toml"], "fact": "The package requires Python 3.11 or newer and declares Python classifiers."},
+        "layer": {"facets": ["platform"], "sources": ["AGENTS.md", "CLAUDE.md"], "fact": "Both instruction files classify it as a reusable platform security-test suite."},
+        "kind": {"facets": ["test-suite"], "sources": ["AGENTS.md", "README.md", "pyproject.toml"], "fact": "It provides reusable live suites, a CLI, and a pytest plugin rather than a domain service."},
+        "framework": {"facets": ["pytest"], "sources": ["README.md", "pyproject.toml"], "fact": "Pytest framework classification, plugin entry point, fixtures, markers, and dependencies are explicit."},
+        "domain": {"facets": ["security-testing"], "sources": ["AGENTS.md", "CLAUDE.md", "README.md", "pyproject.toml"], "fact": "Live authentication and service-stack security testing is its declared purpose."}
+      }
+    }
+  ]
+}

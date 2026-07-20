@@ -86,6 +86,10 @@ class TransportConfirmation:
 
     envelope_sha256: str
     delivered_bytes: int
+    # A client may expose its session identity only after its pre-task gate has
+    # begun.  The kernel starts with a launcher-owned pending identifier and
+    # replaces it atomically before recording HANDED_OFF.
+    client_session_id: str | None = None
 
 
 class TransportAdapter(Protocol):
@@ -196,6 +200,19 @@ class DeliveryKernel:
                     or confirmation.delivered_bytes != len(request.resolved.envelope_bytes)
                 ):
                     _fail("E_CHANNEL", "transport callback did not confirm the exact payload")
+                client_session_id = getattr(confirmation, "client_session_id", None)
+                if client_session_id is not None:
+                    try:
+                        w2b1._identifier(
+                            client_session_id,
+                            "transport client_session_id",
+                        )
+                    except w2b1.AgentContextError:
+                        _fail("E_LIFECYCLE", "transport returned an invalid client-session identity")
+                    session = dict(session)
+                    session["client_session_id"] = client_session_id
+                    w2b1.validate_session(session)
+                    self._write_json(prepared.runtime_dir, "session.json", session, replace=True)
                 receipt = self._transition(
                     prepared.runtime_dir,
                     session,

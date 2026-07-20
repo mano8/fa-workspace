@@ -93,6 +93,42 @@ source hashes, and rejects oversized payloads without truncation:
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w5_claude_adapter -v
 ```
 
+Phase 6 Step 6.1 keeps the tracked Codex project configuration portable and
+least-privilege: it uses on-request approval, workspace-write sandboxing,
+cached search, and the unelevated Windows sandbox without model or reasoning
+effort pins. Run its static check with:
+
+```bash
+"$M8_PYTHON" scripts/agent_context/validate_codex_config.py --workspace .
+```
+
+Phase 6 Steps 6.2--6.4 add the Codex-only canonical launcher boundary.
+[`codex-repo.sh`](../codex-repo.sh) and
+[`codex-repo.ps1`](../codex-repo.ps1) discover the workspace only through the
+exact root marker, accept a repeatable canonical set of registered direct
+children and tasks, and independently prove root plus each selected child
+`AGENTS.md` bytes through the installed `codex debug prompt-input` mechanism.
+Codex's current instruction wrapper is accepted only when it contains the
+exact source once; accounting includes the selected execution directory's
+active native instruction once. They pass only the resolver's exact JCS
+envelope through the verified `developer_instructions` channel. Mutating and
+multi-repository requests require an exact-scope JSON
+authorization record supplied through a workspace-relative regular file.
+Traversal, duplicate identifiers, symlinked children/instructions, missing
+direct `.git`, source/config/client/trust drift, and invalid authorization
+records fail before `codex exec`. The adapter delegates runtime state,
+source-drift checks, receipt validation, collision handling, and `HANDED_OFF`
+terminality to the W2b3 kernel; no printed/model response is treated as
+delivery proof.
+
+```bash
+scripts/codex-repo.sh --repository auth-sdk-m8 "inspect the repository"
+scripts/codex-repo.sh --repository auth-sdk-m8 --repository media-sdk-m8 \
+  --task cross-repository --operation analyze \
+  --authorization .workspace/authorizations/approved-cross-sdk.json "compare both SDKs"
+"$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w6_codex_adapter -v
+```
+
 The faceted resolver mode in [`resolve-context.py`](resolve-context.py) remains
 an explicit, inactive W2b2 tool. It requires a faceted v2 registry/index and policy metadata fixture, then accepts repeatable
 repository, task, exclusion, operation, and authorization arguments. Its

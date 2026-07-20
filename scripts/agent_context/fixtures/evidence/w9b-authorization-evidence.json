@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "evidence_id": "w9b-authorization-2026-07-20",
+  "status": "IMPLEMENTED_PENDING_W9F_EXACT_TREE_VERIFICATION",
+  "contract": ".workspace/contracts/agent-context-w9a-remediation.contract.md#4-authenticated-external-authorization-amendment",
+  "implementation": "scripts/agent_context/authorization.py",
+  "algorithm": "Ed25519",
+  "payload_encoding": "RFC 8785 JCS UTF-8",
+  "external_authority": {
+    "trust_store": "owner-controlled external path outside the workspace write boundary",
+    "replay_store": "owner-controlled external path with atomic O_CREAT|O_EXCL redemption"
+  },
+  "binding": [
+    "launch_id",
+    "nonce",
+    "repositories",
+    "tasks",
+    "operations",
+    "user_task_sha256",
+    "issued_at",
+    "expires_at"
+  ],
+  "receipt_provenance_fields": [
+    "authorization_id",
+    "issuer",
+    "key_id",
+    "signed_payload_sha256",
+    "signature_sha256",
+    "issued_at",
+    "expires_at",
+    "redemption_id"
+  ],
+  "named_negative_test_module": "scripts.agent_context.tests.test_w9b_authorization",
+  "invalidation_triggers": [
+    "authorization-algorithm-change",
+    "authorization-payload-change",
+    "replay-store-change",
+    "trust-store-change"
+  ]
+}

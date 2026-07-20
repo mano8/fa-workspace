@@ -37,6 +37,16 @@ authorization record whose repository and operation sets match exactly;
 manifests, sessions, and receipts retain only its identifier, canonical record
 hash, and source hash alongside the selected repository/task/operation sets.
 
+Phase 10 Step 10.2 adds the W9b external authorization verifier in
+[`authorization.py`](authorization.py). It creates a launch-bound request and
+accepts only an Ed25519 signature over an exact JCS payload from an
+owner-controlled trust store outside the workspace. It atomically consumes the
+capability in an external replay store before submission and exposes only
+authorization ID, issuer/key ID, payload/signature digests, issue/expiry, and
+redemption ID for future manifest/session/receipt linkage. Raw approval and
+signature bytes are never runtime artifacts. The canonical launch remains
+disabled pending the remaining Phase 10 boundaries.
+
 ```bash
 "$M8_PYTHON" scripts/agent_context/resolve-context.py \
   --registry .workspace/repo-types.json \

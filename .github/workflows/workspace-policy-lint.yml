@@ -22,8 +22,8 @@ jobs:
         with:
           python-version: '3.12'
           check-latest: false
-      - name: Install root lint dependency
-        run: python -m pip install --disable-pip-version-check ruff==0.15.22
+      - name: Install root tooling dependencies
+        run: python -m pip install --disable-pip-version-check ruff==0.15.22 cryptography==49.0.0
       - name: Parse root JSON and TOML configuration
         run: |
           python - <<'PY'

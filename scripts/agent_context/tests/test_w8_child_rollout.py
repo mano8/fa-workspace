@@ -25,13 +25,12 @@ class ChildRolloutContractTests(unittest.TestCase):
             (WORKSPACE / child_rollout.ROLLOUT_RECORD).read_bytes()
         )
 
-    def test_frozen_boundaries_match_pending_live_classified_inputs(self) -> None:
+    def test_frozen_boundaries_remain_valid_after_all_rollouts(self) -> None:
         child_rollout.validate_rollout_record(
             WORKSPACE,
             self.registry,
             self.record,
-            verify_live_inputs=True,
-            verify_live_boundary_ids={f"C{number:02d}" for number in range(2, 17)},
+            verify_live_inputs=False,
         )
         self.assertEqual(len(self.record["boundaries"]), 16)
         self.assertTrue(
@@ -40,6 +39,60 @@ class ChildRolloutContractTests(unittest.TestCase):
                 for boundary in self.record["boundaries"]
             )
         )
+
+    def test_live_completed_c02_through_c16_rollouts_have_one_neutral_owner(self) -> None:
+        for repository_id in (
+            "media-sdk-m8",
+            "fastapi-m8",
+            "imgtools_m8",
+            "security-tests-m8",
+            "fa-auth-m8",
+            "media-service-m8",
+            "media-worker-m8",
+            "prompt-engine-m8",
+            "reparto-docente-m8",
+            "fa-ui-m8",
+            "astro-ui-m8",
+            "astro-auth-m8",
+            "astro-media-m8",
+            "astro-prompt-m8",
+            "astro-reparto-m8",
+        ):
+            child = WORKSPACE / repository_id
+            sources = {
+                name: (child / name).read_bytes()
+                for name in ("AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md")
+            }
+            for name, raw in sources.items():
+                with self.subTest(repository=repository_id, source=name):
+                    self.assertFalse(raw.startswith(b"\xef\xbb\xbf"))
+                    self.assertNotIn(b"\r", raw)
+                    self.assertTrue(raw.endswith(b"\n"))
+                    raw.decode("utf-8")
+                    self.assertNotIn(b"/.workspace", raw)
+                    self.assertNotIn(b"/workspace", raw)
+            self.assertIn(b"REPOSITORY_CONTEXT.md", sources["AGENTS.md"])
+            self.assertIn(b"REPOSITORY_CONTEXT.md", sources["CLAUDE.md"])
+            self.assertNotIn(b"## Layer", sources["AGENTS.md"])
+            self.assertNotIn(b"## Layer", sources["CLAUDE.md"])
+            self.assertIn(b"## Layer", sources["REPOSITORY_CONTEXT.md"])
+
+            for agent, entrypoint in (("codex", "AGENTS.md"), ("claude", "CLAUDE.md")):
+                with self.subTest(repository=repository_id, agent=agent, mode="parent-found"):
+                    nested = child_rollout.resolve_child_instruction_context(
+                        child,
+                        repository_id=repository_id,
+                        agent=agent,
+                        workspace_root=WORKSPACE,
+                    )
+                    self.assertEqual(nested.local_sources, ("REPOSITORY_CONTEXT.md", entrypoint))
+                    self.assertTrue(nested.workspace_enhancement_available)
+                with self.subTest(repository=repository_id, agent=agent, mode="parent-absent"):
+                    standalone = child_rollout.resolve_child_instruction_context(
+                        child, repository_id=repository_id, agent=agent
+                    )
+                    self.assertEqual(standalone.local_sources, ("REPOSITORY_CONTEXT.md", entrypoint))
+                    self.assertFalse(standalone.workspace_enhancement_available)
 
     def test_live_c01_rollout_has_one_neutral_owner_in_both_modes(self) -> None:
         child = WORKSPACE / "auth-sdk-m8"

@@ -142,6 +142,20 @@ secret-scanning tooling remains responsible for that concern.
 "$M8_PYTHON" scripts/agent_context/validate_migration_guards.py --workspace .
 ```
 
+Phase 10 Step 10.1 freezes the rejection-remediation decisions in a tracked
+contract and closed finding register. Its validator checks the exact 11-finding
+severity/owner/step mapping, capability ceiling, both audit digests, named
+negative tests and closure artifacts, and the separate ZIP limitation. Ignored
+audit inputs are optional in a clean checkout but must match their frozen hash
+when present:
+
+```bash
+"$M8_PYTHON" scripts/agent_context/validate_w9a_contract.py --workspace .
+"$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w9a_contract -v
+```
+
+Passing W9a validation does not close a finding or enable canonical delivery.
+
 Phase 7.5 preserves a reviewed, tracked baseline for the four workspace-owned
 Codex fixtures that can be measured without a child checkout or a new
 authorization record. It performs two independent measurements and compares

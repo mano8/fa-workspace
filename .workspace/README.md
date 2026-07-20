@@ -149,6 +149,7 @@ Then use the configured `$M8_PYTHON` for root-owned checks:
 "$M8_PYTHON" scripts/agent_context/validate_codex_config.py --workspace .
 "$M8_PYTHON" scripts/agent_context/validate_workspace.py --workspace .
 "$M8_PYTHON" scripts/agent_context/validate_migration_guards.py --workspace .
+"$M8_PYTHON" scripts/agent_context/validate_w9a_contract.py --workspace .
 "$M8_PYTHON" -m unittest discover -s scripts/agent_context/tests -v
 ```
 

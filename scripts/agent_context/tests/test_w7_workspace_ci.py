@@ -15,6 +15,7 @@ class WorkspacePolicyLintWorkflowTests(unittest.TestCase):
         self.assertIn("workspace-policy-lint", text)
         self.assertIn("validate_workspace.py --workspace .", text)
         self.assertIn("validate_migration_guards.py --workspace .", text)
+        self.assertIn("validate_w9a_contract.py --workspace .", text)
         self.assertIn("budget_promotion.py --workspace . --enforce-preferred", text)
         self.assertIn("unittest discover -s scripts/agent_context/tests -v", text)
         self.assertIn("python -m ruff check scripts/agent_context", text)

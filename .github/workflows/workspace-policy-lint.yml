@@ -38,6 +38,7 @@ jobs:
               '.workspace/policy.metadata.json',
               '.workspace/invariants.json',
               '.workspace/contracts/child-repository-rollout-v1.boundaries.json',
+              '.workspace/contracts/agent-context-w9a-findings.json',
               '.claude/settings.json',
           ):
               json.loads((root / relative_path).read_text(encoding='utf-8'))
@@ -50,6 +51,7 @@ jobs:
           python scripts/agent_context/validate_claude_settings.py --workspace .
           python scripts/agent_context/validate_codex_config.py --workspace .
           python scripts/agent_context/validate_migration_guards.py --workspace .
+          python scripts/agent_context/validate_w9a_contract.py --workspace .
       - name: Validate root-owned workspace policy
         run: python scripts/agent_context/validate_workspace.py --workspace .
       - name: Enforce reviewed preferred context budget

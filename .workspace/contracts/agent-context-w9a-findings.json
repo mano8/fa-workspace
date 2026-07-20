@@ -1,0 +1,583 @@
+{
+  "schema_version": 1,
+  "register_id": "w9a-2026-07-20",
+  "status": "FROZEN_W9A",
+  "frozen_at": "2026-07-20T12:17:31Z",
+  "contract_path": ".workspace/contracts/agent-context-w9a-remediation.contract.md",
+  "capability_ceiling": {
+    "required_rows": [
+      "codex:devcontainer:non-interactive"
+    ],
+    "limited_rows": [
+      "claude:devcontainer:interactive",
+      "claude:devcontainer:non-interactive",
+      "codex:devcontainer:interactive"
+    ],
+    "unsupported_rows": [
+      "claude:external-posix:interactive",
+      "claude:external-posix:non-interactive",
+      "claude:windows:interactive",
+      "claude:windows:non-interactive",
+      "codex:external-posix:interactive",
+      "codex:external-posix:non-interactive",
+      "codex:windows:interactive",
+      "codex:windows:non-interactive"
+    ],
+    "canonical_activation": "disabled-until-10.2-through-10.8-pass"
+  },
+  "source_inputs": [
+    {
+      "id": "capability-evidence",
+      "classification": "tracked-normative-input",
+      "path": "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md",
+      "sha256": "3fce2371cada5b2cbe949b0398ba29a376ca1515c7577dc6881b62263ff7588b",
+      "required_in_clean_checkout": true
+    },
+    {
+      "id": "critical-audit-en",
+      "classification": "external-review-input",
+      "path": ".workspace/plans/fa-workspace/feedback/phase-9-5-critical-sign-off-audit-en.md",
+      "sha256": "f07be4be2bc39cad5cff72d741b9c84d4f6970b7a83d21d1afb74785d1109078",
+      "required_in_clean_checkout": false
+    },
+    {
+      "id": "critical-audit-fr",
+      "classification": "external-review-input",
+      "path": ".workspace/plans/fa-workspace/feedback/deep-research-report.md",
+      "sha256": "142bc1658704b1819a4310fb0b791f8cd1761fe2379b98cb854fbd18750132ff",
+      "required_in_clean_checkout": false
+    },
+    {
+      "id": "w2a-contract",
+      "classification": "tracked-normative-input",
+      "path": ".workspace/contracts/agent-context-w2a.contract.md",
+      "sha256": "97e4fcac65f80b6b49a002842cf13c74fbbb933bef5a61993579c93c91934af2",
+      "required_in_clean_checkout": true
+    }
+  ],
+  "amendments": [
+    {
+      "id": "authorization",
+      "owner_step": "10.2",
+      "contract_section": "4",
+      "decision": "ed25519-signed-external-single-use-capability"
+    },
+    {
+      "id": "handoff",
+      "owner_step": "10.3",
+      "contract_section": "5",
+      "decision": "durable-submission-started-with-terminal-ambiguity"
+    },
+    {
+      "id": "lifecycle",
+      "owner_step": "10.6",
+      "contract_section": "8",
+      "decision": "start-resume-fresh-cleanup-no-compact"
+    },
+    {
+      "id": "multi-repository",
+      "owner_step": "10.4",
+      "contract_section": "6",
+      "decision": "root-native-selected-children-injected"
+    },
+    {
+      "id": "trust-identity",
+      "owner_step": "10.5",
+      "contract_section": "7",
+      "decision": "content-bound-clean-root-child-toolchain-identity"
+    }
+  ],
+  "findings": [
+    {
+      "id": "C-1",
+      "severity": "critical",
+      "title": "Authorization provenance is self-asserted",
+      "status": "OPEN",
+      "blocking": true,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.2",
+      "dependencies": [
+        "10.1"
+      ],
+      "owner": "external-authorization-boundary",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9b_authorization.W9bAuthorizationTests.test_agent_created_workspace_json_cannot_authorize",
+        "scripts.agent_context.tests.test_w9b_authorization.W9bAuthorizationTests.test_expired_future_or_overlong_capability_fails",
+        "scripts.agent_context.tests.test_w9b_authorization.W9bAuthorizationTests.test_forged_or_modified_signature_fails",
+        "scripts.agent_context.tests.test_w9b_authorization.W9bAuthorizationTests.test_launch_repository_task_operation_or_prompt_mismatch_fails",
+        "scripts.agent_context.tests.test_w9b_authorization.W9bAuthorizationTests.test_replay_and_ambiguous_redemption_fail"
+      ],
+      "closure_artifacts": [
+        ".workspace/contracts/agent-context-w9a-remediation.contract.md",
+        "scripts/agent_context/authorization.py",
+        "scripts/agent_context/fixtures/evidence/w9b-authorization-evidence.json",
+        "scripts/agent_context/tests/test_w9b_authorization.py"
+      ],
+      "amendment_sections": [
+        "4"
+      ],
+      "invalidation_triggers": [
+        "authorization-algorithm-change",
+        "authorization-payload-change",
+        "replay-store-change",
+        "trust-store-change"
+      ]
+    },
+    {
+      "id": "C-2",
+      "severity": "critical",
+      "title": "User execution precedes durable handoff evidence",
+      "status": "OPEN",
+      "blocking": true,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "narrow-contract-and-remediate",
+      "remediation_step": "10.3",
+      "dependencies": [
+        "10.1",
+        "10.2"
+      ],
+      "owner": "submission-state-boundary",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9c_submission_state.W9cSubmissionStateTests.test_fault_after_context_and_before_prompt_is_ambiguous",
+        "scripts.agent_context.tests.test_w9c_submission_state.W9cSubmissionStateTests.test_fault_after_side_effect_never_retries",
+        "scripts.agent_context.tests.test_w9c_submission_state.W9cSubmissionStateTests.test_fault_after_submission_is_ambiguous",
+        "scripts.agent_context.tests.test_w9c_submission_state.W9cSubmissionStateTests.test_fault_before_transport_is_failed",
+        "scripts.agent_context.tests.test_w9c_submission_state.W9cSubmissionStateTests.test_journal_and_derived_view_crash_matrix_fails_closed",
+        "scripts.agent_context.tests.test_w9c_submission_state.W9cSubmissionStateTests.test_kill_during_cleanup_preserves_terminal_disposition"
+      ],
+      "closure_artifacts": [
+        ".workspace/contracts/agent-context-w9a-remediation.contract.md",
+        "scripts/agent_context/delivery_kernel.py",
+        "scripts/agent_context/fixtures/evidence/w9c-submission-state-evidence.json",
+        "scripts/agent_context/tests/test_w9c_submission_state.py"
+      ],
+      "amendment_sections": [
+        "5"
+      ],
+      "invalidation_triggers": [
+        "client-event-order-change",
+        "journal-format-change",
+        "state-machine-change",
+        "transport-boundary-change"
+      ]
+    },
+    {
+      "id": "H-1",
+      "severity": "high",
+      "title": "Native injected measurement and multi-repository models diverge",
+      "status": "OPEN",
+      "blocking": true,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.4",
+      "dependencies": [
+        "10.1",
+        "10.3"
+      ],
+      "owner": "multi-repository-source-model",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9d1_multi_repository.W9d1MultiRepositoryTests.test_conflicting_siblings_remain_repository_scoped",
+        "scripts.agent_context.tests.test_w9d1_multi_repository.W9d1MultiRepositoryTests.test_native_evidence_ids_are_populated",
+        "scripts.agent_context.tests.test_w9d1_multi_repository.W9d1MultiRepositoryTests.test_reversed_repository_order_has_identical_source_set",
+        "scripts.agent_context.tests.test_w9d1_multi_repository.W9d1MultiRepositoryTests.test_root_native_child_inject_sources_are_exact_once",
+        "scripts.agent_context.tests.test_w9d1_multi_repository.W9d1MultiRepositoryTests.test_single_repository_uses_root_execution_model",
+        "scripts.agent_context.tests.test_w9d1_multi_repository.W9d1MultiRepositoryTests.test_transport_manifest_receipt_and_measurement_recompute"
+      ],
+      "closure_artifacts": [
+        ".workspace/contracts/agent-context-w9a-remediation.contract.md",
+        "scripts/agent_context/codex_adapter.py",
+        "scripts/agent_context/fixtures/evidence/w9d1-multi-repository-evidence.json",
+        "scripts/agent_context/tests/test_w9d1_multi_repository.py"
+      ],
+      "amendment_sections": [
+        "6"
+      ],
+      "invalidation_triggers": [
+        "execution-directory-change",
+        "instruction-discovery-change",
+        "manifest-source-shape-change",
+        "transport-source-set-change"
+      ]
+    },
+    {
+      "id": "H-2",
+      "severity": "high",
+      "title": "Runtime evidence is not bound to the complete reviewed trust set",
+      "status": "OPEN",
+      "blocking": true,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.5",
+      "dependencies": [
+        "10.1"
+      ],
+      "owner": "reviewed-trust-identity",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_binary_global_config_or_platform_drift_fails",
+        "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_capability_lock_config_or_instruction_drift_fails",
+        "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_dirty_or_staged_root_fails",
+        "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_parent_tree_receipt_fails",
+        "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_selected_child_identity_or_instruction_drift_fails"
+      ],
+      "closure_artifacts": [
+        ".workspace/contracts/agent-context-w9a-remediation.contract.md",
+        "scripts/agent_context/fixtures/evidence/w9d2-trust-identity-evidence.json",
+        "scripts/agent_context/tests/test_w9d2_trust_identity.py",
+        "scripts/agent_context/trust_identity.py"
+      ],
+      "amendment_sections": [
+        "7"
+      ],
+      "invalidation_triggers": [
+        "capability-identity-change",
+        "critical-input-set-change",
+        "toolchain-identity-change",
+        "trust-identity-shape-change"
+      ]
+    },
+    {
+      "id": "H-3",
+      "severity": "high",
+      "title": "Required lifecycle and cleanup are not production wired",
+      "status": "OPEN",
+      "blocking": true,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate-or-remove-claim",
+      "remediation_step": "10.6",
+      "dependencies": [
+        "10.3",
+        "10.5"
+      ],
+      "owner": "production-lifecycle-boundary",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9d3_lifecycle.W9d3LifecycleTests.test_ambiguous_generation_cannot_resume",
+        "scripts.agent_context.tests.test_w9d3_lifecycle.W9d3LifecycleTests.test_concurrent_and_substituted_runtime_paths_fail",
+        "scripts.agent_context.tests.test_w9d3_lifecycle.W9d3LifecycleTests.test_fresh_invalidates_prior_reuse",
+        "scripts.agent_context.tests.test_w9d3_lifecycle.W9d3LifecycleTests.test_interrupted_retention_and_startup_cleanup_are_safe",
+        "scripts.agent_context.tests.test_w9d3_lifecycle.W9d3LifecycleTests.test_resume_revalidates_source_and_trust_identity",
+        "scripts.agent_context.tests.test_w9d3_lifecycle.W9d3LifecycleTests.test_unsupported_compact_fails"
+      ],
+      "closure_artifacts": [
+        ".workspace/contracts/agent-context-w9a-remediation.contract.md",
+        "scripts/agent_context/fixtures/evidence/w9d3-lifecycle-evidence.json",
+        "scripts/agent_context/tests/test_w9d3_lifecycle.py",
+        "scripts/codex-repo.ps1",
+        "scripts/codex-repo.sh"
+      ],
+      "amendment_sections": [
+        "5",
+        "8"
+      ],
+      "invalidation_triggers": [
+        "cleanup-policy-change",
+        "client-lifecycle-capability-change",
+        "runtime-layout-change",
+        "wrapper-interface-change"
+      ]
+    },
+    {
+      "id": "M-1",
+      "severity": "medium",
+      "title": "Canonical launch depends on ignored status evidence",
+      "status": "OPEN",
+      "blocking": false,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.7",
+      "dependencies": [
+        "10.5"
+      ],
+      "owner": "capability-authority-boundary",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9d3_capability_authority.W9d3CapabilityAuthorityTests.test_clean_checkout_has_documented_capability_path",
+        "scripts.agent_context.tests.test_w9d3_capability_authority.W9d3CapabilityAuthorityTests.test_deleted_ignored_status_does_not_change_authority",
+        "scripts.agent_context.tests.test_w9d3_capability_authority.W9d3CapabilityAuthorityTests.test_substituted_ignored_status_does_not_change_authority",
+        "scripts.agent_context.tests.test_w9d3_capability_authority.W9d3CapabilityAuthorityTests.test_tracked_capability_drift_fails"
+      ],
+      "closure_artifacts": [
+        "scripts/agent_context/codex_adapter.py",
+        "scripts/agent_context/fixtures/evidence/capability-evidence.json",
+        "scripts/agent_context/fixtures/evidence/w9d3-capability-authority-evidence.json",
+        "scripts/agent_context/tests/test_w9d3_capability_authority.py"
+      ],
+      "amendment_sections": [
+        "7"
+      ],
+      "invalidation_triggers": [
+        "capability-artifact-change",
+        "capability-regeneration-change",
+        "ignored-status-authority-change"
+      ]
+    },
+    {
+      "id": "M-2",
+      "severity": "medium",
+      "title": "Production delivery validation is weaker than offline validation",
+      "status": "OPEN",
+      "blocking": false,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.8",
+      "dependencies": [
+        "10.2",
+        "10.3",
+        "10.4",
+        "10.5",
+        "10.6",
+        "10.7"
+      ],
+      "owner": "shared-live-offline-validator",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9d3_shared_validation.W9d3SharedValidationTests.test_authorization_lifecycle_and_receipt_defects_match",
+        "scripts.agent_context.tests.test_w9d3_shared_validation.W9d3SharedValidationTests.test_native_and_trust_defects_match",
+        "scripts.agent_context.tests.test_w9d3_shared_validation.W9d3SharedValidationTests.test_source_entry_and_accounting_defects_match",
+        "scripts.agent_context.tests.test_w9d3_shared_validation.W9d3SharedValidationTests.test_valid_live_delivery_recomputes_exactly"
+      ],
+      "closure_artifacts": [
+        "scripts/agent_context/fixtures/evidence/w9d3-shared-validation-evidence.json",
+        "scripts/agent_context/shared_validation.py",
+        "scripts/agent_context/tests/test_w9d3_shared_validation.py",
+        "scripts/agent_context/validate_workspace.py"
+      ],
+      "amendment_sections": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "invalidation_triggers": [
+        "artifact-schema-change",
+        "live-preflight-change",
+        "validation-rule-change"
+      ]
+    },
+    {
+      "id": "M-3",
+      "severity": "medium",
+      "title": "Normative documentation and status claims are stale",
+      "status": "OPEN",
+      "blocking": false,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.9",
+      "dependencies": [
+        "10.2",
+        "10.3",
+        "10.4",
+        "10.5",
+        "10.6",
+        "10.7",
+        "10.8"
+      ],
+      "owner": "current-documentation-boundary",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9e_documentation.W9eDocumentationTests.test_active_inactive_and_canonical_limited_claims_are_consistent",
+        "scripts.agent_context.tests.test_w9e_documentation.W9eDocumentationTests.test_current_historical_and_parent_final_tree_claims_are_consistent",
+        "scripts.agent_context.tests.test_w9e_documentation.W9eDocumentationTests.test_documented_commands_and_links_validate"
+      ],
+      "closure_artifacts": [
+        ".workspace/README.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "scripts/agent_context/README.md",
+        "scripts/agent_context/fixtures/evidence/w9e-documentation-evidence.json",
+        "scripts/agent_context/tests/test_w9e_documentation.py"
+      ],
+      "amendment_sections": [
+        "1",
+        "2",
+        "10"
+      ],
+      "invalidation_triggers": [
+        "capability-claim-change",
+        "critical-documentation-change",
+        "runtime-behavior-change"
+      ]
+    },
+    {
+      "id": "M-4",
+      "severity": "medium",
+      "title": "Devcontainer bootstrap is non-deterministic",
+      "status": "OPEN",
+      "blocking": false,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.5",
+      "dependencies": [
+        "10.1"
+      ],
+      "owner": "reviewed-trust-identity",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_floating_bootstrap_input_fails",
+        "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_hash_mismatched_bootstrap_input_fails",
+        "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_two_clean_build_identities_match"
+      ],
+      "closure_artifacts": [
+        ".devcontainer/devcontainer-lock.json",
+        ".devcontainer/setup.sh",
+        ".workspace/contracts/agent-context-w9a-remediation.contract.md",
+        "scripts/agent_context/fixtures/evidence/w9d2-bootstrap-reproducibility-evidence.json",
+        "scripts/agent_context/tests/test_w9d2_trust_identity.py"
+      ],
+      "amendment_sections": [
+        "7"
+      ],
+      "invalidation_triggers": [
+        "bootstrap-input-change",
+        "devcontainer-lock-change",
+        "tool-version-change"
+      ]
+    },
+    {
+      "id": "L-1",
+      "severity": "low",
+      "title": "Root CI dependencies are not immutable",
+      "status": "OPEN",
+      "blocking": false,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.10",
+      "dependencies": [
+        "10.5"
+      ],
+      "owner": "root-supply-chain-boundary",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9e_supply_chain.W9eSupplyChainTests.test_actions_use_full_commit_sha_with_version_comment",
+        "scripts.agent_context.tests.test_w9e_supply_chain.W9eSupplyChainTests.test_python_inputs_are_hash_verified",
+        "scripts.agent_context.tests.test_w9e_supply_chain.W9eSupplyChainTests.test_unreviewed_dependency_refresh_fails"
+      ],
+      "closure_artifacts": [
+        ".github/workflows/workspace-policy-lint.yml",
+        "scripts/agent_context/fixtures/evidence/w9e-supply-chain-evidence.json",
+        "scripts/agent_context/tests/test_w9e_supply_chain.py",
+        "tools/requirements.lock"
+      ],
+      "amendment_sections": [
+        "7"
+      ],
+      "invalidation_triggers": [
+        "ci-action-change",
+        "python-tool-input-change",
+        "supply-chain-refresh-policy-change"
+      ]
+    },
+    {
+      "id": "L-2",
+      "severity": "low",
+      "title": "No machine-readable root-tooling component inventory exists",
+      "status": "OPEN",
+      "blocking": false,
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "remediate",
+      "remediation_step": "10.11",
+      "dependencies": [
+        "10.5",
+        "10.10"
+      ],
+      "owner": "root-compliance-boundary",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9e_sbom.W9eSbomTests.test_sbom_covers_frozen_root_tooling_inputs",
+        "scripts.agent_context.tests.test_w9e_sbom.W9eSbomTests.test_sbom_is_deterministic_and_schema_valid",
+        "scripts.agent_context.tests.test_w9e_sbom.W9eSbomTests.test_sbom_staleness_fails"
+      ],
+      "closure_artifacts": [
+        "sbom/root-tooling.cdx.json",
+        "scripts/agent_context/fixtures/evidence/w9e-sbom-evidence.json",
+        "scripts/agent_context/generate_root_sbom.py",
+        "scripts/agent_context/tests/test_w9e_sbom.py"
+      ],
+      "amendment_sections": [
+        "7"
+      ],
+      "invalidation_triggers": [
+        "root-tooling-component-change",
+        "sbom-generator-change",
+        "sbom-schema-change"
+      ]
+    }
+  ],
+  "input_limitations": [
+    {
+      "id": "zip-reproducibility",
+      "classification": "non-finding-input-limitation",
+      "title": "The supplied ZIP is not a self-contained closeout bundle",
+      "status": "OPEN",
+      "source_ids": [
+        "critical-audit-en",
+        "critical-audit-fr"
+      ],
+      "disposition": "replace-with-self-contained-exact-tree-bundle",
+      "remediation_step": "10.12",
+      "dependencies": [
+        "10.1",
+        "10.2",
+        "10.3",
+        "10.4",
+        "10.5",
+        "10.6",
+        "10.7",
+        "10.8",
+        "10.9",
+        "10.10",
+        "10.11"
+      ],
+      "owner": "final-review-bundle-boundary",
+      "negative_tests": [
+        "scripts.agent_context.tests.test_w9f_review_bundle.W9fReviewBundleTests.test_bundle_rejects_missing_child_or_git_identity",
+        "scripts.agent_context.tests.test_w9f_review_bundle.W9fReviewBundleTests.test_bundle_rejects_missing_finding_evidence",
+        "scripts.agent_context.tests.test_w9f_review_bundle.W9fReviewBundleTests.test_bundle_rejects_parent_tree_or_dirty_proof",
+        "scripts.agent_context.tests.test_w9f_review_bundle.W9fReviewBundleTests.test_self_contained_bundle_replays_minimum_checks"
+      ],
+      "closure_artifacts": [
+        "scripts/agent_context/fixtures/evidence/w9f-review-bundle-manifest.json",
+        "scripts/agent_context/tests/test_w9f_review_bundle.py"
+      ],
+      "amendment_sections": [
+        "1",
+        "2",
+        "10"
+      ],
+      "invalidation_triggers": [
+        "child-identity-change",
+        "critical-file-change",
+        "final-commit-or-tree-change",
+        "finding-evidence-change",
+        "trust-input-change"
+      ]
+    }
+  ]
+}

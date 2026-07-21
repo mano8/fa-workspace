@@ -216,12 +216,15 @@ def _resolved_command(workspace: Path, command: Sequence[str]) -> tuple[str, ...
         raise ReviewBundleError("empty W9f check command")
     executable = command[0]
     if executable == "python":
-        executable = str(Path(sys.executable).resolve())
+        # Preserve the active virtual-environment entry point. Resolving its
+        # symlink selects the base interpreter and silently drops venv packages.
+        executable = str(Path(sys.executable).absolute())
     elif executable == "ruff":
-        resolved = shutil.which("ruff")
+        sibling = Path(sys.executable).absolute().parent / "ruff"
+        resolved = sibling if sibling.is_file() else shutil.which("ruff")
         if resolved is None:
             raise ReviewBundleError("Ruff is unavailable for W9f replay")
-        executable = str(Path(resolved).resolve())
+        executable = str(Path(resolved).absolute())
     return (executable, *command[1:])
 
 

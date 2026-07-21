@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from agent_context.review_bundle import (  # noqa: E402
     CHECK_COMMANDS,
     ReviewBundleError,
+    _resolved_command,
     build_bundle,
     canonical_bytes,
     validate_bundle,
@@ -107,6 +108,10 @@ class W9fReviewBundleTests(unittest.TestCase):
         with self.assertRaisesRegex(ReviewBundleError, "check replay"):
             self._validate(changed)
         self.assertEqual(canonical_bytes(bundle), canonical_bytes(bundle))
+
+    def test_check_runner_preserves_active_virtual_environment(self) -> None:
+        command = _resolved_command(ROOT, ("python", "-V"))
+        self.assertEqual(command[0], str(Path(sys.executable).absolute()))
 
 
 if __name__ == "__main__":

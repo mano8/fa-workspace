@@ -19,6 +19,31 @@
       "resolved": "ghcr.io/chopratejas/headroom@sha256:71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41",
       "binary_sha256": "71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41"
     },
+    "apt_ca_certificates": {
+      "package": "ca-certificates",
+      "version": "20260601~26.04.1",
+      "type": "library"
+    },
+    "apt_curl": {
+      "package": "curl",
+      "version": "8.18.0-1ubuntu2.3",
+      "type": "library"
+    },
+    "apt_git": {
+      "package": "git",
+      "version": "1:2.53.0-1ubuntu1",
+      "type": "application"
+    },
+    "apt_jq": {
+      "package": "jq",
+      "version": "1.8.1-4ubuntu2",
+      "type": "application"
+    },
+    "apt_python_venv": {
+      "package": "python3-venv",
+      "version": "3.14.3-0ubuntu2",
+      "type": "library"
+    },
     "node_runtime": {
       "package": "node",
       "version": "24.16.0",
@@ -28,6 +53,13 @@
       "package": "python",
       "version": "3.12.13",
       "binary_sha256": "f198e482df5d819f064c040a5ffc9e83e702ba41e4fbdd632918bd1123eeb905"
+    },
+    "root_tooling": {
+      "package": "root-tooling-python-lock",
+      "version": "2026-07-21",
+      "type": "application",
+      "requirements_lock": ".github/workflows/root-tooling.requirements.lock",
+      "record_sha256": "a0da875a5c7c202a95fa7963d2b1b1132a47bb32fa25140aa58a52a95d85b368"
     }
   },
   "base_image": {
@@ -53,12 +85,18 @@
     "ghcr.io/devcontainers/features/node:2": {
       "version": "2.0.0",
       "resolved": "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
-      "integrity": "sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f"
+      "integrity": "sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
+      "options": {
+        "version": "24.16.0"
+      }
     },
     "ghcr.io/devcontainers/features/python:1": {
       "version": "1.8.0",
       "resolved": "ghcr.io/devcontainers/features/python@sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511",
-      "integrity": "sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511"
+      "integrity": "sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511",
+      "options": {
+        "version": "3.12.13"
+      }
     }
   }
 }

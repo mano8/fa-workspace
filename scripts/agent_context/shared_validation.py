@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from agent_context import w2b1
+from agent_context.trust_identity import verify_trust_identity
 
 
 def _fail(code: str, message: str) -> None:
@@ -59,11 +60,27 @@ def _validate_accounting(manifest: Mapping[str, Any], envelope_raw: bytes) -> No
         _fail("E_BUDGET", "model-visible context exceeds its effective hard limit")
 
 
+def validate_trust(
+    *, trust_identity_sha256: str, trust_identity: Mapping[str, Any],
+    trust_identity_kwargs: Mapping[str, Any],
+) -> None:
+    """Recompute the same complete trust identity for live and offline callers."""
+    try:
+        w2b1._sha256(trust_identity_sha256, "trust_identity_sha256")
+        current = verify_trust_identity(trust_identity, **dict(trust_identity_kwargs))
+    except w2b1.AgentContextError as error:
+        _fail("E_TRUST", error.message)
+    if current.get("trust_identity_sha256") != trust_identity_sha256:
+        _fail("E_TRUST", "recomputed trust identity does not match the delivery request")
+
+
 def validate_resolved(
     *, workspace: Path, manifest: Mapping[str, Any], envelope: Mapping[str, Any],
     envelope_bytes: bytes, capability_row: Mapping[str, Any] | None = None,
     reviewed_tree: Mapping[str, Any] | None = None, capability_evidence_id: str | None = None,
     trust_identity_sha256: str | None = None, channel_id: str | None = None,
+    trust_identity: Mapping[str, Any] | None = None,
+    trust_identity_kwargs: Mapping[str, Any] | None = None,
 ) -> None:
     """Validate the exact resolver/transport inputs before a live submission."""
     try:
@@ -129,14 +146,33 @@ def validate_resolved(
             w2b1._sha256(trust_identity_sha256, "trust_identity_sha256")
         except w2b1.AgentContextError as error:
             _fail("E_TRUST", error.message)
+    if (trust_identity is None) != (trust_identity_kwargs is None):
+        _fail("E_TRUST", "complete trust identity and recomputation inputs must be supplied together")
+    if trust_identity is not None and trust_identity_kwargs is not None:
+        if trust_identity_sha256 is None:
+            _fail("E_TRUST", "complete trust validation requires its expected digest")
+        validate_trust(
+            trust_identity_sha256=trust_identity_sha256,
+            trust_identity=trust_identity,
+            trust_identity_kwargs=trust_identity_kwargs,
+        )
 
 
 def validate_persisted(
     *, workspace: Path, manifest: Mapping[str, Any], envelope: Mapping[str, Any],
     envelope_bytes: bytes, session: Mapping[str, Any], receipt: Mapping[str, Any],
+    trust_identity: Mapping[str, Any] | None = None,
+    trust_identity_kwargs: Mapping[str, Any] | None = None,
 ) -> None:
     """Validate offline artifacts with the same source/accounting core."""
-    validate_resolved(workspace=workspace, manifest=manifest, envelope=envelope, envelope_bytes=envelope_bytes)
+    validate_resolved(
+        workspace=workspace, manifest=manifest, envelope=envelope,
+        envelope_bytes=envelope_bytes,
+        trust_identity_sha256=(
+            receipt.get("trust_identity_sha256") if trust_identity is not None else None
+        ),
+        trust_identity=trust_identity, trust_identity_kwargs=trust_identity_kwargs,
+    )
     try:
         w2b1.validate_session(dict(session))
         w2b1.validate_receipt(dict(receipt))

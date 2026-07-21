@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "finding": "H-2",
-  "step": "10.6",
+  "step": "10.5",
   "status": "CURRENT_POST_REMEDIATION",
   "identity_inputs": [
     "root commit and tree with tracked-clean proof",
     "selected child commit, tree, and AGENTS.md hash",
     "critical tracked files and capability evidence",
-    "Codex and Python binary identities",
+    "Codex wrapper, executing Node, and Python binary identities",
     "project, user, and global Codex configuration identities",
     "platform identity",
     "external authorization trust-store identity when authorization is selected"

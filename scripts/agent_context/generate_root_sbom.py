@@ -23,10 +23,14 @@ SOURCE_PATHS = (
     Path(".github/workflows/root-tooling.requirements.lock"),
 )
 ACTION_RE = re.compile(r"^\s*- uses:\s*(?P<name>[^@\s]+)@(?P<ref>[^\s#]+)\s+#\s+(?P<version>v\S+)\s*$")
-REQUIREMENT_RE = re.compile(
+INLINE_REQUIREMENT_RE = re.compile(
     r"^(?P<name>[A-Za-z0-9_.-]+(?:\[[^]]+\])?)==(?P<version>[^\s\\]+)"
     r".*--hash=sha256:(?P<hash>[0-9a-f]{64})$"
 )
+REQUIREMENT_START_RE = re.compile(
+    r"^(?P<name>[A-Za-z0-9_.-]+(?:\[[^]]+\])?)==(?P<version>[^\s\\]+)\s*\\$"
+)
+HASH_LINE_RE = re.compile(r"^\s+--hash=sha256:(?P<hash>[0-9a-f]{64})$")
 
 
 class SbomError(ValueError):
@@ -56,6 +60,52 @@ def _component(
     return component
 
 
+def _locked_requirements(path: Path) -> list[tuple[str, str, str]]:
+    """Parse both inline and pip continuation-form single-hash locks strictly."""
+    result: list[tuple[str, str, str]] = []
+    pending: tuple[str, str] | None = None
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line or line.startswith("#"):
+            continue
+        inline = INLINE_REQUIREMENT_RE.fullmatch(line)
+        if inline is not None and pending is None:
+            result.append((inline["name"], inline["version"], inline["hash"]))
+            continue
+        start = REQUIREMENT_START_RE.fullmatch(line)
+        if start is not None and pending is None:
+            pending = (start["name"], start["version"])
+            continue
+        digest = HASH_LINE_RE.fullmatch(line)
+        if digest is not None and pending is not None:
+            result.append((*pending, digest["hash"]))
+            pending = None
+            continue
+        raise SbomError(f"malformed hashed requirement at {path}:{line_number}")
+    if pending is not None:
+        raise SbomError(f"missing requirement hash at {path}")
+    return result
+
+
+def _merge_components(components: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Merge one package used by multiple locks without losing source/wheel hashes."""
+    merged: dict[str, dict[str, Any]] = {}
+    for component in components:
+        reference = component["bom-ref"]
+        existing = merged.get(reference)
+        if existing is None:
+            merged[reference] = component
+            continue
+        for field in ("type", "name", "version"):
+            if existing[field] != component[field]:
+                raise SbomError(f"conflicting component identity for {reference}")
+        for field in ("hashes", "properties"):
+            values = existing.setdefault(field, [])
+            for value in component.get(field, []):
+                if value not in values:
+                    values.append(value)
+    return [merged[reference] for reference in sorted(merged)]
+
+
 def build_sbom(workspace: Path) -> dict[str, Any]:
     workspace = workspace.resolve()
     raw_sources = {path.as_posix(): _sha256(workspace / path) for path in SOURCE_PATHS}
@@ -80,13 +130,11 @@ def build_sbom(workspace: Path) -> dict[str, Any]:
             resolved=bootstrap.get("resolved"),
         ))
     for relative in (".devcontainer/headroom.requirements.lock", ".github/workflows/root-tooling.requirements.lock"):
-        for line in (workspace / relative).read_text(encoding="utf-8").splitlines():
-            match = REQUIREMENT_RE.match(line)
-            if match:
-                components.append(_component(
-                    component_type="library", name=match["name"], version=match["version"],
-                    source=relative, integrity=match["hash"],
-                ))
+        for name, version, digest in _locked_requirements(workspace / relative):
+            components.append(_component(
+                component_type="library", name=name, version=version,
+                source=relative, integrity=digest,
+            ))
     for line in (workspace / ".github/workflows/workspace-policy-lint.yml").read_text(encoding="utf-8").splitlines():
         match = ACTION_RE.match(line)
         if match:
@@ -94,7 +142,7 @@ def build_sbom(workspace: Path) -> dict[str, Any]:
             component_type="application", name=match["name"], version=match["version"],
             source=".github/workflows/workspace-policy-lint.yml", resolved=match["ref"],
             ))
-    components.sort(key=lambda component: component["bom-ref"])
+    components = _merge_components(components)
     digest = hashlib.sha256(json.dumps(raw_sources, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
     return {
         "$schema": "https://cyclonedx.org/schema/bom-1.6.schema.json",

@@ -137,6 +137,11 @@ class DeliveryRequest:
     # A signed authorization capability binds this launcher-generated value.
     # Synthetic and unauthenticated read-only fixtures may leave it unset.
     launch_id: str | None = None
+    # Production supplies the complete transient identity and its exact
+    # recomputation inputs to the shared live/offline validator. Client-neutral
+    # fixtures may omit both while retaining schema-level digest checks.
+    trust_identity: Mapping[str, Any] | None = None
+    trust_identity_kwargs: Mapping[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -415,6 +420,8 @@ class DeliveryKernel:
             capability_row=request.capability_row, reviewed_tree=request.reviewed_tree,
             capability_evidence_id=request.capability_evidence_id,
             trust_identity_sha256=request.trust_identity_sha256, channel_id=request.channel_id,
+            trust_identity=request.trust_identity,
+            trust_identity_kwargs=request.trust_identity_kwargs,
         )
 
     def _validate_persisted_request(self, runtime_dir: Path, request: DeliveryRequest) -> None:
@@ -424,6 +431,8 @@ class DeliveryKernel:
             envelope=request.resolved.envelope, envelope_bytes=request.resolved.envelope_bytes,
             session=self._read_json(runtime_dir, "session.json", w2b1.validate_session),
             receipt=self._read_json(runtime_dir, "receipt.json", w2b1.validate_receipt),
+            trust_identity=request.trust_identity,
+            trust_identity_kwargs=request.trust_identity_kwargs,
         )
 
     def _new_session(self, request: DeliveryRequest) -> dict[str, Any]:

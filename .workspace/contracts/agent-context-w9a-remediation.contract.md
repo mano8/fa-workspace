@@ -87,9 +87,10 @@ externally authorized launch capability:
    closed payload containing `schema_version`, `authorization_id`, `issuer`,
    `key_id`, `nonce`, `issued_at`, `expires_at`, `launch_id`, `repositories`,
    `tasks`, `operations`, and `user_task_sha256`.
-3. The verification trust store and replay store are outside the workspace
-   write boundary, owner-controlled, containment checked, non-reparse, and
-   owner-only. The workspace may contain a signed capability, but workspace
+3. The verification trust store and replay store are in a filesystem tree
+   disjoint from the workspace (neither tree contains the other), outside the
+   workspace write boundary, owner-controlled, containment checked,
+   non-reparse, and owner-only. The workspace may contain a signed capability, but workspace
    writes cannot create a valid signature or alter the external trust anchor.
 4. The verifier rejects an unknown/revoked key, malformed or noncanonical
    payload, invalid signature, duplicate identity/nonce, future issue time,

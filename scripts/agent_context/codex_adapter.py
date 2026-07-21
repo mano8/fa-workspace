@@ -36,7 +36,8 @@ from agent_context.delivery_kernel import (
     TransportConfirmation,
 )
 from agent_context.resolve_context import ResolutionRequest, ResolvedContext, resolve_context
-from agent_context.trust_identity import build_trust_identity, verify_trust_identity
+from agent_context.shared_validation import validate_trust
+from agent_context.trust_identity import build_trust_identity
 
 
 MARKER_NAME = ".m8-workspace-root"
@@ -245,6 +246,7 @@ class CodexDeliveryAdapter:
         verified_authorization_provenance: Sequence[Mapping[str, Any]] = (),
         authorization_trust_store: Path | None = None,
         launch_id: str | None = None,
+        fresh_runtime_dir: Path | None = None,
         kernel: DeliveryKernel | None = None,
     ) -> DeliveryResult:
         """Perform exactly one full-content handoff for a resolved generation."""
@@ -257,6 +259,10 @@ class CodexDeliveryAdapter:
             authorization_trust_store=authorization_trust_store,
         )
         root = workspace_root.resolve(strict=True)
+        trust_kwargs = (
+            self._trust_identity_kwargs(root, repositories, inspection, authorization_trust_store)
+            if self.strict_trust_identity else None
+        )
         request = DeliveryRequest(
             workspace_root=root, resolved=resolved,
             capability_row=CURRENT_CODEX_CAPABILITY, trusted=True,
@@ -267,6 +273,8 @@ class CodexDeliveryAdapter:
             client_session_id="codex.pending", channel_id="cli-config-developer-instructions",
             trust_identity_sha256=inspection.trust_identity.get("trust_identity_sha256", "0" * 64),
             launch_id=launch_id,
+            trust_identity=inspection.trust_identity if self.strict_trust_identity else None,
+            trust_identity_kwargs=trust_kwargs,
         )
         transport = CodexExecTransport(
             runner=self.runner, codex_command=self.codex_command, repository=root,
@@ -277,8 +285,32 @@ class CodexDeliveryAdapter:
             ),
         )
         delivery_kernel = kernel or DeliveryKernel()
-        prepared = delivery_kernel.prepare(request)
+        prepared = (
+            delivery_kernel.fresh(fresh_runtime_dir, request)
+            if fresh_runtime_dir is not None
+            else delivery_kernel.prepare(request)
+        )
         return delivery_kernel.handoff(prepared, transport)
+
+    def fresh_and_handoff_repositories(
+        self, *, workspace_root: Path, prior_runtime_dir: Path,
+        repository_ids: Sequence[str], prompt: str,
+        tasks: Sequence[str] = (), operations: Sequence[str] = (),
+        authorizations: Sequence[Mapping[str, Any]] = (),
+        verified_authorization_provenance: Sequence[Mapping[str, Any]] = (),
+        authorization_trust_store: Path | None = None,
+        launch_id: str | None = None,
+        kernel: DeliveryKernel | None = None,
+    ) -> DeliveryResult:
+        """Invalidate one validated prior runtime and hand off generation zero."""
+        return self.prepare_and_handoff_repositories(
+            workspace_root=workspace_root, repository_ids=repository_ids,
+            prompt=prompt, tasks=tasks, operations=operations,
+            authorizations=authorizations,
+            verified_authorization_provenance=verified_authorization_provenance,
+            authorization_trust_store=authorization_trust_store,
+            launch_id=launch_id, fresh_runtime_dir=prior_runtime_dir, kernel=kernel,
+        )
 
     def resume_and_handoff_repositories(
         self, *, workspace_root: Path, runtime_dir: Path, repository_ids: Sequence[str], prompt: str,
@@ -301,7 +333,7 @@ class CodexDeliveryAdapter:
         prior = delivery_kernel._authoritative_session(runtime_dir)
         if prior["state"] != "COMPLETED":
             _fail("E_LIFECYCLE", "only a completed generation may resume")
-        _, resolved, inspection = self.resolve_repositories(
+        repositories, resolved, inspection = self.resolve_repositories(
             workspace_root=workspace_root, repository_ids=repository_ids, tasks=tasks,
             operations=operations, authorizations=authorizations,
             verified_authorization_provenance=verified_authorization_provenance,
@@ -309,6 +341,10 @@ class CodexDeliveryAdapter:
             generation=prior["generation"] + 1,
         )
         root = workspace_root.resolve(strict=True)
+        trust_kwargs = (
+            self._trust_identity_kwargs(root, repositories, inspection, authorization_trust_store)
+            if self.strict_trust_identity else None
+        )
         request = DeliveryRequest(
             workspace_root=root, resolved=resolved, capability_row=CURRENT_CODEX_CAPABILITY,
             trusted=True, reviewed_tree=resolved.manifest["reviewed_tree"],
@@ -316,6 +352,8 @@ class CodexDeliveryAdapter:
             client_session_id=prior["client_session_id"], channel_id="cli-config-developer-instructions",
             trust_identity_sha256=inspection.trust_identity.get("trust_identity_sha256", "0" * 64),
             launch_id=launch_id,
+            trust_identity=inspection.trust_identity if self.strict_trust_identity else None,
+            trust_identity_kwargs=trust_kwargs,
         )
         prepared = delivery_kernel.resume(runtime_dir, request)
         transport = CodexExecTransport(
@@ -393,12 +431,28 @@ class CodexDeliveryAdapter:
                 root.joinpath(*entry["path"].split("/"))
                 for entry in inspection.trust_identity["children"]
             )
-            verify_trust_identity(
-                inspection.trust_identity, workspace_root=root,
-                selected_repositories=selected, capability_path=CAPABILITY_EVIDENCE_PATH,
-                codex_binary=binary, codex_version=inspection.client_version,
-                authorization_trust_store=authorization_trust_store,
+            validate_trust(
+                trust_identity_sha256=inspection.trust_identity["trust_identity_sha256"],
+                trust_identity=inspection.trust_identity,
+                trust_identity_kwargs=self._trust_identity_kwargs(
+                    root, selected, inspection, authorization_trust_store,
+                    codex_binary=binary,
+                ),
             )
+
+    @staticmethod
+    def _trust_identity_kwargs(
+        root: Path, repositories: Sequence[Path], inspection: CodexNativeInspection,
+        authorization_trust_store: Path | None, *, codex_binary: Path | None = None,
+    ) -> dict[str, Any]:
+        return {
+            "workspace_root": root,
+            "selected_repositories": tuple(repositories),
+            "capability_path": CAPABILITY_EVIDENCE_PATH,
+            "codex_binary": codex_binary or Path(inspection.client_identity).resolve(strict=True),
+            "codex_version": inspection.client_version,
+            "authorization_trust_store": authorization_trust_store,
+        }
 
     def preflight(self, *, workspace_root: Path, repository_id: str) -> tuple[Path, CodexNativeInspection]:
         """Backward-compatible single-repository preflight entry point."""

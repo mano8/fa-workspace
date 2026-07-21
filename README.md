@@ -37,7 +37,7 @@ fa-workspace/                # This repository: the workspace root and control p
 └── astro-ui-m8/ fa-ui-m8/
 ```
 
-The directories above are direct children of `fa-workspace`; they are not siblings of it. The Dev Container bind-mounts this repository root as `/workspace`. Its initial setup reads development requirements from the direct children `fa-auth-m8`, `imgtools_m8`, and `media-service-m8`.
+The directories above are direct children of `fa-workspace`; they are not siblings of it. The Dev Container bind-mounts this repository root as `/workspace`. Its root bootstrap installs only the hash-locked root validation toolchain; each child remains responsible for its own standalone dependency environment.
 
 Within `fa-workspace`:
 
@@ -117,7 +117,7 @@ They are a local safeguard, not a replacement for review. Check `git status` bef
 
 ### Dev Container and Headroom
 
-The active configuration is [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json) with [`.devcontainer/docker-compose.devcontainer.yml`](.devcontainer/docker-compose.devcontainer.yml). It supplies an Ubuntu workspace container with Node.js 24, Python 3.12, Docker access, recommended VS Code extensions, a shared Python virtual environment, Codex CLI, and Claude Code.
+The active configuration is [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json) with [`.devcontainer/docker-compose.devcontainer.yml`](.devcontainer/docker-compose.devcontainer.yml). It supplies an Ubuntu workspace container with fail-closed Node.js 24.16.0 and Python 3.12.13 identity checks, Docker access, recommended VS Code extensions, a root-tooling Python virtual environment, Codex CLI, and Claude Code.
 
 [Headroom](https://github.com/headroomlabs-ai/headroom) is an open-source MCP helper that compresses large, non-sensitive tool outputs before they reach an AI model. The Compose stack runs `headroom-proxy` only on a private Docker network at `http://headroom-proxy:8787`; it exposes no host port. Container startup registers it with Codex and, when available, Claude Code.
 
@@ -129,10 +129,10 @@ Use Headroom for logs, test output, JSON, stack traces, and long file excerpts. 
 
 1. Install and start [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 2. Install [Visual Studio Code](https://code.visualstudio.com/) and the **Dev Containers** extension.
-3. Keep `fa-auth-m8`, `imgtools_m8`, and `media-service-m8` as direct children of this workspace root. The initial setup installs their configured development requirements.
+3. Keep the registered repositories as direct children of this workspace root. Install child dependencies through each child's standalone instructions; the root setup does not consume child-owned requirement files.
 4. Open `fa-workspace` in VS Code.
 5. Open the Command Palette (`F1` or `Ctrl+Shift+P`) and select **Dev Containers: Reopen in Container**.
-6. Wait for the first build. It installs system tools, development dependencies, Codex CLI, and Headroom.
+6. Wait for the first build. It verifies exact system/runtime identities and installs the hash-locked root tools, Codex CLI, and Headroom.
 7. Verify the environment in a new integrated terminal:
 
    ```bash

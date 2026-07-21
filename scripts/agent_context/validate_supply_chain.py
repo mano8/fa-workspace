@@ -71,9 +71,13 @@ def validate_supply_chain(workspace: Path) -> None:
 
     headroom_lock = workspace / ".devcontainer/headroom.requirements.lock"
     bootstrap_lock = workspace / ".devcontainer/devcontainer-lock.json"
+    devcontainer = json.loads(
+        (workspace / ".devcontainer/devcontainer.json").read_text(encoding="utf-8")
+    )
     setup = (workspace / ".devcontainer/setup.sh").read_text(encoding="utf-8")
     compose = (workspace / ".devcontainer/docker-compose.devcontainer.yml").read_text(encoding="utf-8")
-    bootstrap = json.loads(bootstrap_lock.read_text(encoding="utf-8"))["bootstrap"]
+    locked = json.loads(bootstrap_lock.read_text(encoding="utf-8"))
+    bootstrap = locked["bootstrap"]
     headroom_lines = [
         line for line in headroom_lock.read_text(encoding="utf-8").splitlines()
         if line and not line.startswith("#")
@@ -89,12 +93,45 @@ def validate_supply_chain(workspace: Path) -> None:
         _fail("Headroom lock digest does not match devcontainer-lock.json")
     if not all(token in setup for token in ("--only-binary=:all:", "--require-hashes", "--no-deps")):
         _fail("Headroom setup does not enforce the complete hashed wheel lock")
+    root_lock_sha256 = hashlib.sha256(lock.read_bytes()).hexdigest()
+    if bootstrap["root_tooling"].get("record_sha256") != root_lock_sha256:
+        _fail("root-tooling lock digest does not match devcontainer-lock.json")
+    if "/workspace/.github/workflows/root-tooling.requirements.lock" not in setup:
+        _fail("shared root venv is not installed from the hashed root-tooling lock")
+    child_requirements = (
+        "fa-auth-m8/auth_user_service/requirements_dev.txt",
+        "imgtools_m8/requirements.txt",
+        "media-service-m8/media_service/requirements_dev.txt",
+    )
+    if any(value in setup for value in child_requirements):
+        _fail("root bootstrap must not install floating child-owned requirements")
     proxy = bootstrap["headroom_proxy"]
     if proxy.get("resolved") not in compose or proxy.get("binary_sha256") not in proxy.get("resolved", ""):
         _fail("Headroom proxy image is not pinned to the reviewed digest")
-    for item in (bootstrap["codex"], bootstrap["headroom"]):
+    runtime_features = {
+        "node_runtime": "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
+        "python_runtime": "ghcr.io/devcontainers/features/python@sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511",
+    }
+    for runtime, feature in runtime_features.items():
+        version = bootstrap[runtime]["version"]
+        if devcontainer.get("features", {}).get(feature, {}).get("version") != version:
+            _fail(f"{runtime} feature option is not exact or differs from its lock")
+        locked_feature = feature.split("@", 1)[0].replace(
+            "ghcr.io/devcontainers/features/node", "ghcr.io/devcontainers/features/node:2"
+        ).replace(
+            "ghcr.io/devcontainers/features/python", "ghcr.io/devcontainers/features/python:1"
+        )
+        if locked["features"][locked_feature].get("options", {}).get("version") != version:
+            _fail(f"{runtime} devcontainer lock option differs from bootstrap identity")
+    enforced = (
+        bootstrap["codex"], bootstrap["headroom"], bootstrap["node_runtime"],
+        bootstrap["python_runtime"], bootstrap["root_tooling"],
+        bootstrap["apt_ca_certificates"], bootstrap["apt_curl"], bootstrap["apt_git"],
+        bootstrap["apt_jq"], bootstrap["apt_python_venv"],
+    )
+    for item in enforced:
         for value in (item["version"], item.get("binary_sha256") or item.get("record_sha256")):
-            if value not in setup:
+            if value is not None and value not in setup:
                 _fail(f"bootstrap setup does not enforce {item['package']} identity")
 
 

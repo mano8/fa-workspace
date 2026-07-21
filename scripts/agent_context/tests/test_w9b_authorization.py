@@ -73,7 +73,8 @@ class W9bAuthorizationTests(unittest.TestCase):
 
     def _redeem(self, capability: dict[str, object], request: authorization.AuthorizationRequest | None = None):
         return authorization.verify_and_redeem(
-            capability, request=request or self.request, external_root=self.external,
+            capability, request=request or self.request, workspace_root=self.workspace,
+            external_root=self.external,
             trust_store=self.trust, replay_store=self.replay, now=self.now,
         )
 
@@ -87,6 +88,25 @@ class W9bAuthorizationTests(unittest.TestCase):
         unsigned["signature"] = _b64url(b"x" * 64)
         with self.assertRaisesRegex(w2b1.AgentContextError, "signature is invalid"):
             self._redeem(unsigned)
+        workspace_authority = self.workspace / "authority"
+        workspace_authority.mkdir(mode=0o700)
+        workspace_replay = workspace_authority / "replay"
+        workspace_replay.mkdir(mode=0o700)
+        workspace_trust = workspace_authority / "trust.json"
+        workspace_trust.write_bytes(self.trust.read_bytes())
+        self._owner_only(workspace_authority, workspace_replay, workspace_trust)
+        with self.assertRaisesRegex(w2b1.AgentContextError, "outside the workspace"):
+            authorization.verify_and_redeem(
+                self._capability(), request=self.request, workspace_root=self.workspace,
+                external_root=workspace_authority, trust_store=workspace_trust,
+                replay_store=workspace_replay, now=self.now,
+            )
+        with self.assertRaisesRegex(w2b1.AgentContextError, "must not contain"):
+            authorization.verify_and_redeem(
+                self._capability(), request=self.request, workspace_root=self.workspace,
+                external_root=self.workspace.parent, trust_store=workspace_trust,
+                replay_store=workspace_replay, now=self.now,
+            )
 
     def test_expired_future_or_overlong_capability_fails(self) -> None:
         cases = (

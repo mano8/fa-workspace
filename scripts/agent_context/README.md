@@ -34,7 +34,8 @@ release, Headroom, and cross-repository overlays. Default resolution selects
 none of them. Mutating and cross-repository tasks require a single-use
 externally signed capability whose launch, repository, task, operation, and
 user-task hash match exactly. The canonical launcher verifies and atomically
-redeems it against owner-only trust/replay stores outside the workspace.
+redeems it against owner-only trust/replay stores in a filesystem tree disjoint
+from the workspace (neither path may contain the other).
 Manifests, sessions, and receipts retain only verified metadata provenance;
 raw approval and signature content is excluded.
 
@@ -42,7 +43,7 @@ Phase 10 Steps 10.2--10.8 implement the W9b--W9d remediation boundaries. The
 W9b external authorization verifier in
 [`authorization.py`](authorization.py). It creates a launch-bound request and
 accepts only an Ed25519 signature over an exact JCS payload from an
-owner-controlled trust store outside the workspace. It atomically consumes the
+owner-controlled trust store in a disjoint external tree. It atomically consumes the
 capability in an external replay store before submission and exposes only
 authorization ID, issuer/key ID, payload/signature digests, issue/expiry, and
 redemption ID for future manifest/session/receipt linkage. Raw approval and
@@ -125,7 +126,11 @@ exact source once; accounting includes the selected execution directory's
 active native instruction once. They pass only the resolver's exact JCS
 envelope through the verified `developer_instructions` channel. Mutating and
 multi-repository requests use a workspace-relative signed capability whose
-trust anchor and replay state remain outside the workspace.
+trust anchor and replay state remain in an owner-only tree disjoint from the
+workspace. The reviewed identity binds the Codex wrapper and the Node runtime
+that executes it, Python, platform/configuration inputs, all selected Git
+trees, and every critical root file. The shared validator recomputes that full
+identity for production preflight/state transitions as well as offline audit.
 Traversal, duplicate identifiers, symlinked children/instructions, missing
 direct `.git`, source/config/client/trust drift, and invalid authorization
 records fail before `codex exec`. The adapter delegates runtime state,
@@ -208,6 +213,9 @@ scripts/codex-repo.sh --repository auth-sdk-m8 --repository media-sdk-m8 \
   --authorization-trust-store /owner-controlled/authorization/trust-store.json \
   --authorization-replay-store /owner-controlled/authorization/replay \
   "compare both SDKs"
+# Explicit fresh invalidates the named completed runtime before generation zero.
+scripts/codex-repo.sh --repository auth-sdk-m8 \
+  --fresh .workspace/.runtime/session-previous "start a replacement thread"
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w6_codex_adapter -v
 ```
 

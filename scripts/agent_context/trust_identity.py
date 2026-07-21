@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import os
 import platform
+import shutil
 import stat
 import subprocess
 import sys
@@ -171,6 +172,36 @@ def _binary_identity(path: Path, version: str) -> dict[str, str]:
     return {"path": str(path), "sha256": _sha256(path), "version": version}
 
 
+def _node_identity(node_binary: Path | None, node_version: str | None) -> dict[str, str]:
+    if (node_binary is None) != (node_version is None):
+        _fail("E_TRUST", "Node binary and version must be supplied together")
+    if node_binary is None:
+        discovered = shutil.which("node")
+        if discovered is None:
+            _fail("E_TRUST", "Node runtime for Codex cannot be resolved")
+        try:
+            node_binary = Path(discovered).resolve(strict=True)
+        except OSError as error:
+            _fail("E_TRUST", f"Node runtime for Codex cannot be resolved: {error}")
+        result = subprocess.run(
+            (str(node_binary), "--version"), check=False, capture_output=True,
+        )
+        if result.returncode != 0:
+            _fail("E_TRUST", "Node runtime version probe failed")
+        try:
+            node_version = result.stdout.decode("ascii", "strict").strip().removeprefix("v")
+        except UnicodeDecodeError:
+            _fail("E_TRUST", "Node runtime version is not ASCII")
+        if not node_version:
+            _fail("E_TRUST", "Node runtime version is empty")
+    assert node_binary is not None and node_version is not None
+    try:
+        resolved = node_binary.resolve(strict=True)
+    except OSError as error:
+        _fail("E_TRUST", f"Node runtime cannot be resolved: {error}")
+    return _binary_identity(resolved, node_version)
+
+
 def build_trust_identity(
     *,
     workspace_root: Path,
@@ -178,6 +209,8 @@ def build_trust_identity(
     capability_path: str,
     codex_binary: Path,
     codex_version: str,
+    node_binary: Path | None = None,
+    node_version: str | None = None,
     authorization_trust_store: Path | None = None,
 ) -> dict[str, Any]:
     """Return a JCS-addressed identity after fail-closed trust preflight.
@@ -215,6 +248,7 @@ def build_trust_identity(
         "children": children,
         "critical_files": _critical_hashes(root, capability_path),
         "codex": _binary_identity(codex_binary, codex_version),
+        "node": _node_identity(node_binary, node_version),
         "python": _binary_identity(python_path, platform.python_version()),
         "platform": {
             "system": platform.system(), "release": platform.release(),

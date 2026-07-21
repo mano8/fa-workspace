@@ -40,6 +40,11 @@ class W9eSupplyChainTests(unittest.TestCase):
         ]
         self.assertGreater(len(headroom_requirements), 1)
         self.assertTrue(all(" --hash=sha256:" in line for line in headroom_requirements))
+        setup = (ROOT / ".devcontainer/setup.sh").read_text(encoding="utf-8")
+        self.assertIn(".github/workflows/root-tooling.requirements.lock", setup)
+        self.assertNotIn("fa-auth-m8/auth_user_service/requirements_dev.txt", setup)
+        self.assertNotIn("imgtools_m8/requirements.txt", setup)
+        self.assertNotIn("media-service-m8/media_service/requirements_dev.txt", setup)
         validate_supply_chain(ROOT)
 
     def test_unreviewed_dependency_refresh_fails(self) -> None:

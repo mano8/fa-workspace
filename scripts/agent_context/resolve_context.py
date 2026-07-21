@@ -1,4 +1,4 @@
-"""Inactive W2b2 scoped context resolver for the active faceted v2 schema.
+"""Active scoped context resolver for the faceted v2 schema.
 
 The resolver reads explicit fixture inputs and produces deterministic manifests
 plus injected envelopes. It does not activate a client transport or write
@@ -76,7 +76,7 @@ TIER_ORDER = {"security": 0, "workspace": 1, "task": 2, "repository": 3}
 
 @dataclass(frozen=True)
 class ResolutionRequest:
-    """Explicit inputs for one non-activating W2b2 resolution."""
+    """Explicit inputs for one deterministic resolution."""
 
     root: Path
     registry: Mapping[str, Any]
@@ -102,7 +102,7 @@ class ResolutionRequest:
 
 @dataclass(frozen=True)
 class ResolvedContext:
-    """Canonical resolver outputs, held in memory by this inactive step."""
+    """Canonical resolver outputs held in memory until validation/delivery."""
 
     manifest: dict[str, Any]
     envelope: dict[str, Any]
@@ -866,7 +866,7 @@ def _load_json(path: str) -> Mapping[str, Any]:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Resolve inactive W2b2 faceted agent context.")
+    parser = argparse.ArgumentParser(description="Resolve faceted v2 agent context without transport.")
     parser.add_argument("--root")
     parser.add_argument("--registry", required=True)
     parser.add_argument("--policy-index", required=True)

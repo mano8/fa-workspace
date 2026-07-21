@@ -41,6 +41,8 @@ class W9d2TrustIdentityTests(unittest.TestCase):
         self._commit(self.root)
         self.binary = Path(self.temporary.name) / "codex-fixture"
         shutil.copyfile(Path(sys.executable).resolve(), self.binary)
+        self.node = Path(self.temporary.name) / "node-fixture"
+        shutil.copyfile(Path(sys.executable).resolve(), self.node)
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -61,7 +63,8 @@ class W9d2TrustIdentityTests(unittest.TestCase):
             return build_trust_identity(
                 workspace_root=self.root, selected_repositories=(self.child,),
                 capability_path=self.capability, codex_binary=self.binary,
-                codex_version="fixture",
+                codex_version="fixture", node_binary=self.node,
+                node_version="fixture-node",
             )
         finally:
             if old_home is None:
@@ -76,7 +79,8 @@ class W9d2TrustIdentityTests(unittest.TestCase):
             verify_trust_identity(
                 identity, workspace_root=self.root, selected_repositories=(self.child,),
                 capability_path=self.capability, codex_binary=self.binary,
-                codex_version="fixture",
+                codex_version="fixture", node_binary=self.node,
+                node_version="fixture-node",
             )
         finally:
             if old_home is None:
@@ -112,6 +116,7 @@ class W9d2TrustIdentityTests(unittest.TestCase):
             second = build_trust_identity(
                 workspace_root=second_root, selected_repositories=(second_root / "child",),
                 capability_path=self.capability, codex_binary=self.binary, codex_version="fixture",
+                node_binary=self.node, node_version="fixture-node",
             )
         finally:
             if old_home is None:
@@ -130,6 +135,12 @@ class W9d2TrustIdentityTests(unittest.TestCase):
         with self.assertRaisesRegex(w2b1.AgentContextError, "drifted"):
             self._verify(identity)
         self.binary.write_bytes(original)
+
+        node_original = self.node.read_bytes()
+        self.node.write_bytes(node_original + b"drift")
+        with self.assertRaisesRegex(w2b1.AgentContextError, "drifted"):
+            self._verify(identity)
+        self.node.write_bytes(node_original)
 
         with mock.patch(
             "agent_context.trust_identity._config_inventory",

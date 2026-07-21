@@ -197,7 +197,11 @@ def _finding_dispositions(workspace: Path) -> tuple[list[dict[str, Any]], dict[s
         raise ReviewBundleError("W9a finding register is incomplete")
     disposition = [{
         "id": finding["id"], "severity": finding["severity"],
-        "status": "CLOSED_BY_REPLAYED_W9F_EVIDENCE",
+        "status": (
+            "IMPLEMENTED_PENDING_DOCKER_REVALIDATION"
+            if finding["id"] == "M-4"
+            else "CLOSED_BY_REPLAYED_W9F_EVIDENCE"
+        ),
         "negative_tests": finding["negative_tests"],
         "closure_artifacts": finding["closure_artifacts"],
     } for finding in findings]

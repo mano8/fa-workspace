@@ -6,6 +6,7 @@ import sys
 import unittest
 from copy import deepcopy
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
@@ -55,12 +56,35 @@ class W9d3SharedValidationTests(unittest.TestCase):
 
     def test_native_and_trust_defects_match(self) -> None:
         source = self.fixture.root / "policy.md"
+        original = source.read_bytes()
         source.write_bytes(b"drift\n")
         with self.assertRaises(w2b1.AgentContextError) as offline:
             validate_resolved(workspace=self.fixture.root, manifest=self.fixture.resolved.manifest,
                 envelope=self.fixture.resolved.envelope, envelope_bytes=self.fixture.resolved.envelope_bytes)
         self.assertEqual(self._live_code(self.fixture.resolved), offline.exception.code)
         self.assertEqual(offline.exception.code, "E_SOURCE")
+        source.write_bytes(original)
+
+        identity = {"trust_identity_sha256": "a" * 64}
+        trust_kwargs: dict[str, object] = {}
+        drift = w2b1.AgentContextError("E_TRUST", "reviewed trust identity drifted")
+        with mock.patch(
+            "agent_context.shared_validation.verify_trust_identity", side_effect=drift,
+        ):
+            with self.assertRaises(w2b1.AgentContextError) as offline_trust:
+                validate_resolved(
+                    workspace=self.fixture.root, manifest=self.fixture.resolved.manifest,
+                    envelope=self.fixture.resolved.envelope,
+                    envelope_bytes=self.fixture.resolved.envelope_bytes,
+                    trust_identity_sha256="a" * 64, trust_identity=identity,
+                    trust_identity_kwargs=trust_kwargs,
+                )
+            live_code = self._live_code(
+                self.fixture.resolved, trust_identity_sha256="a" * 64,
+                trust_identity=identity, trust_identity_kwargs=trust_kwargs,
+            )
+        self.assertEqual(offline_trust.exception.code, "E_TRUST")
+        self.assertEqual(live_code, offline_trust.exception.code)
 
     def test_source_entry_and_accounting_defects_match(self) -> None:
         manifest = deepcopy(self.fixture.resolved.manifest)

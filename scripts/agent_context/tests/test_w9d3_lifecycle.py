@@ -3,11 +3,14 @@ from __future__ import annotations
 import os
 import sys
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from agent_context import w2b1
+from agent_context import codex_repo_launcher, w2b1
 from agent_context.delivery_kernel import DeliveryKernel, FakeTransportAdapter
 from agent_context.resolve_context import ResolvedContext
 from agent_context.tests.test_delivery_kernel import DeliveryKernelTests
@@ -58,6 +61,29 @@ class W9d3LifecycleTests(unittest.TestCase):
         self.assertEqual(fresh.session["generation"], 0)
         with self.assertRaises(w2b1.AgentContextError):
             kernel.resume(prior.runtime_dir, self._next_request())
+
+        adapter = mock.Mock()
+        adapter.fresh_and_handoff_repositories.return_value = mock.Mock(
+            receipt={"receipt_id": "a" * 64}
+        )
+        launcher_kernel = mock.Mock()
+        prior_path = self.fixture.root / ".workspace/.runtime/session-prior"
+        with (
+            mock.patch.object(codex_repo_launcher, "find_workspace_root", return_value=self.fixture.root),
+            mock.patch.object(codex_repo_launcher, "DeliveryKernel", return_value=launcher_kernel),
+            mock.patch.object(codex_repo_launcher, "CodexDeliveryAdapter", return_value=adapter),
+            redirect_stdout(StringIO()),
+        ):
+            exit_status = codex_repo_launcher.main([
+                "--repository", "repo-a", "--fresh", str(prior_path), "fresh task",
+            ])
+        self.assertEqual(exit_status, 0)
+        launcher_kernel._validate_runtime_dir.assert_called_once_with(prior_path, self.fixture.root)
+        adapter.fresh_and_handoff_repositories.assert_called_once()
+        self.assertEqual(
+            adapter.fresh_and_handoff_repositories.call_args.kwargs["prior_runtime_dir"],
+            prior_path,
+        )
 
     def test_interrupted_retention_and_startup_cleanup_are_safe(self) -> None:
         kernel = DeliveryKernel()

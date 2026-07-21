@@ -223,10 +223,25 @@ class VerifiedAuthorization:
     provenance: AuthorizationProvenance
 
 
-def _external_path(external_root: Path, path: Path, *, directory: bool) -> Path:
+def _external_path(
+    external_root: Path, path: Path, *, workspace_root: Path, directory: bool,
+) -> Path:
     """Resolve an owner-only external path without following any reparse point."""
     try:
         root = external_root.resolve(strict=True)
+        workspace = workspace_root.resolve(strict=True)
+        try:
+            root.relative_to(workspace)
+        except ValueError:
+            pass
+        else:
+            _fail("external authorization root must be outside the workspace")
+        try:
+            workspace.relative_to(root)
+        except ValueError:
+            pass
+        else:
+            _fail("external authorization root must not contain the workspace")
         target = path.resolve(strict=True)
         target.relative_to(root)
         relative = target.relative_to(root)
@@ -263,8 +278,12 @@ def _external_path(external_root: Path, path: Path, *, directory: bool) -> Path:
     return target
 
 
-def _trust_key(external_root: Path, trust_store: Path, issuer: str, key_id: str) -> bytes:
-    path = _external_path(external_root, trust_store, directory=False)
+def _trust_key(
+    external_root: Path, trust_store: Path, workspace_root: Path, issuer: str, key_id: str,
+) -> bytes:
+    path = _external_path(
+        external_root, trust_store, workspace_root=workspace_root, directory=False,
+    )
     try:
         value = w2b1.parse_strict_json(path.read_bytes())
     except (OSError, w2b1.AgentContextError) as error:
@@ -288,8 +307,13 @@ def _trust_key(external_root: Path, trust_store: Path, issuer: str, key_id: str)
     return raw
 
 
-def _consume(replay_store: Path, external_root: Path, *, identity: str, provenance: AuthorizationProvenance) -> None:
-    store = _external_path(external_root, replay_store, directory=True)
+def _consume(
+    replay_store: Path, external_root: Path, workspace_root: Path, *,
+    identity: str, provenance: AuthorizationProvenance,
+) -> None:
+    store = _external_path(
+        external_root, replay_store, workspace_root=workspace_root, directory=True,
+    )
     path = store / f"redeemed-{identity}.json"
     payload = w2b1.canonical_bytes(provenance.as_dict())
     try:
@@ -313,7 +337,7 @@ def _consume(replay_store: Path, external_root: Path, *, identity: str, provenan
 
 def verify_and_redeem(
     capability: Mapping[str, Any], *, request: AuthorizationRequest,
-    external_root: Path, trust_store: Path, replay_store: Path,
+    workspace_root: Path, external_root: Path, trust_store: Path, replay_store: Path,
     now: datetime | None = None,
 ) -> VerifiedAuthorization:
     """Verify and atomically consume one externally signed authorization.
@@ -353,7 +377,9 @@ def verify_and_redeem(
     for field, value in expected.items():
         if payload[field] != value:
             _fail(f"authorization capability {field} does not match its launch request")
-    public_key = _trust_key(external_root, trust_store, payload["issuer"], payload["key_id"])
+    public_key = _trust_key(
+        external_root, trust_store, workspace_root, payload["issuer"], payload["key_id"],
+    )
     signature = _unb64url(supplied["signature"], "authorization signature")
     if len(signature) != 64:
         _fail("authorization signature must be an Ed25519 signature")
@@ -371,5 +397,8 @@ def verify_and_redeem(
         signed_payload_sha256=payload_digest, signature_sha256=signature_digest,
         issued_at=payload["issued_at"], expires_at=payload["expires_at"], redemption_id=identity,
     )
-    _consume(replay_store, external_root, identity=identity, provenance=provenance)
+    _consume(
+        replay_store, external_root, workspace_root,
+        identity=identity, provenance=provenance,
+    )
     return VerifiedAuthorization(request=request, provenance=provenance)

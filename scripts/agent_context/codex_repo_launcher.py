@@ -42,8 +42,8 @@ def main(argv: list[str] | None = None) -> int:
         help="resume one completed verified generation from this runtime session directory",
     )
     lifecycle.add_argument(
-        "--fresh", action="store_true",
-        help="start a new launch/thread and do not reuse any prior generation (the default)",
+        "--fresh", metavar="SESSION_DIR",
+        help="discard this prior runtime's reuse eligibility and start generation zero",
     )
     parser.add_argument(
         "--cleanup-retained", type=int, metavar="MAX_SESSIONS",
@@ -92,6 +92,17 @@ def main(argv: list[str] | None = None) -> int:
                 workspace_root=root, runtime_dir=runtime_dir, repository_ids=arguments.repository,
                 tasks=arguments.task, operations=arguments.operation,
                 authorizations=records, verified_authorization_provenance=provenance,
+                authorization_trust_store=trust_store, launch_id=launch_id,
+                prompt=arguments.prompt, kernel=kernel,
+            )
+        elif arguments.fresh:
+            runtime_dir = Path(arguments.fresh)
+            kernel._validate_runtime_dir(runtime_dir, root)
+            result = adapter.fresh_and_handoff_repositories(
+                workspace_root=root, prior_runtime_dir=runtime_dir,
+                repository_ids=arguments.repository, tasks=arguments.task,
+                operations=arguments.operation, authorizations=records,
+                verified_authorization_provenance=provenance,
                 authorization_trust_store=trust_store, launch_id=launch_id,
                 prompt=arguments.prompt, kernel=kernel,
             )
@@ -144,7 +155,6 @@ def _verified_authorizations(
     external_root: Path | None, trust_store: Path | None, replay_store: Path | None,
 ) -> tuple[tuple[dict[str, object], ...], tuple[dict[str, str], ...], str | None, Path | None]:
     """Authenticate and consume all signed capabilities before adapter preflight."""
-    del root
     external_values = (external_root, trust_store, replay_store)
     if not capabilities:
         if any(value is not None for value in external_values):
@@ -169,7 +179,7 @@ def _verified_authorizations(
             operations=operations, user_task=prompt,
         )
         verified = authorization.verify_and_redeem(
-            capability, request=request, external_root=external_root,
+            capability, request=request, workspace_root=root, external_root=external_root,
             trust_store=resolved_trust_store, replay_store=resolved_replay_store,
         )
         item = verified.provenance.as_dict()

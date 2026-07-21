@@ -38,6 +38,10 @@ class W9eSbomTests(unittest.TestCase):
             "container:ghcr.io/devcontainers/features/python:1@1.8.0",
             "application:actions/checkout@v4.2.2",
             "application:actions/setup-python@v5.6.0",
+            "library:ruff@0.15.22",
+            "library:cryptography@49.0.0",
+            "library:cffi@2.1.0",
+            "library:pycparser@3.0",
         ):
             self.assertIn(expected, components)
         by_reference = {component["bom-ref"]: component for component in sbom["components"]}
@@ -46,9 +50,27 @@ class W9eSbomTests(unittest.TestCase):
             "71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41",
         )
         self.assertEqual(
-            by_reference["application:actions/checkout@v4.2.2"]["properties"][1]["value"],
+            next(
+                property["value"]
+                for property in by_reference["application:actions/checkout@v4.2.2"]["properties"]
+                if property["name"] == "m8:resolved"
+            ),
             "11bd71901bbe5b1630ceea73d27597364c9af683",
         )
+        for reference in (
+            "library:ruff@0.15.22", "library:cryptography@49.0.0",
+            "library:cffi@2.1.0", "library:pycparser@3.0",
+        ):
+            self.assertEqual(
+                sum(
+                    property == {
+                        "name": "m8:source",
+                        "value": ".github/workflows/root-tooling.requirements.lock",
+                    }
+                    for property in by_reference[reference]["properties"]
+                ),
+                1,
+            )
 
     def test_sbom_is_deterministic_and_schema_valid(self) -> None:
         first = canonical_bytes(ROOT)

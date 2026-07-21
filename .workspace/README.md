@@ -70,7 +70,7 @@ canonical authority:
 | Windows and host-POSIX rows | `UNSUPPORTED` | No behavior is inferred; these rows do not create implementation obligations. |
 
 The required row is the current canonical Codex launch mode after the Phase 10
-remediation. It is invalidated by a changed client binary/version, project
+remediation. It is invalidated by a changed client or Node binary/version, project
 trust or configuration, capability evidence, native inspection mechanism,
 channel, lifecycle behavior, source hash, allowance, or safety margin. A new
 dated capability refresh is required before making or retaining a canonical
@@ -93,8 +93,9 @@ immediately before submission, then passes the full envelope through
 delivery proof. The authoritative runtime journal records
 `SUBMISSION_STARTED` before transport and makes crashes, kills, timeouts, or
 uncertain persistence terminal `EXECUTION_AMBIGUOUS`. Only a successful
-`COMPLETED` generation may resume. `fresh` starts generation zero with a new
-thread; client-native `clear` and `compact` are not claimed. Claude and
+`COMPLETED` generation may resume. `--fresh SESSION_DIR` first invalidates that
+validated prior runtime, then starts generation zero with a new thread;
+client-native `clear` and `compact` are not claimed. Claude and
 unsupported client rows remain limited or unsupported and fail closed.
 
 For an authorized launch, first run `scripts/codex-repo.sh` with

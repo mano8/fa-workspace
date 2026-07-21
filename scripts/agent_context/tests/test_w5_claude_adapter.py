@@ -87,10 +87,11 @@ class W5ClaudeAdapterTests(unittest.TestCase):
             "repositories": [], "tasks": [], "operations": [], "authorization_ids": [],
             "authorization_provenance": [],
             "entries": [{
-                "policy_id": "workspace.policy", "repository_id": "$workspace",
+                "policy_id": "workspace.policy", "source_kind": "policy", "repository_id": "$workspace",
                 "scope_prefix": ".", "path": "policy.md", "delivery": "inject",
                 "source_sha256": source_hash, "source_bytes": len(raw),
                 "metadata_sha256": "c" * 64, "native_evidence_id": None,
+                "envelope_entry_sha256": w2b1.canonical_sha256(entry),
             }],
             "accounting": {
                 "policy_hard_limit": 32768, "verified_channel_limit": 32768,
@@ -178,8 +179,8 @@ class W5ClaudeAdapterTests(unittest.TestCase):
             inspection=self._inspection(("CLAUDE.md",)), transport=FakeTransportAdapter(),
             kernel=DeliveryKernel(),
         )
-        self.assertEqual(result.session["state"], "HANDED_OFF")
-        self.assertEqual(result.receipt["state"], "HANDED_OFF")
+        self.assertEqual(result.session["state"], "COMPLETED")
+        self.assertEqual(result.receipt["state"], "COMPLETED")
         self.assertEqual(result.receipt["delivered_bytes"], len(request.resolved.envelope_bytes))
 
     def test_channel_selection_never_truncates_or_uses_a_pointer(self) -> None:

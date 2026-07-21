@@ -95,10 +95,10 @@ class WorkspaceValidatorTests(unittest.TestCase):
             "capability_evidence_id": "b" * 64, "repositories": [], "tasks": [], "operations": [],
             "authorization_ids": [], "authorization_provenance": [],
             "entries": [{
-                "policy_id": "always.security", "repository_id": "$workspace", "scope_prefix": ".",
+                "policy_id": "always.security", "source_kind": "policy", "repository_id": "$workspace", "scope_prefix": ".",
                 "path": ".workspace/policies/always/security.md", "delivery": "inject",
                 "source_sha256": source_hash, "source_bytes": len(raw), "metadata_sha256": "c" * 64,
-                "native_evidence_id": None,
+                "native_evidence_id": None, "envelope_entry_sha256": w2b1.canonical_sha256(envelope_entry),
             }],
             "accounting": {
                 "policy_hard_limit": 32768, "verified_channel_limit": 32768,
@@ -118,19 +118,23 @@ class WorkspaceValidatorTests(unittest.TestCase):
         envelope, envelope_raw, envelope_hash = w2b1.build_envelope(manifest_id=manifest["manifest_id"], generation=0, entries=[envelope_entry])
         session = {
             "schema_version": 2, "launch_id": "launch.fixture", "client_session_id": "client.fixture",
-            "generation": 0, "state": "HANDED_OFF", "manifest_id": manifest["manifest_id"], "envelope_sha256": envelope_hash,
-            "capability_evidence_id": "b" * 64, "native_evidence_ids": [], "repositories": [], "tasks": [], "operations": [],
-            "authorization_ids": [], "authorization_provenance": [], "created_at": "2026-07-20T00:00:00Z",
+            "generation": 0, "state": "COMPLETED", "manifest_id": manifest["manifest_id"], "envelope_sha256": envelope_hash,
+            "capability_evidence_id": "b" * 64, "trust_identity_sha256": "0" * 64, "native_evidence_ids": [], "repositories": [], "tasks": [], "operations": [],
+            "authorization_ids": [], "authorization_provenance": [], "sources": [], "created_at": "2026-07-20T00:00:00Z",
             "updated_at": "2026-07-20T00:00:00Z", "previous_receipt_sha256": "d" * 64,
         }
         receipt = {
             "schema_version": 2, "receipt_id": "0" * 64, "launch_id": session["launch_id"], "client_session_id": session["client_session_id"],
-            "generation": 0, "manifest_id": manifest["manifest_id"], "envelope_sha256": envelope_hash, "capability_evidence_id": "b" * 64,
-            "native_evidence_ids": [], "repositories": [], "tasks": [], "operations": [], "authorization_ids": [], "authorization_provenance": [],
-            "previous_state": "PREPARED", "state": "HANDED_OFF", "channel_id": "fixture-channel", "delivered_bytes": len(envelope_raw),
+            "generation": 0, "manifest_id": manifest["manifest_id"], "envelope_sha256": envelope_hash, "capability_evidence_id": "b" * 64, "trust_identity_sha256": "0" * 64,
+            "native_evidence_ids": [], "repositories": [], "tasks": [], "operations": [], "authorization_ids": [], "authorization_provenance": [], "sources": [],
+            "previous_state": "SUBMISSION_STARTED", "state": "COMPLETED", "channel_id": "fixture-channel", "delivered_bytes": len(envelope_raw),
             "failure_code": "OK", "recorded_at": "2026-07-20T00:00:00Z",
         }
         receipt["receipt_id"] = w2b1.canonical_sha256({key: value for key, value in receipt.items() if key != "receipt_id"})
+        session["sources"] = manifest["entries"]
+        receipt["sources"] = manifest["entries"]
+        receipt["receipt_id"] = w2b1.canonical_sha256({key: value for key, value in receipt.items() if key != "receipt_id"})
+        session["previous_receipt_sha256"] = receipt["receipt_id"]
         runtime = self.root / ".workspace/.runtime/session-fixture"
         runtime.mkdir(parents=True)
         os.chmod(runtime, 0o700)

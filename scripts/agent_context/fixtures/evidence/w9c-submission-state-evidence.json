@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "finding": "C-2",
+  "contract": "durable-submission-started-with-terminal-ambiguity",
+  "authoritative_state": "immutable-hash-chained-generation-journal",
+  "states": ["RESOLVED", "PREPARED", "SUBMISSION_STARTED", "COMPLETED", "EXECUTION_AMBIGUOUS", "FAILED"],
+  "crash_boundaries": ["before-submission-journal", "after-submission-journal", "before-transport", "after-transport", "receipt-view-before-write", "receipt-view-after-write", "session-view-before-write", "session-view-after-write", "cleanup-before-remove", "cleanup-after-remove"],
+  "retry_rule": "SUBMISSION_STARTED and EXECUTION_AMBIGUOUS are never automatically retried or resumed"
+}

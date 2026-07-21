@@ -5,14 +5,14 @@
   },
   "capability_evidence": {
     "path": "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md",
-    "sha256": "3fce2371cada5b2cbe949b0398ba29a376ca1515c7577dc6881b62263ff7588b"
+    "sha256": "d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b"
   },
   "fixtures": [
     {
       "effective_hard_limit": 32768,
-      "envelope_sha256": "f4c94dde7f404c16c487bcab4a2cd117f99b096a3f5f668efed3ddff5df5a33e",
+      "envelope_sha256": "4d2cd4d92e38a9465a92bc21524f0bf7cd0e8ea55ba2537277d48c23a40b4ce2",
       "fixture_id": "sdk-implementation",
-      "manifest_sha256": "9fb056ccdd3492e233cb4a3262d53fc13c1ea896dbcba525907159188ca130d8",
+      "manifest_sha256": "0cdb879f32e9a4652044e49a45189967e7055de60c46ab3929cef4592b72b9eb",
       "model_visible_total": 4988,
       "native": {"bytes": 1965, "path": "AGENTS.md", "sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b"},
       "policy_paths": [".workspace/policies/always/security.md", ".workspace/policies/always/workspace.md", ".workspace/policies/facets/language-python.md"],
@@ -27,9 +27,9 @@
     },
     {
       "effective_hard_limit": 32768,
-      "envelope_sha256": "f985ad7fb98fad87a1332d1f2e5cdc0c3ed5dc4e181121b6bee53df7349b1be3",
+      "envelope_sha256": "38b7c31999eb754f005881a2f790c3cdb5ec0faee0029fedfdec120185142794",
       "fixture_id": "worker-environment",
-      "manifest_sha256": "d56de77a7fd2daddaefbbe7cbcd13475c4bc1e9394401708af155f630b908ab1",
+      "manifest_sha256": "3443a90e0230b20ded574f42b880699c4770559a26cfba1399ba8c7053c66cfd",
       "model_visible_total": 7663,
       "native": {"bytes": 1965, "path": "AGENTS.md", "sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b"},
       "policy_paths": [".workspace/policies/always/security.md", ".workspace/policies/always/workspace.md", ".workspace/policies/facets/language-python.md", ".workspace/policies/tasks/environment.md"],
@@ -45,9 +45,9 @@
     },
     {
       "effective_hard_limit": 32768,
-      "envelope_sha256": "24ff82b05536482464d8eb117d9345c8d3b1b95feabed140d2c9d45c6a65e859",
+      "envelope_sha256": "121168427483022baecf11a7673fcb052a325801c514dbfee16d7ec216e2f9c8",
       "fixture_id": "astro-host-implementation",
-      "manifest_sha256": "7476e3f90460c2735833c4befd85d35a3d9c0f76ed985a4f056fc3710d221d20",
+      "manifest_sha256": "6f140753499f04663cc1062b850e2bf3deb078baf60da8ec7feb83e894b4e4f9",
       "model_visible_total": 6176,
       "native": {"bytes": 1965, "path": "AGENTS.md", "sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b"},
       "policy_paths": [".workspace/policies/always/security.md", ".workspace/policies/always/workspace.md", ".workspace/policies/facets/language-typescript.md", ".workspace/policies/facets/layer-client.md", ".workspace/policies/facets/framework-astro.md", ".workspace/policies/facets/domain-shared-ui.md"],
@@ -65,9 +65,9 @@
     },
     {
       "effective_hard_limit": 32768,
-      "envelope_sha256": "41cb073d545648c914dcf2ee7e609330bc887adb21c086629d4d3d6a2d949922",
+      "envelope_sha256": "afcb3545c45850af77987d86d6072150fdf3ff3816bef3adffe26d81ec38e050",
       "fixture_id": "astro-plugin-implementation",
-      "manifest_sha256": "3a7fb651fadddc71790b8a951e55676b3dd259bddc7cf1fd5fb44b9c75a2ab35",
+      "manifest_sha256": "b39b3cb9adfb8f5eadc3d5cedc9f604fa459f0f1883f32913091ee1c458db6d5",
       "model_visible_total": 7209,
       "native": {"bytes": 1965, "path": "AGENTS.md", "sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b"},
       "policy_paths": [".workspace/policies/always/security.md", ".workspace/policies/always/workspace.md", ".workspace/policies/facets/language-typescript.md", ".workspace/policies/facets/layer-client.md", ".workspace/policies/facets/kind-astro-plugin.md", ".workspace/policies/facets/framework-astro.md", ".workspace/policies/facets/domain-auth-client.md"],

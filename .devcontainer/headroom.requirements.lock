@@ -1,0 +1,6 @@
+# Reviewed direct bootstrap artifact. Its exact wheel hash is recorded here for
+# the Step 10.5 clean-build verification; the setup script checks the installed
+# package record after the pinned functional install. A complete transitive lock
+# still requires the blocked clean-devcontainer reproduction run.
+headroom-ai[mcp,proxy,code]==0.32.1 \
+    --hash=sha256:00190bb57ae063199bd1460ec8cf50845d9293a8724c21fcef4dfb5cca27df2e

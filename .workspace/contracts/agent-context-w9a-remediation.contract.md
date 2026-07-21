@@ -26,15 +26,17 @@ The frozen inputs are:
 - the independent French critical audit, SHA-256
   `142bc1658704b1819a4310fb0b791f8cd1761fe2379b98cb854fbd18750132ff`;
 - the W2a contract version 2.1.0, SHA-256
-  `97e4fcac65f80b6b49a002842cf13c74fbbb933bef5a61993579c93c91934af2`;
+  `9bd47076c6a27aca3110f4c8885235368c1bac06c98aa04edf7dbb5d9d3eb6f7`;
   and
-- the tracked copy of the 2026-07-19 capability evidence, SHA-256
-  `3fce2371cada5b2cbe949b0398ba29a376ca1515c7577dc6881b62263ff7588b`.
+- the tracked canonical artifact
+  `scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md`,
+  SHA-256
+  `d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b`.
 
 This contract amends W2a Sections 4, 6, 8, 9, 10, 12, and 13 for remediation.
 Where the two contracts disagree, this contract governs. Unamended W2a data,
 serialization, authority, accounting, standalone, and exit-code rules remain
-normative. The audit prose and ignored status files are evidence inputs, not
+normative. The audit prose and ignored status files are historical evidence inputs, not
 runtime authority. The tracked finding register is the one disposition source
 for `C-1`, `C-2`, `H-1`--`H-3`, `M-1`--`M-4`, `L-1`--`L-2`, and the separate
 ZIP reproducibility limitation.

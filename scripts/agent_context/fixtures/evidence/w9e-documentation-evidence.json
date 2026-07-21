@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "evidence_id": "w9e-documentation-2026-07-21",
+  "finding": "M-3",
+  "step": "10.9",
+  "status": "CURRENT_POST_REMEDIATION",
+  "canonical_required_row": "codex-devcontainer-non-interactive",
+  "limited_rows": ["codex-devcontainer-interactive", "claude-devcontainer-interactive", "claude-devcontainer-non-interactive"],
+  "unsupported_rows": ["windows", "host-posix"],
+  "current_lifecycle": ["RESOLVED", "PREPARED", "SUBMISSION_STARTED", "COMPLETED", "EXECUTION_AMBIGUOUS", "FAILED"],
+  "resumable_state": "COMPLETED",
+  "fresh_operation": "generation-zero-new-thread",
+  "unsupported_operations": ["compact", "client-native-clear"],
+  "historical_artifacts": [
+    ".workspace/status/fa-workspace/agent-configuration-token-efficiency-w9-phase-9-4-2026-07-20.md",
+    ".workspace/status/fa-workspace/agent-configuration-token-efficiency-w9-phase-9-5-provisional-sol-review-2026-07-20.md"
+  ],
+  "sha256": {
+    ".workspace/README.md": "9083ee0ea789dbf927e79022eda5e5e41e971f87a99587505bf05ffdf87122a8",
+    "AGENTS.md": "8b6b743d234696de8fa2b78285d12121cb6d6a747da286a692f037b74e2d07d1",
+    "CLAUDE.md": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09",
+    "scripts/agent_context/README.md": "4bff1b714e02267b51f50332dd4e649eb946cfb405831e2e4152be975a248dc5",
+    "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md": "d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b",
+    ".workspace/status/fa-workspace/agent-configuration-token-efficiency-w9-phase-9-4-2026-07-20.md": "f54416f58c49edf2d07467eb4552068d9588ff98e16bd3486cd7129f19b5db13"
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "$schema": "https://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "application:@openai/codex@0.144.6",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "134063e133f0b4244fa3b251acf973d4fe4b4aeeacbdc135211bf480f59f1477"
+        }
+      ],
+      "name": "@openai/codex",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "application",
+      "version": "0.144.6"
+    },
+    {
+      "bom-ref": "application:actions/checkout@v4.2.2",
+      "name": "actions/checkout",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".github/workflows/workspace-policy-lint.yml"
+        }
+      ],
+      "type": "application",
+      "version": "v4.2.2"
+    },
+    {
+      "bom-ref": "application:actions/setup-python@v5.6.0",
+      "name": "actions/setup-python",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".github/workflows/workspace-policy-lint.yml"
+        }
+      ],
+      "type": "application",
+      "version": "v5.6.0"
+    },
+    {
+      "bom-ref": "application:headroom-ai[mcp,proxy,code]@0.32.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f924558152b73d544efb800d9884db709e4856d4a989b47023864c9a2325aa02"
+        }
+      ],
+      "name": "headroom-ai[mcp,proxy,code]",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "application",
+      "version": "0.32.1"
+    },
+    {
+      "bom-ref": "container:ghcr.io/anthropics/devcontainer-features/claude-code:1.0@1.0.5",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "cfc2e7d3e9fd3b9b01f8d5cb158508a884c8c0ede2e23ed10f32dea5d4ffe69a"
+        }
+      ],
+      "name": "ghcr.io/anthropics/devcontainer-features/claude-code:1.0",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "container",
+      "version": "1.0.5"
+    },
+    {
+      "bom-ref": "container:ghcr.io/devcontainers/features/docker-outside-of-docker:1@1.10.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e"
+        }
+      ],
+      "name": "ghcr.io/devcontainers/features/docker-outside-of-docker:1",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "container",
+      "version": "1.10.0"
+    },
+    {
+      "bom-ref": "container:ghcr.io/devcontainers/features/node:2@2.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f"
+        }
+      ],
+      "name": "ghcr.io/devcontainers/features/node:2",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "container",
+      "version": "2.0.0"
+    },
+    {
+      "bom-ref": "container:ghcr.io/devcontainers/features/python:1@1.8.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511"
+        }
+      ],
+      "name": "ghcr.io/devcontainers/features/python:1",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "container",
+      "version": "1.8.0"
+    },
+    {
+      "bom-ref": "container:mcr.microsoft.com/devcontainers/base:ubuntu@mcr.microsoft.com/devcontainers/base@sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c"
+        }
+      ],
+      "name": "mcr.microsoft.com/devcontainers/base:ubuntu",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "container",
+      "version": "mcr.microsoft.com/devcontainers/base@sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c"
+    },
+    {
+      "bom-ref": "library:cffi@2.1.0",
+      "name": "cffi",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".github/workflows/root-tooling.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.1.0"
+    },
+    {
+      "bom-ref": "library:cryptography@49.0.0",
+      "name": "cryptography",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".github/workflows/root-tooling.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "49.0.0"
+    },
+    {
+      "bom-ref": "library:headroom-ai[mcp,proxy,code]@0.32.1",
+      "name": "headroom-ai[mcp,proxy,code]",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.32.1"
+    },
+    {
+      "bom-ref": "library:pycparser@3.0",
+      "name": "pycparser",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".github/workflows/root-tooling.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.0"
+    },
+    {
+      "bom-ref": "library:ruff@0.15.22",
+      "name": "ruff",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".github/workflows/root-tooling.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.15.22"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "name": "fa-workspace-root-tooling",
+      "type": "application",
+      "version": "15fa0108b504684f48c43fe9d8fc940a85a4c8084845c76bc5a17df57778bb37"
+    },
+    "properties": [
+      {
+        "name": "m8:deterministic",
+        "value": "true"
+      },
+      {
+        "name": "m8:source-sha256:.devcontainer/devcontainer-lock.json",
+        "value": "3bf74f7e0cbea31a1fe936f4aefb7d0abb0cc5ff379210e4cbaec2fb1fc005ed"
+      },
+      {
+        "name": "m8:source-sha256:.devcontainer/devcontainer.json",
+        "value": "22d3f3e9b9c9652504a516c372c11907908bd26c70bf855f009f26f605f891ee"
+      },
+      {
+        "name": "m8:source-sha256:.devcontainer/headroom.requirements.lock",
+        "value": "bf968e68d59a5316af6ff0f07114f62c889dac4fbe4bb99776bf3c1e77471559"
+      },
+      {
+        "name": "m8:source-sha256:.devcontainer/setup.sh",
+        "value": "dc4f43d2d8f48f4a435640cd8eeb1547cae870bf191a50b1388dd8dbde6e48f3"
+      },
+      {
+        "name": "m8:source-sha256:.github/workflows/root-tooling.requirements.lock",
+        "value": "a0da875a5c7c202a95fa7963d2b1b1132a47bb32fa25140aa58a52a95d85b368"
+      },
+      {
+        "name": "m8:source-sha256:.github/workflows/workspace-policy-lint.yml",
+        "value": "ea42d5b59e1b598c1c14171fdf345a153edaa1fab0f7df544da2837c7e3fbf6d"
+      }
+    ]
+  },
+  "serialNumber": "urn:uuid:01ea52db-5d95-560c-ac60-42c501fe3662",
+  "specVersion": "1.6",
+  "version": 1
+}

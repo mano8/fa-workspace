@@ -1,4 +1,22 @@
 {
+  "bootstrap": {
+    "codex": {
+      "package": "@openai/codex",
+      "version": "0.144.6",
+      "binary_sha256": "134063e133f0b4244fa3b251acf973d4fe4b4aeeacbdc135211bf480f59f1477"
+    },
+    "headroom": {
+      "package": "headroom-ai[mcp,proxy,code]",
+      "version": "0.32.1",
+      "requirements_lock": ".devcontainer/headroom.requirements.lock",
+      "record_sha256": "f924558152b73d544efb800d9884db709e4856d4a989b47023864c9a2325aa02"
+    }
+  },
+  "base_image": {
+    "reference": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "resolved": "mcr.microsoft.com/devcontainers/base@sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c",
+    "integrity": "sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c"
+  },
   "features": {
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {
       "version": "1.0.5",
@@ -8,7 +26,11 @@
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "version": "1.10.0",
       "resolved": "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e",
-      "integrity": "sha256:c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e"
+      "integrity": "sha256:c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e",
+      "options": {
+        "version": "29.6.1",
+        "moby": false
+      }
     },
     "ghcr.io/devcontainers/features/node:2": {
       "version": "2.0.0",

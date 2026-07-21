@@ -86,7 +86,7 @@ EXPECTED_SOURCES = {
     "capability-evidence": (
         "tracked-normative-input",
         "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md",
-        "3fce2371cada5b2cbe949b0398ba29a376ca1515c7577dc6881b62263ff7588b",
+        "d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b",
         True,
     ),
     "critical-audit-en": (
@@ -104,7 +104,7 @@ EXPECTED_SOURCES = {
     "w2a-contract": (
         "tracked-normative-input",
         ".workspace/contracts/agent-context-w2a.contract.md",
-        "97e4fcac65f80b6b49a002842cf13c74fbbb933bef5a61993579c93c91934af2",
+        "9bd47076c6a27aca3110f4c8885235368c1bac06c98aa04edf7dbb5d9d3eb6f7",
         True,
     ),
 }

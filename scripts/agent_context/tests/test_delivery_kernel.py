@@ -58,10 +58,11 @@ class DeliveryKernelTests(unittest.TestCase):
             "repositories": [], "tasks": [], "operations": [],
             "authorization_ids": [], "authorization_provenance": [],
             "entries": [{
-                "policy_id": entry["policy_id"], "repository_id": entry["repository_id"],
+                "policy_id": entry["policy_id"], "source_kind": "policy", "repository_id": entry["repository_id"],
                 "scope_prefix": entry["scope_prefix"], "path": entry["path"], "delivery": "inject",
                 "source_sha256": source_hash, "source_bytes": len(raw),
                 "metadata_sha256": "c" * 64, "native_evidence_id": None,
+                "envelope_entry_sha256": w2b1.canonical_sha256(entry),
             }],
             "accounting": {
                 "policy_hard_limit": 32768, "verified_channel_limit": 32768,
@@ -136,13 +137,13 @@ class DeliveryKernelTests(unittest.TestCase):
             channel_id="fake-full-content",
         )
 
-    def test_exact_fake_callback_is_the_only_handoff_transition(self) -> None:
+    def test_exact_fake_callback_records_completed_submission_not_handoff(self) -> None:
         kernel = DeliveryKernel()
         prepared = kernel.prepare(self._request())
         self.assertEqual(prepared.session["state"], "PREPARED")
         self.assertEqual(prepared.receipt["state"], "PREPARED")
         result = kernel.handoff(prepared, FakeTransportAdapter())
-        self.assertEqual(result.session["state"], "HANDED_OFF")
+        self.assertEqual(result.session["state"], "COMPLETED")
         self.assertEqual(result.receipt["delivered_bytes"], len(self.resolved.envelope_bytes))
         self.assertFalse((result.runtime_dir / "receipt.json").is_symlink())
 
@@ -153,7 +154,7 @@ class DeliveryKernelTests(unittest.TestCase):
             kernel.handoff(prepared, FakeTransportAdapter(returned_bytes=0))
         self.assertEqual(exit_code(mismatch.exception), ExitCode.E_CHANNEL)
         failed = w2b1.parse_strict_json((prepared.runtime_dir / "session.json").read_bytes())
-        self.assertEqual(failed["state"], "FAILED")
+        self.assertEqual(failed["state"], "EXECUTION_AMBIGUOUS")
 
         fresh = kernel.prepare(self._request())
         (self.root / "policy.md").write_bytes(b"changed\n")
@@ -232,7 +233,7 @@ class DeliveryKernelTests(unittest.TestCase):
         self.assertFalse(writer.is_alive())
         self.assertEqual(adapter.calls, 1)
         self.assertEqual(len(outcome), 1)
-        self.assertEqual(outcome[0].session["state"], "HANDED_OFF")
+        self.assertEqual(outcome[0].session["state"], "COMPLETED")
 
     def test_runtime_collision_and_terminal_receipt_rewrite_fail_closed(self) -> None:
         kernel = DeliveryKernel()
@@ -246,7 +247,7 @@ class DeliveryKernelTests(unittest.TestCase):
             kernel.handoff(first, FakeTransportAdapter())
         self.assertEqual(exit_code(duplicate.exception), ExitCode.E_RECEIPT)
         session = w2b1.parse_strict_json((first.runtime_dir / "session.json").read_bytes())
-        self.assertEqual(session["state"], "HANDED_OFF")
+        self.assertEqual(session["state"], "COMPLETED")
 
     def test_runtime_substitution_and_permissions_fail_before_handoff(self) -> None:
         kernel = DeliveryKernel()

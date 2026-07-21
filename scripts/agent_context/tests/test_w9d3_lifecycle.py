@@ -1,0 +1,87 @@
+from __future__ import annotations
+
+import os
+import sys
+import unittest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from agent_context import w2b1
+from agent_context.delivery_kernel import DeliveryKernel, FakeTransportAdapter
+from agent_context.resolve_context import ResolvedContext
+from agent_context.tests.test_delivery_kernel import DeliveryKernelTests
+
+
+class W9d3LifecycleTests(unittest.TestCase):
+    """Frozen H-3 production lifecycle and retention safety fixtures."""
+
+    def setUp(self) -> None:
+        self.fixture = DeliveryKernelTests()
+        self.fixture.setUp()
+
+    def tearDown(self) -> None:
+        self.fixture.tearDown()
+
+    def _next_request(self, **changes: object):
+        envelope, raw, digest = w2b1.build_envelope(
+            manifest_id=self.fixture.resolved.manifest["manifest_id"], generation=1,
+            entries=self.fixture.resolved.envelope["entries"],
+        )
+        resolved = ResolvedContext(self.fixture.resolved.manifest, envelope, raw, digest)
+        return type(self.fixture._request())(**{
+            **self.fixture._request().__dict__, "resolved": resolved, **changes,
+        })
+
+    def test_ambiguous_generation_cannot_resume(self) -> None:
+        prepared = DeliveryKernel().prepare(self.fixture._request())
+        with self.assertRaises(w2b1.AgentContextError):
+            DeliveryKernel().handoff(prepared, type("Fault", (), {"deliver": lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError())})())
+        with self.assertRaisesRegex(w2b1.AgentContextError, "completed generation") as failure:
+            DeliveryKernel().resume(prepared.runtime_dir, self._next_request())
+        self.assertEqual(failure.exception.code, "E_LIFECYCLE")
+
+    def test_concurrent_and_substituted_runtime_paths_fail(self) -> None:
+        kernel = DeliveryKernel()
+        prepared = kernel.prepare(self.fixture._request())
+        (prepared.runtime_dir / "receipt.json").unlink()
+        (prepared.runtime_dir / "receipt.json").symlink_to(self.fixture.root / "policy.md")
+        with self.assertRaisesRegex(w2b1.AgentContextError, "unsafe") as failure:
+            kernel.cleanup(prepared.runtime_dir, self.fixture.root)
+        self.assertEqual(failure.exception.code, "E_RUNTIME")
+
+    def test_fresh_invalidates_prior_reuse(self) -> None:
+        kernel = DeliveryKernel()
+        prior = kernel.handoff(kernel.prepare(self.fixture._request()), FakeTransportAdapter())
+        fresh = kernel.fresh(prior.runtime_dir, self.fixture._request())
+        self.assertFalse(prior.runtime_dir.exists())
+        self.assertEqual(fresh.session["generation"], 0)
+        with self.assertRaises(w2b1.AgentContextError):
+            kernel.resume(prior.runtime_dir, self._next_request())
+
+    def test_interrupted_retention_and_startup_cleanup_are_safe(self) -> None:
+        kernel = DeliveryKernel()
+        old = kernel.prepare(self.fixture._request()).runtime_dir
+        newer = kernel.prepare(self.fixture._request()).runtime_dir
+        os.utime(old, (1, 1))
+        os.utime(newer, (2, 2))
+        self.assertEqual(kernel.cleanup_retained(self.fixture.root, max_sessions=1), 1)
+        self.assertFalse(old.exists())
+        self.assertTrue(newer.exists())
+
+    def test_resume_revalidates_source_and_trust_identity(self) -> None:
+        kernel = DeliveryKernel()
+        completed = kernel.handoff(kernel.prepare(self.fixture._request()), FakeTransportAdapter())
+        with self.assertRaisesRegex(w2b1.AgentContextError, "linkage") as failure:
+            kernel.resume(completed.runtime_dir, self._next_request(trust_identity_sha256="a" * 64))
+        self.assertEqual(failure.exception.code, "E_RECEIPT")
+
+    def test_unsupported_compact_fails(self) -> None:
+        prepared = DeliveryKernel().prepare(self.fixture._request())
+        with self.assertRaisesRegex(w2b1.AgentContextError, "compaction") as failure:
+            DeliveryKernel().compact(prepared)
+        self.assertEqual(failure.exception.code, "E_LIFECYCLE")
+
+
+if __name__ == "__main__":
+    unittest.main()

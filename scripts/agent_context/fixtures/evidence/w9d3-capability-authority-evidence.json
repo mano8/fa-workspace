@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "finding": "M-1",
+  "step": "10.7",
+  "canonical_capability_path": "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md",
+  "canonical_capability_sha256": "d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b",
+  "ignored_status_authority": "none",
+  "verification": {
+    "command": "PYTHONPATH=scripts python -m unittest agent_context.tests.test_w9d3_capability_authority",
+    "required_tests": [
+      "test_clean_checkout_has_documented_capability_path",
+      "test_deleted_ignored_status_does_not_change_authority",
+      "test_substituted_ignored_status_does_not_change_authority",
+      "test_tracked_capability_drift_fails"
+    ],
+    "expected_result": "pass"
+  }
+}

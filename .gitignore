@@ -1,5 +1,7 @@
 # Ignore every root-level entry by default.
 /*
+!/sbom/
+!/sbom/root-tooling.cdx.json
 
 # Files owned by fa-workspace.
 !/.gitignore

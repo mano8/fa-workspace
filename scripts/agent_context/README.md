@@ -37,15 +37,18 @@ authorization record whose repository and operation sets match exactly;
 manifests, sessions, and receipts retain only its identifier, canonical record
 hash, and source hash alongside the selected repository/task/operation sets.
 
-Phase 10 Step 10.2 adds the W9b external authorization verifier in
+Phase 10 Steps 10.2--10.8 implement the W9b--W9d remediation boundaries. The
+W9b external authorization verifier in
 [`authorization.py`](authorization.py). It creates a launch-bound request and
 accepts only an Ed25519 signature over an exact JCS payload from an
 owner-controlled trust store outside the workspace. It atomically consumes the
 capability in an external replay store before submission and exposes only
 authorization ID, issuer/key ID, payload/signature digests, issue/expiry, and
 redemption ID for future manifest/session/receipt linkage. Raw approval and
-signature bytes are never runtime artifacts. The canonical launch remains
-disabled pending the remaining Phase 10 boundaries.
+signature bytes are never runtime artifacts. Canonical Codex launch is
+available only for the required devcontainer non-interactive row after the
+complete trust and capability preflight; Claude and unsupported rows remain
+fail-closed limited/unsupported modes.
 
 ```bash
 "$M8_PYTHON" scripts/agent_context/resolve-context.py \
@@ -92,11 +95,10 @@ actions require confirmation. Run its static check with:
 
 Phase 5 Step 5.6 adds the Claude-only adapter boundary in
 [`claude_adapter.py`](claude_adapter.py). Current Claude capability evidence is
-`LIMITED`, so project-hook activation and real transport are intentionally
-disabled; the adapter fails before runtime creation or a handoff. Its synthetic
-fixtures prove the future adapter seam delegates exact-once `HANDED_OFF`
-receipts to the shared kernel, checks root/nested/on-demand/standalone native
-source hashes, and rejects oversized payloads without truncation:
+`LIMITED`, so project-hook activation and real transport remain disabled; the
+adapter fails before runtime creation or submission. Its synthetic fixtures
+cover the future adapter seam, source hashes, and oversized-payload rejection
+without truncation:
 
 ```bash
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w5_claude_adapter -v
@@ -126,9 +128,11 @@ authorization record supplied through a workspace-relative regular file.
 Traversal, duplicate identifiers, symlinked children/instructions, missing
 direct `.git`, source/config/client/trust drift, and invalid authorization
 records fail before `codex exec`. The adapter delegates runtime state,
-source-drift checks, receipt validation, collision handling, and `HANDED_OFF`
-terminality to the W2b3 kernel; no printed/model response is treated as
-delivery proof.
+source-drift checks, shared strict validation, collision handling, and the
+hash-chained `SUBMISSION_STARTED`/`COMPLETED`/`EXECUTION_AMBIGUOUS` lifecycle
+to the kernel; no printed/model response is treated as delivery proof. A
+`COMPLETED` receipt means client success and framing/linkage validation, not
+model retention or exactly-once external effects.
 
 Phase 7 adds a root-only control-plane validator. Its default strict pass reads
 tracked workspace inputs only and never checks out, runs, or interprets child

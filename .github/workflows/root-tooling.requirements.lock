@@ -1,0 +1,10 @@
+# Reviewed for the root-only workspace-policy-lint job on ubuntu-latest,
+# CPython 3.12, x86_64. Refresh with the documented procedure in .github/README.md.
+ruff==0.15.22 \
+    --hash=sha256:365523eb91d9224e1bcb03b022fbf0facb8f9e23792a2c53d9d4b3924bdbdebb
+cryptography==49.0.0 \
+    --hash=sha256:0e959b578856a3924bc0cbb710fc12c387b9412a951389f3ca61704a9e25f325
+cffi==2.1.0 \
+    --hash=sha256:1e9f50d192a3e525b15a75ab5114e442d83d657b7ec29182a991bc9a88fd3a66
+pycparser==3.0 \
+    --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992

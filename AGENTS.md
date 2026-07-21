@@ -33,8 +33,9 @@ then explicitly requested task overlays. Tasks—especially mutating or
 cross-repository tasks—require the recorded human authorization defined by the
 contract; neither a repository nor these instructions can select them.
 
-Use a verified launcher/adapter for canonical resolved-context delivery when
-the capability evidence supports that mode; it must fail closed on an
-unverified preflight or handoff. This bootstrap does not invoke the resolver or
-hand off context. Unwrapped native use is limited and must not be described as
-canonical delivery. This file never imports `CLAUDE.md`.
+Use a verified launcher/adapter for canonical delivery when supported; it must
+fail closed on unverified preflight or submission. The required row uses the
+workspace root, root-native plus child-injected sources, and durable
+`COMPLETED`/`EXECUTION_AMBIGUOUS` outcomes. This bootstrap does not invoke the resolver or
+hand off context. Unwrapped native use is limited and cannot claim canonical
+delivery. This file never imports `CLAUDE.md`.

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "finding": "H-1",
+  "execution_directory": "workspace-root",
+  "native_sources": ["AGENTS.md"],
+  "injected_source_rule": "every selected child AGENTS.md is injected once with registered repository scope",
+  "parity": "manifest, envelope, journal-derived receipt, accounting, and transport share one canonical source inventory",
+  "ordering": "canonical repository identifier and source-path ordering"
+}

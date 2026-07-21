@@ -1,0 +1,1 @@
+{"schema_version":1,"evidence_id":"w9d2-bootstrap-reproducibility-2026-07-20","tests":["test_floating_bootstrap_input_fails","test_hash_mismatched_bootstrap_input_fails","test_two_clean_build_identities_match"],"bootstrap":{"codex":"@openai/codex@0.144.6","headroom":"headroom-ai[mcp,proxy,code]==0.32.1"},"status":"implemented"}

@@ -145,7 +145,9 @@ class W6CodexAdapterTests(unittest.TestCase):
             )
         self.assertEqual(repository, self.repo)
         self.assertEqual(inspection.source_sha256["AGENTS.md"], hashlib.sha256((self.root / "AGENTS.md").read_bytes()).hexdigest())
-        self.assertEqual([entry["delivery"] for entry in resolved.manifest["entries"]], ["inject", "inject"])
+        self.assertEqual([entry["delivery"] for entry in resolved.manifest["entries"]], ["inject", "inject", "native", "inject"])
+        self.assertEqual(resolved.manifest["entries"][2]["path"], "AGENTS.md")
+        self.assertEqual(resolved.manifest["entries"][3]["repository_id"], "repo-a")
         self.assertEqual(resolved.manifest["repositories"], ["repo-a"])
 
     def test_exact_transport_handoff_uses_kernel_receipt_and_thread_identity(self) -> None:
@@ -153,7 +155,7 @@ class W6CodexAdapterTests(unittest.TestCase):
             result = self._adapter().prepare_and_handoff(
                 workspace_root=self.root, repository_id="repo-a", prompt="inspect the repository",
             )
-        self.assertEqual(result.receipt["state"], "HANDED_OFF")
+        self.assertEqual(result.receipt["state"], "COMPLETED")
         self.assertEqual(result.receipt["client_session_id"], "thread.fixture")
         self.assertGreater(result.receipt["delivered_bytes"], 0)
         self.assertFalse((result.runtime_dir / "receipt.json").read_bytes().count(b"always policy"))
@@ -206,7 +208,7 @@ class W6CodexAdapterTests(unittest.TestCase):
         self.assertEqual(first.manifest["manifest_id"], second.manifest["manifest_id"])
         self.assertEqual(first.envelope_sha256, second.envelope_sha256)
         self.assertEqual(sorted(inspection.source_sha256), ["AGENTS.md", "repo-a/AGENTS.md", "repo-b/AGENTS.md"])
-        self.assertEqual(result.receipt["state"], "HANDED_OFF")
+        self.assertEqual(result.receipt["state"], "COMPLETED")
         self.assertEqual(result.receipt["repositories"], ["repo-a", "repo-b"])
         self.assertEqual(result.receipt["authorization_ids"], ["human.cross"])
 

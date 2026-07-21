@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+readonly CODEX_VERSION="0.144.6"
+readonly CODEX_BINARY_SHA256="134063e133f0b4244fa3b251acf973d4fe4b4aeeacbdc135211bf480f59f1477"
+readonly HEADROOM_RECORD_SHA256="f924558152b73d544efb800d9884db709e4856d4a989b47023864c9a2325aa02"
+
 echo "[1/7] Mise à jour des outils système..."
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
@@ -42,14 +46,26 @@ python3 -m venv .shared-venv
     -r /workspace/imgtools_m8/requirements.txt \
     -r /workspace/media-service-m8/media_service/requirements_dev.txt
 
-echo "[5/7] Installation de Codex CLI sans sudo..."
+echo "[5/7] Installation vérifiée de Codex CLI sans sudo..."
 npm config delete prefix
-npm install -g @openai/codex
+codex_path="$(command -v codex || true)"
+if [ -z "${codex_path}" ]; then
+    npm install -g "@openai/codex@${CODEX_VERSION}"
+    codex_path="$(command -v codex)"
+fi
+test "$(sha256sum "${codex_path}" | awk '{print $1}')" = "${CODEX_BINARY_SHA256}"
+test "$(codex --version)" = "codex-cli ${CODEX_VERSION}"
 
-echo "[6/7] Installation de Headroom MCP CLI dans un venv isolé..."
+echo "[6/7] Installation verrouillée de Headroom MCP CLI dans un venv isolé..."
 python3 -m venv "${HOME}/.venvs/headroom"
-"${HOME}/.venvs/headroom/bin/pip" install --upgrade pip
-"${HOME}/.venvs/headroom/bin/pip" install "headroom-ai[mcp,proxy,code]"
+# The direct Headroom wheel is pinned and its installed RECORD is checked
+# below.  Its transitive lock remains an open Step 10.5 build-verification
+# requirement; use of the versioned direct requirement keeps the bootstrap
+# functional until that clean-build evidence can be produced.
+"${HOME}/.venvs/headroom/bin/pip" install "headroom-ai[mcp,proxy,code]==0.32.1"
+headroom_record="$(find "${HOME}/.venvs/headroom/lib" -path '*/headroom_ai-0.32.1.dist-info/RECORD' -type f -print -quit)"
+test -n "${headroom_record}"
+test "$(sha256sum "${headroom_record}" | awk '{print $1}')" = "${HEADROOM_RECORD_SHA256}"
 
 if ! grep -q '.venvs/headroom/bin' "${HOME}/.bashrc"; then
     echo 'export PATH="${HOME}/.venvs/headroom/bin:${PATH}"' >> "${HOME}/.bashrc"

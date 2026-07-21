@@ -1,0 +1,9 @@
+{
+  "artifact": "sbom/root-tooling.cdx.json",
+  "component_count": 14,
+  "generator": "scripts/agent_context/generate_root_sbom.py",
+  "generator_sha256": "77146a402001f9aac6a39ebefe6964e0d72d13a68176f41bfcb90a12153c030f",
+  "schema": "CycloneDX-1.6",
+  "sbom_sha256": "33075fce3ca5c2b5673908d7660f243896650be67d5803f7a64b862de9474b35",
+  "status": "CURRENT_POST_REMEDIATION"
+}

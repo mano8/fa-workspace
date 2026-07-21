@@ -26,6 +26,7 @@ from agent_context import w2b1
 from agent_context import child_rollout
 from agent_context import codex_adapter
 from agent_context import resolve_context
+from agent_context.shared_validation import validate_persisted
 from agent_context.validate_claude_settings import validate_claude_settings
 from agent_context.validate_codex_config import validate_codex_config
 from agent_context.validate_invariants import validate_workspace_invariants
@@ -44,6 +45,7 @@ ROOT_INPUTS = (
     Path(".workspace/contracts/child-repository-rollout-v1.contract.md"),
     Path(".workspace/contracts/child-repository-rollout-v1.boundaries.json"),
     Path("scripts/codex-repo.sh"), Path("scripts/codex-repo.ps1"),
+    CAPABILITY_EVIDENCE,
 )
 
 
@@ -97,10 +99,12 @@ def _regular_contained(workspace: Path, relative: str, description: str) -> Path
 
 
 def _validate_capability_evidence(workspace: Path) -> None:
-    # Evidence reports are intentionally ignored runtime/status artifacts.  A
-    # strict workspace pass therefore proves only the tracked contract's pinned
-    # identity and the adapter's matching requirement; the launcher performs
-    # live client/config/native-source freshness checks before every handoff.
+    # The frozen capability artifact is tracked and is the only capability
+    # evidence authority consumed by the canonical launcher. Ignored status
+    # files may retain historical observations but cannot affect preflight.
+    evidence = _read_normalized(workspace / CAPABILITY_EVIDENCE, "capability evidence")
+    if hashlib.sha256(evidence).hexdigest() != codex_adapter.CAPABILITY_EVIDENCE_SHA256:
+        _fail("tracked capability-evidence hash does not match the canonical adapter identity")
     contract = _read_normalized(
         workspace / ".workspace/contracts/agent-context-w2a.contract.md", "agent-context contract"
     )
@@ -166,7 +170,11 @@ def _validate_artifacts(
         if os.name == "posix" and (directory_info.st_uid != os.getuid() or stat.S_IMODE(directory_info.st_mode) & 0o077):
             _fail("runtime artifact directory is not owner-only")
         permitted_runtime_names = {"session.json", "receipt.json", ".lock"}
-        if any(child.name not in permitted_runtime_names for child in runtime_dir.iterdir()):
+        if any(
+            child.name not in permitted_runtime_names
+            and not (child.name.startswith("journal-") and child.name.endswith(".json"))
+            for child in runtime_dir.iterdir()
+        ):
             _fail("runtime session contains non-metadata content")
         for path in supplied:
             info = path.lstat()
@@ -181,69 +189,13 @@ def _validate_artifacts(
         envelope = w2b1.parse_strict_json(envelope_raw)
         session = w2b1.parse_strict_json(session_path.read_bytes())
         receipt = w2b1.parse_strict_json(receipt_path.read_bytes())
-        w2b1.validate_manifest(manifest)
-        w2b1.validate_session(session)
-        w2b1.validate_receipt(receipt)
-        if w2b1.canonical_bytes(envelope) != envelope_raw:
-            _fail("envelope is not exact canonical JCS bytes")
-        rebuilt, serialized, digest = w2b1.build_envelope(
-            manifest_id=manifest["manifest_id"], generation=session["generation"], entries=envelope["entries"]
+        validate_persisted(
+            workspace=workspace, manifest=manifest, envelope=envelope,
+            envelope_bytes=envelope_raw, session=session, receipt=receipt,
         )
-        if rebuilt != envelope or digest != receipt["envelope_sha256"] or serialized != envelope_raw:
-            _fail("envelope hash or canonical framing does not match the receipt")
-        shared = ("launch_id", "client_session_id", "generation", "manifest_id", "envelope_sha256",
-                  "capability_evidence_id", "native_evidence_ids", "repositories", "tasks", "operations",
-                  "authorization_ids", "authorization_provenance")
-        if any(session[key] != receipt[key] for key in shared):
-            _fail("session and receipt linkage differs")
-        if receipt["state"] != session["state"] or receipt["state"] not in {"HANDED_OFF", "FAILED", "PREPARED"}:
-            _fail("receipt/session lifecycle state is inconsistent")
-        if receipt["state"] == "HANDED_OFF" and receipt["delivered_bytes"] != len(envelope_raw):
-            _fail("handed-off receipt did not record the exact envelope byte count")
-        if receipt["state"] != "HANDED_OFF" and receipt["delivered_bytes"] != 0:
-            _fail("non-handed-off receipt must not claim delivered bytes")
-        manifest_entries = {entry["path"]: entry for entry in manifest["entries"]}
-        envelope_entries = {entry["path"]: entry for entry in envelope["entries"]}
-        if set(envelope_entries) != {
-            entry["path"] for entry in manifest["entries"] if entry["delivery"] == "inject"
-        }:
-            _fail("manifest injection entries do not match the envelope exactly")
-        for path, entry in manifest_entries.items():
-            source = _regular_contained(workspace, path, f"manifest source {path}")
-            raw = source.read_bytes()
-            if hashlib.sha256(raw).hexdigest() != entry["source_sha256"] or len(raw) != entry["source_bytes"]:
-                _fail("manifest source hash or byte count drifted")
-            injected = envelope_entries.get(path)
-            if injected is not None and (
-                injected["source_sha256"] != entry["source_sha256"]
-                or injected["source_bytes"] != entry["source_bytes"]
-            ):
-                _fail("manifest and envelope source identity differs")
-        accounting = manifest["accounting"]
-        expected_limit = min(
-            accounting["policy_hard_limit"], accounting["verified_channel_limit"],
-            accounting["client_context_allowance"] - accounting["reserved_margin"],
-        )
-        raw_injected = sum(entry["source_bytes"] for entry in envelope["entries"])
-        total = (
-            accounting["native_model_visible_bytes"] + len(envelope_raw)
-            + accounting["other_model_visible_bootstrap_bytes"]
-        )
-        if expected_limit < 0 or accounting["effective_hard_limit"] != expected_limit:
-            _fail("effective context budget arithmetic is inconsistent")
-        if accounting["model_visible_total"] != total or total > expected_limit:
-            _fail("model-visible context accounting is inconsistent or over budget")
-        if accounting["serialized_injected_envelope_bytes"] != len(envelope_raw):
-            _fail("manifest does not record the exact serialized envelope bytes")
-        if accounting["raw_injected_source_bytes"] != raw_injected:
-            _fail("raw injected-source accounting is inconsistent")
-        if accounting["serialization_overhead_bytes"] != len(envelope_raw) - raw_injected:
-            _fail("serialization overhead accounting is inconsistent")
-        if accounting["estimated_tokens"] != (total + 3) // 4:
-            _fail("estimated-token accounting is inconsistent")
+        return True
     except (OSError, w2b1.AgentContextError) as error:
         _fail(f"runtime artifact validation failed: {error}")
-    return True
 
 
 def validate_workspace(

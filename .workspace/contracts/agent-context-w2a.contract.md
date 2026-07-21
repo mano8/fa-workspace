@@ -10,10 +10,10 @@
 delivery path is enabled
 
 **Capability evidence:**
-`.workspace/status/fa-workspace/agent-configuration-token-efficiency-capability-evidence-2026-07-19.md`
+`scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md`
 
 **Capability evidence SHA-256:**
-`3fce2371cada5b2cbe949b0398ba29a376ca1515c7577dc6881b62263ff7588b`
+`d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b`
 
 ## 1. Decision and activation gate
 
@@ -489,11 +489,18 @@ duplicate handoff, and unsafe interrupted cleanup.
 
 ## 13. Capability freeze and invalidation
 
-The 2026-07-19 capability artifact satisfies the W2a activation gate for the
+The tracked 2026-07-19 capability artifact at
+`scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md`
+satisfies the W2a activation gate for the
 single required row. Steps 2.2-2.5 may implement that row within their separate
 W2b boundaries. The completed W3 switch makes the faceted v2 configuration
 authoritative; it does not enable a transport or canonical
 delivery adapter.
+
+Ignored `.workspace/status/` files are historical observations only and are
+not read by workspace validation or canonical preflight. If the tracked
+artifact is absent or its pinned hash differs, canonical preflight fails with
+`E_CAPABILITY` until a verified refresh updates the artifact and its identities.
 
 Any change to the required Codex binary/version, devcontainer lock, project
 trust/configuration, inspection mechanism, native source discovery, channel,

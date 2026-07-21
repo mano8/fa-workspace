@@ -54,8 +54,11 @@ evidence only.
 ## Capability evidence and modes
 
 Capability evidence is per installed client, platform, and loading mode; it is
-not inferred from documentation or another platform. The current evidence is
-recorded in [`status/fa-workspace/agent-configuration-token-efficiency-capability-evidence-2026-07-19.md`](status/fa-workspace/agent-configuration-token-efficiency-capability-evidence-2026-07-19.md):
+not inferred from documentation or another platform. The tracked canonical
+artifact consumed by validation and preflight is
+[`capability-evidence-2026-07-19.md`](../scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md).
+Ignored `.workspace/status/` observations are historical only and cannot alter
+canonical authority:
 
 | Client/mode | Status | Canonical consequence |
 |---|---|---|
@@ -64,10 +67,13 @@ recorded in [`status/fa-workspace/agent-configuration-token-efficiency-capabilit
 | Claude devcontainer interactive/non-interactive | `LIMITED` | Noncanonical; no verified native inspection or exact full-content channel. |
 | Windows and host-POSIX rows | `UNSUPPORTED` | No behavior is inferred; these rows do not create implementation obligations. |
 
-The required row is invalidated by a changed client binary/version, project
+The required row is the current canonical Codex launch mode after the Phase 10
+remediation. It is invalidated by a changed client binary/version, project
 trust or configuration, capability evidence, native inspection mechanism,
 channel, lifecycle behavior, source hash, allowance, or safety margin. A new
-dated capability refresh is required before making a canonical claim.
+dated capability refresh is required before making or retaining a canonical
+claim. The Phase 9.5 rejection and parent-tree observations remain historical
+and do not describe this current tree.
 
 ## Resolution and delivery
 
@@ -76,13 +82,17 @@ The resolver validates authority, repository/task scope, conflicts,
 overrides, required exclusions, source hashes, and native evidence before it
 creates a deterministic manifest and RFC 8785 JCS UTF-8 envelope.
 
-For a verified native source, the launcher checks the current native evidence
-and source hash. For an injected source, native discovery must be demonstrably
-disabled and the launcher must prove one exact-once handoff for the requested
-generation. The canonical Codex devcontainer launcher passes the full envelope
-through `developer_instructions` immediately before `codex exec`; a model reply
-is not delivery proof. Claude and unsupported client rows remain limited or
-unsupported and must fail closed rather than claim canonical delivery.
+The canonical Codex devcontainer launcher runs from the reviewed workspace root:
+root `AGENTS.md` is native, and each selected child `AGENTS.md` is injected once
+with its repository scope. It checks native evidence and rehashes every source
+immediately before submission, then passes the full envelope through
+`developer_instructions` immediately before `codex exec`; a model reply is not
+delivery proof. The authoritative runtime journal records
+`SUBMISSION_STARTED` before transport and makes crashes, kills, timeouts, or
+uncertain persistence terminal `EXECUTION_AMBIGUOUS`. Only a successful
+`COMPLETED` generation may resume. `fresh` starts generation zero with a new
+thread; client-native `clear` and `compact` are not claimed. Claude and
+unsupported client rows remain limited or unsupported and fail closed.
 
 Parent-found mode may add reviewed workspace context. Parent-absent standalone
 mode uses only verified child-owned native instructions; workspace policies,
@@ -126,8 +136,10 @@ bounded interrupted cleanup are checked. Cleanup follows validated direct
 runtime children and never an untrusted discovered path.
 
 Normal logs and receipts contain metadata and hashes, never raw policy text or
-user secrets. A `HANDED_OFF` receipt proves launcher/adapter handoff and exact
-linkage; it does not prove model retention or behavior. Receipt and session
+user secrets. A `COMPLETED` receipt proves the expected client identity returned
+success and framing/linkage passed; it does not prove model retention or
+external-effect exactly-once behavior. `SUBMISSION_STARTED` and
+`EXECUTION_AMBIGUOUS` are terminal for retry purposes. Receipt and session
 metadata are excluded from model-visible accounting.
 
 ## Validation entry points

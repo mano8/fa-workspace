@@ -1,10 +1,11 @@
-"""Inactive W2b3 client-neutral delivery kernel.
+"""Conservative client-neutral submission kernel.
 
 This module deliberately has no client hooks, launcher, or real transport
 adapter.  It turns a W2b2 faceted ``ResolvedContext`` into an isolated prepared
-runtime state and accepts a transport callback only for the exact final
-handoff. The active faceted resolver remains path-selection only
-until a later adapter explicitly enables a demonstrated client mode.
+runtime state and accepts a transport callback only after a durable
+``SUBMISSION_STARTED`` journal record.  The installed Codex transport has no
+separate verified context-acceptance event, so this module intentionally makes
+no handoff or exactly-once execution claim.
 """
 
 from __future__ import annotations
@@ -23,6 +24,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from agent_context import w2b1
+from agent_context.shared_validation import validate_persisted, validate_resolved
 from agent_context.resolve_context import ResolvedContext
 
 
@@ -93,7 +95,7 @@ class TransportConfirmation:
 
 
 class TransportAdapter(Protocol):
-    """The sole callback permitted to create a ``HANDED_OFF`` receipt."""
+    """One task submission callback; success is not context acceptance proof."""
 
     def deliver(
         self, *, payload: bytes, envelope_sha256: str, channel_id: str
@@ -129,11 +131,14 @@ class DeliveryRequest:
     capability_evidence_id: str
     client_session_id: str
     channel_id: str
+    # The client-neutral test seam uses zero; production adapters provide a
+    # nonzero reviewed-tree/environment identity on every launch.
+    trust_identity_sha256: str = ZERO_SHA256
 
 
 @dataclass(frozen=True)
 class PreparedDelivery:
-    """A prepared, but not handed-off, single generation."""
+    """A prepared, not-yet-submitted, single generation."""
 
     request: DeliveryRequest
     runtime_dir: Path
@@ -151,7 +156,16 @@ class DeliveryResult:
 
 
 class DeliveryKernel:
-    """Secure isolated state and exact-once handoff for one context generation."""
+    """Secure isolated state with a single immutable journal authority."""
+
+    def __init__(self, *, fault_hook: Callable[[str], None] | None = None) -> None:
+        # Test-only crash/kill seams name real persistence and transport
+        # boundaries. A production caller supplies no hook.
+        self._fault_hook = fault_hook
+
+    def _fault(self, boundary: str) -> None:
+        if self._fault_hook is not None:
+            self._fault_hook(boundary)
 
     def prepare(self, request: DeliveryRequest) -> PreparedDelivery:
         """Validate all preflight inputs and atomically persist ``PREPARED``."""
@@ -160,7 +174,8 @@ class DeliveryKernel:
         try:
             self._rehash_sources(request)
             session = self._new_session(request)
-            self._write_json(runtime_dir, "session.json", session, replace=False)
+            self._append_journal(runtime_dir, session, "RESOLVED", "RESOLVED", request.channel_id, 0, "OK")
+            self._write_views(runtime_dir, session, self._latest_journal(runtime_dir))
             prepared_receipt = self._transition(
                 runtime_dir,
                 session,
@@ -169,6 +184,7 @@ class DeliveryKernel:
                 delivered_bytes=0,
                 failure_code="OK",
             )
+            self._validate_persisted_request(runtime_dir, request)
             session = self._read_json(runtime_dir, "session.json", w2b1.validate_session)
             return PreparedDelivery(request, runtime_dir, session, prepared_receipt)
         except w2b1.AgentContextError as error:
@@ -179,22 +195,32 @@ class DeliveryKernel:
             _fail("E_RUNTIME", f"runtime storage failed: {error}")
 
     def handoff(self, prepared: PreparedDelivery, adapter: TransportAdapter) -> DeliveryResult:
-        """Use one exact payload callback; only its exact confirmation hands off."""
+        """Durably begin one submission and never silently retry ambiguity."""
         request = prepared.request
         lock_acquired = False
         try:
             with self._exclusive_lock(prepared.runtime_dir):
                 lock_acquired = True
                 self._validate_runtime_dir(prepared.runtime_dir, request.workspace_root)
-                session = self._read_json(prepared.runtime_dir, "session.json", w2b1.validate_session)
+                session = self._authoritative_session(prepared.runtime_dir)
                 if session["state"] != "PREPARED" or session["generation"] != request.resolved.envelope["generation"]:
-                    _fail("E_RECEIPT", "only the current PREPARED generation may hand off")
+                    _fail("E_RECEIPT", "only the current PREPARED generation may start submission")
                 self._rehash_sources(request)
+                self._fault("before-submission-journal")
+                self._transition(
+                    prepared.runtime_dir, session, "SUBMISSION_STARTED",
+                    channel_id=request.channel_id,
+                    delivered_bytes=len(request.resolved.envelope_bytes), failure_code="OK",
+                )
+                session = self._authoritative_session(prepared.runtime_dir)
+                self._fault("after-submission-journal")
+                self._fault("before-transport")
                 confirmation = adapter.deliver(
                     payload=request.resolved.envelope_bytes,
                     envelope_sha256=request.resolved.envelope_sha256,
                     channel_id=request.channel_id,
                 )
+                self._fault("after-transport")
                 if (
                     confirmation.envelope_sha256 != request.resolved.envelope_sha256
                     or confirmation.delivered_bytes != len(request.resolved.envelope_bytes)
@@ -212,20 +238,20 @@ class DeliveryKernel:
                     session = dict(session)
                     session["client_session_id"] = client_session_id
                     w2b1.validate_session(session)
-                    self._write_json(prepared.runtime_dir, "session.json", session, replace=True)
                 receipt = self._transition(
                     prepared.runtime_dir,
                     session,
-                    "HANDED_OFF",
+                    "COMPLETED",
                     channel_id=request.channel_id,
                     delivered_bytes=len(request.resolved.envelope_bytes),
                     failure_code="OK",
                 )
+                self._validate_persisted_request(prepared.runtime_dir, request)
                 final_session = self._read_json(prepared.runtime_dir, "session.json", w2b1.validate_session)
                 return DeliveryResult(prepared.runtime_dir, final_session, receipt)
         except w2b1.AgentContextError as error:
-            # A competing process did not own this generation and therefore
-            # must not rewrite its receipt/session to FAILED.
+            # A competing process does not own this generation and must not
+            # alter its authoritative journal.
             if lock_acquired:
                 self._record_failure(prepared.runtime_dir, request, error.code)
             raise
@@ -238,6 +264,20 @@ class DeliveryKernel:
         """The only frozen required mode has no compaction lifecycle."""
         self._record_failure(prepared.runtime_dir, prepared.request, "E_LIFECYCLE")
         _fail("E_LIFECYCLE", "compaction is unsupported for this delivery mode")
+
+    def fresh(self, prior_runtime_dir: Path | None, request: DeliveryRequest) -> PreparedDelivery:
+        """Start a new launch at generation zero and discard prior reuse state.
+
+        A fresh launch is intentionally not a client-native ``clear``.  When a
+        caller names a prior runtime directory it is validated and removed with
+        the same owner-only containment checks as retention cleanup, so the old
+        receipt can no longer be resumed.
+        """
+        if request.resolved.envelope["generation"] != 0:
+            _fail("E_LIFECYCLE", "fresh launch must begin at generation zero")
+        if prior_runtime_dir is not None:
+            self.cleanup(prior_runtime_dir, request.workspace_root)
+        return self.prepare(request)
 
     def cleanup(self, runtime_dir: Path, workspace_root: Path) -> None:
         """Remove one validated direct runtime child without following paths.
@@ -252,7 +292,9 @@ class DeliveryKernel:
                 permitted = {"session.json", "receipt.json", ".lock"}
                 entries = list(runtime_dir.iterdir())
                 for entry in entries:
-                    if entry.name not in permitted:
+                    if entry.name not in permitted and not (
+                        entry.name.startswith("journal-") and entry.name.endswith(".json")
+                    ):
                         _fail("E_RUNTIME", "runtime cleanup found an unexpected entry")
                     info = entry.lstat()
                     if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
@@ -261,9 +303,11 @@ class DeliveryKernel:
                         info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) & 0o077
                     ):
                         _fail("E_RUNTIME", "runtime cleanup found a non-owner-only entry")
+                self._fault("cleanup-before-remove")
                 for entry in entries:
                     entry.unlink()
                 runtime_dir.rmdir()
+                self._fault("cleanup-after-remove")
         except w2b1.AgentContextError:
             raise
         except OSError as error:
@@ -309,9 +353,9 @@ class DeliveryKernel:
             with self._exclusive_lock(runtime_dir):
                 lock_acquired = True
                 self._validate_runtime_dir(runtime_dir, request.workspace_root)
-                prior = self._read_json(runtime_dir, "session.json", w2b1.validate_session)
-                if prior["state"] != "HANDED_OFF":
-                    _fail("E_LIFECYCLE", "only a handed-off generation may resume")
+                prior = self._authoritative_session(runtime_dir)
+                if prior["state"] != "COMPLETED":
+                    _fail("E_LIFECYCLE", "only a completed generation may resume")
                 if prior["client_session_id"] != request.client_session_id:
                     _fail("E_LIFECYCLE", "resume client-session identity changed")
                 if request.resolved.envelope["generation"] != prior["generation"] + 1:
@@ -319,6 +363,7 @@ class DeliveryKernel:
                 if (
                     prior["manifest_id"] != request.resolved.manifest["manifest_id"]
                     or prior["capability_evidence_id"] != request.capability_evidence_id
+                    or prior["trust_identity_sha256"] != request.trust_identity_sha256
                     or prior["native_evidence_ids"] != sorted({entry["native_evidence_id"] for entry in request.resolved.manifest["entries"] if entry["native_evidence_id"]})
                     or prior["repositories"] != request.resolved.manifest["repositories"]
                     or prior["tasks"] != request.resolved.manifest["tasks"]
@@ -334,11 +379,13 @@ class DeliveryKernel:
                     envelope_sha256=request.resolved.envelope_sha256, updated_at=_now(),
                 )
                 w2b1.validate_session(session)
-                self._write_json(runtime_dir, "session.json", session, replace=True)
+                self._append_journal(runtime_dir, session, "RESOLVED", prior["state"], request.channel_id, 0, "OK")
+                self._write_views(runtime_dir, session, self._latest_journal(runtime_dir))
                 receipt = self._transition(
                     runtime_dir, session, "PREPARED", channel_id=request.channel_id,
                     delivered_bytes=0, failure_code="OK",
                 )
+                self._validate_persisted_request(runtime_dir, request)
                 current = self._read_json(runtime_dir, "session.json", w2b1.validate_session)
                 return PreparedDelivery(request, runtime_dir, current, receipt)
         except w2b1.AgentContextError as error:
@@ -352,51 +399,27 @@ class DeliveryKernel:
 
     def _validate_request(self, request: DeliveryRequest) -> None:
         try:
-            w2b1.validate_manifest(request.resolved.manifest)
-            if request.resolved.envelope_sha256 != _digest(request.resolved.envelope_bytes):
-                _fail("E_SOURCE", "envelope hash does not cover the supplied bytes")
-            if w2b1.canonical_bytes(request.resolved.envelope) != request.resolved.envelope_bytes:
-                _fail("E_SOURCE", "envelope object and supplied bytes differ")
-            if request.resolved.envelope["manifest_id"] != request.resolved.manifest["manifest_id"]:
-                _fail("E_RECEIPT", "envelope and manifest identifiers differ")
             w2b1._identifier(request.client_session_id, "client_session_id")
-            w2b1._sha256(request.capability_evidence_id, "capability_evidence_id")
         except w2b1.AgentContextError:
             raise
-        manifest = request.resolved.manifest
-        row = request.capability_row
-        if not request.trusted or manifest["reviewed_tree"] != dict(request.reviewed_tree):
+        if not request.trusted:
             _fail("E_TRUST", "trusted reviewed workspace identity cannot be proved")
-        if manifest["capability_evidence_id"] != request.capability_evidence_id:
-            _fail("E_CAPABILITY", "capability evidence identity differs from the manifest")
-        required = {
-            "agent", "platform", "mode", "status", "channel_id", "verified_channel_limit",
-            "client_context_allowance", "reserved_margin", "start_supported",
-            "client_session_identity_available",
-        }
-        if not isinstance(row, Mapping) or not required.issubset(row):
-            _fail("E_CAPABILITY", "capability row is absent or incomplete")
-        if any(row[key] != manifest[key] for key in ("agent", "platform", "mode")):
-            _fail("E_CAPABILITY", "capability row does not match the manifest mode")
-        if row["status"] != "REQUIRED":
-            _fail("E_UNSUPPORTED_MODE", "canonical delivery is not frozen for this mode")
-        if not row["start_supported"] or not row["client_session_identity_available"]:
-            _fail("E_LIFECYCLE", "mode cannot provide a canonical start/session identity")
-        if row["channel_id"] != request.channel_id:
-            _fail("E_CHANNEL", "requested channel is not the verified channel")
-        if not all(isinstance(row[key], int) and not isinstance(row[key], bool) for key in ("verified_channel_limit", "client_context_allowance", "reserved_margin")):
-            _fail("E_CAPABILITY", "capability limits must be integers")
-        accounting = manifest["accounting"]
-        expected_limit = min(
-            accounting["policy_hard_limit"], row["verified_channel_limit"],
-            row["client_context_allowance"] - row["reserved_margin"],
+        validate_resolved(
+            workspace=request.workspace_root.resolve(), manifest=request.resolved.manifest,
+            envelope=request.resolved.envelope, envelope_bytes=request.resolved.envelope_bytes,
+            capability_row=request.capability_row, reviewed_tree=request.reviewed_tree,
+            capability_evidence_id=request.capability_evidence_id,
+            trust_identity_sha256=request.trust_identity_sha256, channel_id=request.channel_id,
         )
-        if expected_limit < 0 or accounting["effective_hard_limit"] != expected_limit:
-            _fail("E_BUDGET", "effective hard limit is absent or inconsistent")
-        if accounting["model_visible_total"] > expected_limit:
-            _fail("E_BUDGET", "model-visible context exceeds its effective hard limit")
-        if len(request.resolved.envelope_bytes) > row["verified_channel_limit"]:
-            _fail("E_CHANNEL", "serialized envelope exceeds the verified channel limit")
+
+    def _validate_persisted_request(self, runtime_dir: Path, request: DeliveryRequest) -> None:
+        """Use the same strict validator after each production state transition."""
+        validate_persisted(
+            workspace=request.workspace_root.resolve(), manifest=request.resolved.manifest,
+            envelope=request.resolved.envelope, envelope_bytes=request.resolved.envelope_bytes,
+            session=self._read_json(runtime_dir, "session.json", w2b1.validate_session),
+            receipt=self._read_json(runtime_dir, "receipt.json", w2b1.validate_receipt),
+        )
 
     def _new_session(self, request: DeliveryRequest) -> dict[str, Any]:
         manifest = request.resolved.manifest
@@ -409,12 +432,14 @@ class DeliveryKernel:
             "manifest_id": manifest["manifest_id"],
             "envelope_sha256": request.resolved.envelope_sha256,
             "capability_evidence_id": request.capability_evidence_id,
+            "trust_identity_sha256": request.trust_identity_sha256,
             "native_evidence_ids": sorted({entry["native_evidence_id"] for entry in manifest["entries"] if entry["native_evidence_id"]}),
             "repositories": manifest["repositories"],
             "tasks": manifest["tasks"],
             "operations": manifest["operations"],
             "authorization_ids": manifest["authorization_ids"],
             "authorization_provenance": manifest["authorization_provenance"],
+            "sources": manifest["entries"],
             "created_at": _now(),
             "updated_at": _now(),
             "previous_receipt_sha256": ZERO_SHA256,
@@ -422,34 +447,164 @@ class DeliveryKernel:
 
     def _transition(self, runtime_dir: Path, session: Mapping[str, Any], state: str, *, channel_id: str, delivered_bytes: int, failure_code: str) -> dict[str, Any]:
         current = session["state"]
-        if (current, state) not in {("RESOLVED", "PREPARED"), ("RESOLVED", "FAILED"), ("PREPARED", "HANDED_OFF"), ("PREPARED", "FAILED")}:
+        if (current, state) not in {
+            ("RESOLVED", "PREPARED"), ("RESOLVED", "FAILED"),
+            ("PREPARED", "SUBMISSION_STARTED"), ("PREPARED", "FAILED"),
+            ("SUBMISSION_STARTED", "COMPLETED"),
+            ("SUBMISSION_STARTED", "EXECUTION_AMBIGUOUS"),
+        }:
             _fail("E_RECEIPT", f"illegal receipt transition {current} -> {state}")
         receipt = _receipt({
             "schema_version": 2, "receipt_id": ZERO_SHA256,
             "launch_id": session["launch_id"], "client_session_id": session["client_session_id"],
             "generation": session["generation"], "manifest_id": session["manifest_id"],
             "envelope_sha256": session["envelope_sha256"], "capability_evidence_id": session["capability_evidence_id"],
+            "trust_identity_sha256": session["trust_identity_sha256"],
             "native_evidence_ids": session["native_evidence_ids"], "repositories": session["repositories"],
             "tasks": session["tasks"], "operations": session["operations"],
             "authorization_ids": session["authorization_ids"],
             "authorization_provenance": session["authorization_provenance"],
+            "sources": session["sources"],
             "previous_state": current, "state": state, "channel_id": channel_id,
             "delivered_bytes": delivered_bytes, "failure_code": failure_code, "recorded_at": _now(),
         })
         next_session = dict(session)
         next_session.update(state=state, updated_at=receipt["recorded_at"], previous_receipt_sha256=receipt["receipt_id"])
         w2b1.validate_session(next_session)
-        self._write_json(runtime_dir, "receipt.json", receipt, replace=True)
-        self._write_json(runtime_dir, "session.json", next_session, replace=True)
+        record = self._append_journal(
+            runtime_dir, next_session, state, current, channel_id, delivered_bytes,
+            failure_code, receipt=receipt,
+        )
+        self._write_views(runtime_dir, next_session, record)
         return receipt
 
     def _record_failure(self, runtime_dir: Path, request: DeliveryRequest, code: str) -> None:
         try:
-            session = self._read_json(runtime_dir, "session.json", w2b1.validate_session)
+            session = self._authoritative_session(runtime_dir)
             if session["state"] in {"RESOLVED", "PREPARED"}:
                 self._transition(runtime_dir, session, "FAILED", channel_id=request.channel_id, delivered_bytes=0, failure_code=code)
+            elif session["state"] == "SUBMISSION_STARTED":
+                # The external process may already have accepted the combined
+                # context/task invocation.  This is terminal and non-retryable.
+                self._transition(
+                    runtime_dir, session, "EXECUTION_AMBIGUOUS",
+                    channel_id=request.channel_id,
+                    delivered_bytes=session.get("submitted_bytes", len(request.resolved.envelope_bytes)),
+                    failure_code=code,
+                )
         except (OSError, w2b1.AgentContextError):
             pass
+
+    def _append_journal(
+        self, runtime_dir: Path, session: Mapping[str, Any], state: str,
+        previous_state: str, channel_id: str, delivered_bytes: int,
+        failure_code: str, *, receipt: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Atomically create the next immutable hash-chained journal record."""
+        prior = self._latest_journal(runtime_dir, required=False)
+        if receipt is None:
+            receipt = _receipt({
+                "schema_version": 2, "receipt_id": ZERO_SHA256,
+                "launch_id": session["launch_id"], "client_session_id": session["client_session_id"],
+                "generation": session["generation"], "manifest_id": session["manifest_id"],
+                "envelope_sha256": session["envelope_sha256"],
+                "capability_evidence_id": session["capability_evidence_id"],
+                "trust_identity_sha256": session["trust_identity_sha256"],
+                "native_evidence_ids": session["native_evidence_ids"], "repositories": session["repositories"],
+                "tasks": session["tasks"], "operations": session["operations"],
+                "authorization_ids": session["authorization_ids"],
+                "authorization_provenance": session["authorization_provenance"], "sources": session["sources"],
+                "previous_state": previous_state, "state": state, "channel_id": channel_id,
+                "delivered_bytes": delivered_bytes, "failure_code": failure_code, "recorded_at": _now(),
+            })
+        record = {
+            "schema_version": 1,
+            "sequence": 0 if prior is None else prior["sequence"] + 1,
+            "previous_journal_sha256": ZERO_SHA256 if prior is None else prior["journal_id"],
+            "receipt": dict(receipt),
+            "journal_id": ZERO_SHA256,
+        }
+        record["journal_id"] = w2b1.canonical_sha256(
+            {key: value for key, value in record.items() if key != "journal_id"}
+        )
+        self._validate_journal(record, prior)
+        self._write_json(runtime_dir, f"journal-{record['sequence']:06d}.json", record, replace=False)
+        return record
+
+    @staticmethod
+    def _validate_journal(value: Any, prior: Mapping[str, Any] | None) -> None:
+        if not isinstance(value, dict) or set(value) != {
+            "schema_version", "sequence", "previous_journal_sha256", "receipt", "journal_id",
+        }:
+            _fail("E_RECEIPT", "generation journal has an invalid closed shape")
+        if value["schema_version"] != 1 or not isinstance(value["sequence"], int) or value["sequence"] < 0:
+            _fail("E_RECEIPT", "generation journal has an invalid sequence")
+        try:
+            w2b1._sha256(value["previous_journal_sha256"], "journal previous hash")
+            w2b1._sha256(value["journal_id"], "journal identity")
+            w2b1.validate_receipt(value["receipt"])
+        except w2b1.AgentContextError as error:
+            _fail("E_RECEIPT", error.message)
+        expected = w2b1.canonical_sha256({key: item for key, item in value.items() if key != "journal_id"})
+        if value["journal_id"] != expected:
+            _fail("E_RECEIPT", "generation journal hash does not match JCS content")
+        if prior is None:
+            valid = value["sequence"] == 0 and value["previous_journal_sha256"] == ZERO_SHA256
+        else:
+            valid = value["sequence"] == prior["sequence"] + 1 and value["previous_journal_sha256"] == prior["journal_id"]
+        if not valid:
+            _fail("E_RECEIPT", "generation journal hash chain is discontinuous")
+
+    def _latest_journal(self, runtime_dir: Path, *, required: bool = True) -> dict[str, Any] | None:
+        self._validate_dir(runtime_dir, runtime_dir.parent, allow_root=False)
+        records: list[dict[str, Any]] = []
+        try:
+            names = sorted(child.name for child in runtime_dir.iterdir() if child.name.startswith("journal-"))
+            for index, name in enumerate(names):
+                if name != f"journal-{index:06d}.json":
+                    _fail("E_RECEIPT", "generation journal filenames are discontinuous")
+                record = self._read_json(runtime_dir, name, lambda item: None)
+                self._validate_journal(record, records[-1] if records else None)
+                records.append(record)
+        except OSError as error:
+            _fail("E_RUNTIME", f"generation journal cannot be read: {error}")
+        if not records and required:
+            _fail("E_RECEIPT", "generation journal is missing")
+        return records[-1] if records else None
+
+    def _write_views(self, runtime_dir: Path, session: Mapping[str, Any], record: Mapping[str, Any]) -> None:
+        receipt = record["receipt"]
+        derived = dict(session)
+        derived.update(
+            state=receipt["state"], updated_at=receipt["recorded_at"],
+            previous_receipt_sha256=receipt["receipt_id"],
+        )
+        w2b1.validate_session(derived)
+        self._fault("receipt-view-before-write")
+        self._write_json(runtime_dir, "receipt.json", receipt, replace=True)
+        self._fault("receipt-view-after-write")
+        self._fault("session-view-before-write")
+        self._write_json(runtime_dir, "session.json", derived, replace=True)
+        self._fault("session-view-after-write")
+
+    def _authoritative_session(self, runtime_dir: Path) -> dict[str, Any]:
+        """Reject a missing/divergent derived view without changing the journal."""
+        record = self._latest_journal(runtime_dir)
+        assert record is not None
+        receipt = self._read_json(runtime_dir, "receipt.json", w2b1.validate_receipt)
+        session = self._read_json(runtime_dir, "session.json", w2b1.validate_session)
+        if receipt != record["receipt"]:
+            _fail("E_RECEIPT", "receipt view diverges from the authoritative generation journal")
+        shared = (
+            "launch_id", "client_session_id", "generation", "manifest_id", "envelope_sha256",
+            "capability_evidence_id", "trust_identity_sha256", "native_evidence_ids", "repositories", "tasks", "operations",
+            "authorization_ids", "authorization_provenance", "sources",
+        )
+        if any(session[key] != receipt[key] for key in shared) or session["state"] != receipt["state"]:
+            _fail("E_RECEIPT", "session view diverges from the authoritative generation journal")
+        if session["previous_receipt_sha256"] != receipt["receipt_id"]:
+            _fail("E_RECEIPT", "session view does not link the authoritative journal receipt")
+        return session
 
     def _rehash_sources(self, request: DeliveryRequest) -> None:
         root = request.workspace_root.resolve(strict=True)

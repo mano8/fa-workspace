@@ -25,7 +25,10 @@ GIT_TREE_RE = {
     "git-sha1": re.compile(r"^[0-9a-f]{40}$"),
     "git-sha256": re.compile(r"^[0-9a-f]{64}$"),
 }
-STATES = frozenset({"RESOLVED", "PREPARED", "HANDED_OFF", "FAILED"})
+STATES = frozenset({
+    "RESOLVED", "PREPARED", "SUBMISSION_STARTED", "COMPLETED",
+    "EXECUTION_AMBIGUOUS", "FAILED",
+})
 AUTHORIZATION = frozenset({"none", "mutating", "cross-repository"})
 AUTHORITY_TIERS = frozenset({"security", "workspace", "task", "repository"})
 
@@ -407,8 +410,10 @@ def _reviewed_tree(value: Any) -> None:
 
 
 def _manifest_entry(value: Any) -> None:
-    entry = _closed(value, {"policy_id", "repository_id", "scope_prefix", "path", "delivery", "source_sha256", "source_bytes", "metadata_sha256", "native_evidence_id"}, "manifest entry")
+    entry = _closed(value, {"policy_id", "source_kind", "repository_id", "scope_prefix", "path", "delivery", "source_sha256", "source_bytes", "metadata_sha256", "native_evidence_id", "envelope_entry_sha256"}, "manifest entry")
     _identifier(entry["policy_id"], "manifest entry policy_id")
+    if entry["source_kind"] not in {"policy", "instruction"}:
+        _fail("manifest entry source_kind is invalid")
     _identifier(entry["repository_id"], "manifest entry repository_id")
     _scope_prefix(entry["scope_prefix"], "manifest entry scope_prefix")
     _canonical_path(entry["path"], "manifest entry path")
@@ -419,6 +424,12 @@ def _manifest_entry(value: Any) -> None:
     _sha256(entry["metadata_sha256"], "manifest entry metadata_sha256")
     if entry["native_evidence_id"] is not None:
         _sha256(entry["native_evidence_id"], "manifest entry native_evidence_id")
+    if entry["envelope_entry_sha256"] is not None:
+        _sha256(entry["envelope_entry_sha256"], "manifest entry envelope_entry_sha256")
+    if (entry["delivery"] == "native") != (entry["native_evidence_id"] is not None):
+        _fail("manifest native delivery and evidence identity do not match")
+    if (entry["delivery"] == "inject") != (entry["envelope_entry_sha256"] is not None):
+        _fail("manifest injected delivery and envelope identity do not match")
 
 
 ACCOUNTING_FIELDS = {
@@ -483,8 +494,8 @@ def validate_manifest(value: Any, *, verify_identifier: bool = True) -> None:
 
 SESSION_FIELDS = {
     "schema_version", "launch_id", "client_session_id", "generation", "state", "manifest_id", "envelope_sha256",
-    "capability_evidence_id", "native_evidence_ids", "repositories", "tasks", "operations", "authorization_ids",
-    "authorization_provenance", "created_at", "updated_at", "previous_receipt_sha256",
+    "capability_evidence_id", "trust_identity_sha256", "native_evidence_ids", "repositories", "tasks", "operations", "authorization_ids",
+    "authorization_provenance", "sources", "created_at", "updated_at", "previous_receipt_sha256",
 }
 
 
@@ -497,7 +508,7 @@ def validate_session(value: Any) -> None:
     _byte_count(session["generation"], "session generation")
     if session["state"] not in STATES:
         _fail("session state is invalid")
-    for field in ("manifest_id", "envelope_sha256", "capability_evidence_id", "previous_receipt_sha256"):
+    for field in ("manifest_id", "envelope_sha256", "capability_evidence_id", "trust_identity_sha256", "previous_receipt_sha256"):
         _sha256(session[field], f"session {field}")
     _canonical_sha256_set(session["native_evidence_ids"], "session native_evidence_ids")
     for field in ("repositories", "tasks", "operations", "authorization_ids"):
@@ -509,14 +520,18 @@ def validate_session(value: Any) -> None:
         _fail("session authorization provenance does not match authorization_ids")
     if bool(session["authorization_ids"]) != bool(session["operations"]):
         _fail("session operations and authorization provenance must coexist")
+    if not isinstance(session["sources"], list):
+        _fail("session sources must be an array")
+    for entry in session["sources"]:
+        _manifest_entry(entry)
     _timestamp(session["created_at"], "session created_at")
     _timestamp(session["updated_at"], "session updated_at")
 
 
 RECEIPT_FIELDS = {
     "schema_version", "receipt_id", "launch_id", "client_session_id", "generation", "manifest_id", "envelope_sha256",
-    "capability_evidence_id", "native_evidence_ids", "repositories", "tasks", "operations", "authorization_ids",
-    "authorization_provenance", "previous_state", "state", "channel_id",
+    "capability_evidence_id", "trust_identity_sha256", "native_evidence_ids", "repositories", "tasks", "operations", "authorization_ids",
+    "authorization_provenance", "sources", "previous_state", "state", "channel_id",
     "delivered_bytes", "failure_code", "recorded_at",
 }
 
@@ -529,7 +544,7 @@ def validate_receipt(value: Any, *, verify_identifier: bool = True) -> None:
     _identifier(receipt["launch_id"], "receipt launch_id")
     _identifier(receipt["client_session_id"], "receipt client_session_id")
     _byte_count(receipt["generation"], "receipt generation")
-    for field in ("manifest_id", "envelope_sha256", "capability_evidence_id"):
+    for field in ("manifest_id", "envelope_sha256", "capability_evidence_id", "trust_identity_sha256"):
         _sha256(receipt[field], f"receipt {field}")
     _canonical_sha256_set(receipt["native_evidence_ids"], "receipt native_evidence_ids")
     for field in ("repositories", "tasks", "operations", "authorization_ids"):
@@ -541,6 +556,10 @@ def validate_receipt(value: Any, *, verify_identifier: bool = True) -> None:
         _fail("receipt authorization provenance does not match authorization_ids")
     if bool(receipt["authorization_ids"]) != bool(receipt["operations"]):
         _fail("receipt operations and authorization provenance must coexist")
+    if not isinstance(receipt["sources"], list):
+        _fail("receipt sources must be an array")
+    for entry in receipt["sources"]:
+        _manifest_entry(entry)
     if receipt["previous_state"] not in STATES or receipt["state"] not in STATES:
         _fail("receipt state is invalid")
     _identifier(receipt["channel_id"], "receipt channel_id")

@@ -29,7 +29,9 @@ min(32768 policy, 32768 channel, 65536 allowance - 32768 margin) = 32768
 ```
 
 This is a workspace-capped verified maximum, not a claim about the physical
-maximum accepted by Codex or the model.
+maximum accepted by Codex or the model. The current post-remediation launcher
+is canonical for this row only after its complete trust-identity and shared
+validation preflight passes.
 
 Project-hook injection is not selected for this row and is not claimed as a
 verified capability. The canonical wrapper is the pre-task gate immediately
@@ -73,9 +75,10 @@ resume -> thread 019f7996-c0ee-7cb3-9332-be868393affd -> CAPABILITY_RESUME_OK
 clear  -> thread 019f7996-f5e3-75e3-aeb3-7cc56b67c933 -> CAPABILITY_CLEAR_NEW_SESSION_OK
 ```
 
-For this non-interactive row, `clear` means discarding the prior receipt and
-starting a fresh `codex exec` session. The client exposes no non-interactive
-compact command; a canonical launcher must return `E_LIFECYCLE` rather than
+For this non-interactive row, the launcher operation `fresh` discards reuse
+eligibility and starts a new generation-zero `codex exec` session. This is not
+a client-native `clear` capability. The client exposes no non-interactive
+compact command; the canonical launcher returns `E_LIFECYCLE` rather than
 infer preservation or duplicate injection.
 
 ## Rerun
@@ -96,3 +99,18 @@ fresh-start clear, and `thread.started` before `turn.started`.
 Any Codex binary/version, devcontainer lock, project trust/configuration,
 inspection mechanism, channel, lifecycle behavior, source hash, allowance, or
 margin change invalidates this row and re-gates W2a.
+
+## Post-remediation status — 2026-07-21
+
+Steps 10.2--10.8 are implemented and their tracked evidence is authoritative
+for current behavior: `w9c-submission-state-evidence.json`,
+`w9d1-multi-repository-evidence.json`,
+`w9d2-bootstrap-reproducibility-evidence.json`,
+`w9d3-capability-authority-evidence.json`,
+`w9d3-lifecycle-evidence.json`, and
+`w9d3-shared-validation-evidence.json`. The current lifecycle is
+`RESOLVED -> PREPARED -> SUBMISSION_STARTED -> COMPLETED`, with terminal
+`EXECUTION_AMBIGUOUS` or `FAILED` branches. Only `COMPLETED` may resume;
+submission-started or ambiguous generations are never automatically retried.
+The 2026-07-20 Phase 9.4 receipt and the 2026-07-20 rejected Step 9.5 review
+remain historical observations, not current-tree acceptance or sign-off.

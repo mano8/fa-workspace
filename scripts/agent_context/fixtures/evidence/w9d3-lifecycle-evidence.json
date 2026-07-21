@@ -1,0 +1,1 @@
+{"schema_version":1,"evidence_id":"w9d3-lifecycle-2026-07-20","operations":["start","resume","fresh","cleanup-retained"],"unsupported":["compact","client-native-clear"],"status":"implemented"}

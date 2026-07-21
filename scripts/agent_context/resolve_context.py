@@ -90,6 +90,7 @@ class ResolutionRequest:
     authorizations: tuple[Mapping[str, Any], ...] = ()
     native_evidence: Mapping[str, Any] | None = None
     injection_evidence: Mapping[str, Any] | None = None
+    instruction_sources: tuple[Mapping[str, Any], ...] = ()
     other_model_visible_bootstrap_bytes: int = 0
     generation: int = 0
 
@@ -631,16 +632,24 @@ def _manifest_entries(
         if request.native_evidence
         else None
     )
+    source_specs: list[dict[str, Any]] = []
+    for policy_id in selected:
+        unit = units[policy_id]
+        source_specs.append({
+            "policy_id": policy_id, "source_kind": "policy", "path": unit["path"],
+            "repository_id": unit["scope"]["repository_id"], "scope_prefix": unit["scope"]["prefix"],
+            "authority_tier": unit["authority_tier"], "metadata": dict(unit),
+        })
+    source_specs.extend(_instruction_source_specs(request, source_specs))
     manifest_entries: list[dict[str, Any]] = []
     envelope_entries: list[dict[str, Any]] = []
     native_bytes = 0
     raw_injected_bytes = 0
-    for policy_id in selected:
-        unit = units[policy_id]
-        raw = _read_source(request.root, unit["path"])
+    for spec in source_specs:
+        raw = _read_source(request.root, spec["path"])
         digest = hashlib.sha256(raw).hexdigest()
-        native_match = native_sources.get(unit["path"]) == digest
-        inject_match = injection_sources.get(unit["path"]) == digest
+        native_match = native_sources.get(spec["path"]) == digest
+        inject_match = injection_sources.get(spec["path"]) == digest
         if native_match:
             delivery = "native"
             native_evidence_id: str | None = native_id
@@ -651,36 +660,64 @@ def _manifest_entries(
             raw_injected_bytes += len(raw)
         else:
             _fail(
-                f"source has neither verified native nor exact-once inject evidence: {unit['path']}",
+                f"source has neither verified native nor exact-once inject evidence: {spec['path']}",
                 "E_NATIVE_EVIDENCE",
             )
-        manifest_entries.append(
-            {
-                "policy_id": policy_id,
-                "repository_id": unit["scope"]["repository_id"],
-                "scope_prefix": unit["scope"]["prefix"],
-                "path": unit["path"],
-                "delivery": delivery,
-                "source_sha256": digest,
-                "source_bytes": len(raw),
-                "metadata_sha256": w2b1.canonical_sha256(unit),
-                "native_evidence_id": native_evidence_id,
-            }
-        )
+        manifest_entry = {
+            "policy_id": spec["policy_id"], "source_kind": spec["source_kind"],
+            "repository_id": spec["repository_id"], "scope_prefix": spec["scope_prefix"],
+            "path": spec["path"], "delivery": delivery, "source_sha256": digest,
+            "source_bytes": len(raw), "metadata_sha256": w2b1.canonical_sha256(spec["metadata"]),
+            "native_evidence_id": native_evidence_id, "envelope_entry_sha256": None,
+        }
         if delivery == "inject":
-            envelope_entries.append(
-                w2b1.source_entry_from_bytes(
-                    raw,
-                    {
-                        "policy_id": policy_id,
-                        "repository_id": unit["scope"]["repository_id"],
-                        "scope_prefix": unit["scope"]["prefix"],
-                        "path": unit["path"],
-                        "authority_tier": unit["authority_tier"],
-                    },
-                )
-            )
+            envelope_entry = w2b1.source_entry_from_bytes(raw, {
+                "policy_id": spec["policy_id"], "repository_id": spec["repository_id"],
+                "scope_prefix": spec["scope_prefix"], "path": spec["path"],
+                "authority_tier": spec["authority_tier"],
+            })
+            manifest_entry["envelope_entry_sha256"] = w2b1.canonical_sha256(envelope_entry)
+            envelope_entries.append(envelope_entry)
+        manifest_entries.append(manifest_entry)
     return manifest_entries, envelope_entries, native_bytes, raw_injected_bytes
+
+
+def _instruction_source_specs(
+    request: ResolutionRequest, existing: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Return the adapter-proven root/selected-child instruction inventory."""
+    allowed_repositories = {"$workspace", *_canonical_input(request.repositories, "repository")}
+    paths = {item["path"] for item in existing}
+    identifiers = {item["policy_id"] for item in existing}
+    fields = {"policy_id", "repository_id", "scope_prefix", "path", "authority_tier"}
+    result: list[dict[str, Any]] = []
+    for supplied in request.instruction_sources:
+        item = _closed(supplied, fields, "instruction source", "E_NATIVE_EVIDENCE")
+        policy_id = _identifier(item["policy_id"], "instruction source policy_id", "E_NATIVE_EVIDENCE")
+        repository_id = _identifier(item["repository_id"], "instruction source repository_id", "E_NATIVE_EVIDENCE")
+        if policy_id in identifiers or item["path"] in paths:
+            _fail("instruction source duplicates the visible inventory", "E_NATIVE_EVIDENCE")
+        if repository_id not in allowed_repositories:
+            _fail("instruction source repository is outside selected scope", "E_SCOPE_UNAVAILABLE")
+        try:
+            w2b1._scope_prefix(item["scope_prefix"], "instruction source scope_prefix")
+            w2b1._canonical_path(item["path"], "instruction source path")
+        except w2b1.AgentContextError as error:
+            _fail(error.message, "E_NATIVE_EVIDENCE")
+        if item["authority_tier"] not in TIER_ORDER:
+            _fail("instruction source authority tier is invalid", "E_NATIVE_EVIDENCE")
+        if repository_id == "$workspace":
+            valid = item["path"] == "AGENTS.md" and item["scope_prefix"] == "."
+        else:
+            valid = item["scope_prefix"] != "." and item["path"] == f"{item['scope_prefix']}/AGENTS.md"
+        if not valid:
+            _fail("instruction source does not match its canonical repository scope", "E_NATIVE_EVIDENCE")
+        paths.add(item["path"])
+        identifiers.add(policy_id)
+        result.append({**item, "source_kind": "instruction", "metadata": dict(item)})
+    if [item["path"] for item in result] != sorted(item["path"] for item in result):
+        _fail("instruction sources must be in canonical path order", "E_NATIVE_EVIDENCE")
+    return result
 
 
 def resolve_context(request: ResolutionRequest) -> ResolvedContext:

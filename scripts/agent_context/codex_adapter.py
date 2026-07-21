@@ -8,9 +8,9 @@ exact JCS envelope through the evidence-backed ``developer_instructions``
 override.  Inputs are identifiers, never paths; multi-repository authorization
 is delegated to the frozen resolver contract.
 
-The shared kernel remains the owner of source-drift checks, runtime storage,
-receipt transitions, and the exact-once state machine.  This module neither
-serializes envelopes nor treats model output as delivery evidence.
+The shared kernel remains the owner of source-drift checks, immutable journal
+state, and conservative submission semantics. This module neither serializes
+envelopes nor treats model output as context acceptance or exactly-once proof.
 """
 
 from __future__ import annotations
@@ -36,14 +36,15 @@ from agent_context.delivery_kernel import (
     TransportConfirmation,
 )
 from agent_context.resolve_context import ResolutionRequest, ResolvedContext, resolve_context
+from agent_context.trust_identity import build_trust_identity, verify_trust_identity
 
 
 MARKER_NAME = ".m8-workspace-root"
 MARKER_VALUE = "m8-workspace-v2\n"
 CAPABILITY_EVIDENCE_PATH = (
-    ".workspace/status/fa-workspace/agent-configuration-token-efficiency-capability-evidence-2026-07-19.md"
+    "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md"
 )
-CAPABILITY_EVIDENCE_SHA256 = "3fce2371cada5b2cbe949b0398ba29a376ca1515c7577dc6881b62263ff7588b"
+CAPABILITY_EVIDENCE_SHA256 = "d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b"
 EXPECTED_CODEX_VERSION = "codex-cli 0.144.6"
 EXPECTED_CODEX_SHA256 = "134063e133f0b4244fa3b251acf973d4fe4b4aeeacbdc135211bf480f59f1477"
 
@@ -129,6 +130,8 @@ class CodexNativeInspection:
     active_source_sha256: Mapping[str, str]
     # Transient preflight data only; it never reaches persistent runtime state.
     visible_text: str
+    # Complete reviewed-tree/environment identity captured before resolution.
+    trust_identity: Mapping[str, Any]
 
 
 def find_workspace_root(start: Path) -> Path:
@@ -154,9 +157,16 @@ def find_workspace_root(start: Path) -> Path:
 class CodexDeliveryAdapter:
     """Codex-specific preflight/resolution boundary for direct children."""
 
-    def __init__(self, *, runner: CommandRunner = subprocess_runner, codex_command: str = "codex") -> None:
+    def __init__(
+        self, *, runner: CommandRunner = subprocess_runner, codex_command: str = "codex",
+        strict_trust_identity: bool = False,
+    ) -> None:
         self.runner = runner
         self.codex_command = codex_command
+        # The production wrapper opts in.  This keeps W2b resolver fixtures
+        # independent of a host Git/configuration environment while ensuring
+        # the only public canonical launcher cannot bypass W9d2 preflight.
+        self.strict_trust_identity = strict_trust_identity
 
     def resolve_single_repository(
         self, *, workspace_root: Path, repository_id: str,
@@ -170,6 +180,7 @@ class CodexDeliveryAdapter:
         self, *, workspace_root: Path, repository_ids: Sequence[str],
         tasks: Sequence[str] = (), operations: Sequence[str] = (),
         authorizations: Sequence[Mapping[str, Any]] = (),
+        generation: int = 0,
     ) -> tuple[tuple[Path, ...], ResolvedContext, CodexNativeInspection]:
         """Resolve a canonical direct-child set without starting a user task.
 
@@ -189,7 +200,9 @@ class CodexDeliveryAdapter:
         )
         root = workspace_root.resolve(strict=True)
         metadata = _load_json(root / ".workspace" / "policy.metadata.json")
-        injection_evidence = self._injection_evidence(root, metadata, inspection.visible_text)
+        injection_evidence = self._injection_evidence(
+            root, metadata, inspection.visible_text, repositories, generation,
+        )
         native_evidence = self._native_evidence(inspection)
         request = ResolutionRequest(
             root=root, registry=_load_json(root / ".workspace" / "repo-types.json"),
@@ -200,9 +213,11 @@ class CodexDeliveryAdapter:
             tasks=canonical_tasks, operations=canonical_operations,
             authorizations=tuple(authorizations),
             native_evidence=native_evidence, injection_evidence=injection_evidence,
+            instruction_sources=self._instruction_sources(root, canonical_repositories, repositories),
             other_model_visible_bootstrap_bytes=sum(
                 (root / source).stat().st_size for source in inspection.active_source_sha256
             ),
+            generation=generation,
         )
         return repositories, resolve_context(request), inspection
 
@@ -239,15 +254,55 @@ class CodexDeliveryAdapter:
             # The actual client identity is learned from thread.started by the
             # transport and replaces this launch-owned pending value atomically.
             client_session_id="codex.pending", channel_id="cli-config-developer-instructions",
+            trust_identity_sha256=inspection.trust_identity.get("trust_identity_sha256", "0" * 64),
         )
         transport = CodexExecTransport(
-            runner=self.runner, codex_command=self.codex_command, repository=repositories[0],
+            runner=self.runner, codex_command=self.codex_command, repository=root,
             workspace_root=root, prompt=prompt, expected_native_sources=inspection.active_source_sha256,
             expected_config_sha256=inspection.config_sha256,
             integrity_check=lambda: self._verify_live_integration(root, inspection),
         )
         delivery_kernel = kernel or DeliveryKernel()
         prepared = delivery_kernel.prepare(request)
+        return delivery_kernel.handoff(prepared, transport)
+
+    def resume_and_handoff_repositories(
+        self, *, workspace_root: Path, runtime_dir: Path, repository_ids: Sequence[str], prompt: str,
+        tasks: Sequence[str] = (), operations: Sequence[str] = (),
+        authorizations: Sequence[Mapping[str, Any]] = (), kernel: DeliveryKernel | None = None,
+    ) -> DeliveryResult:
+        """Resume only a completed, identity-matched Codex thread once.
+
+        The generation is derived from the authoritative journal-backed session;
+        source and trust state are freshly resolved before the kernel permits a
+        resume.  Ambiguous/failed sessions therefore cannot reach transport.
+        """
+        if not isinstance(prompt, str) or not prompt:
+            _fail("E_USAGE", "a non-empty Codex user prompt is required")
+        delivery_kernel = kernel or DeliveryKernel()
+        prior = delivery_kernel._authoritative_session(runtime_dir)
+        if prior["state"] != "COMPLETED":
+            _fail("E_LIFECYCLE", "only a completed generation may resume")
+        _, resolved, inspection = self.resolve_repositories(
+            workspace_root=workspace_root, repository_ids=repository_ids, tasks=tasks,
+            operations=operations, authorizations=authorizations, generation=prior["generation"] + 1,
+        )
+        root = workspace_root.resolve(strict=True)
+        request = DeliveryRequest(
+            workspace_root=root, resolved=resolved, capability_row=CURRENT_CODEX_CAPABILITY,
+            trusted=True, reviewed_tree=resolved.manifest["reviewed_tree"],
+            capability_evidence_id=w2b1.canonical_sha256(CURRENT_CODEX_CAPABILITY),
+            client_session_id=prior["client_session_id"], channel_id="cli-config-developer-instructions",
+            trust_identity_sha256=inspection.trust_identity.get("trust_identity_sha256", "0" * 64),
+        )
+        prepared = delivery_kernel.resume(runtime_dir, request)
+        transport = CodexExecTransport(
+            runner=self.runner, codex_command=self.codex_command, repository=root,
+            workspace_root=root, prompt=prompt, expected_native_sources=inspection.active_source_sha256,
+            expected_config_sha256=inspection.config_sha256,
+            integrity_check=lambda: self._verify_live_integration(root, inspection),
+            resume_session_id=prior["client_session_id"],
+        )
         return delivery_kernel.handoff(prepared, transport)
 
     def _preflight_repositories(
@@ -261,10 +316,24 @@ class CodexDeliveryAdapter:
         config = root / ".codex" / "config.toml"
         self._verify_project_config(config)
         repositories = tuple(self._repository_path(root, repository_id) for repository_id in repository_ids)
-        self._verify_client_identity()
+        binary = self._verify_client_identity()
         self._verify_project_trust(root)
-        return repositories, self._inspect_native_sources(
-            root, repositories, config, active_repository=repositories[0],
+        inspection = self._inspect_native_sources(root, repositories, config)
+        trust_identity: Mapping[str, Any] = {}
+        if self.strict_trust_identity:
+            trust_identity = build_trust_identity(
+                workspace_root=root, selected_repositories=repositories,
+                capability_path=CAPABILITY_EVIDENCE_PATH, codex_binary=binary,
+                codex_version=inspection.client_version,
+            )
+        return repositories, CodexNativeInspection(
+            client_identity=inspection.client_identity,
+            client_version=inspection.client_version,
+            config_sha256=inspection.config_sha256,
+            source_sha256=inspection.source_sha256,
+            active_source_sha256=inspection.active_source_sha256,
+            visible_text=inspection.visible_text,
+            trust_identity=trust_identity,
         )
 
     @staticmethod
@@ -285,11 +354,21 @@ class CodexDeliveryAdapter:
         self._verify_project_config(config)
         if _sha256(config) != inspection.config_sha256:
             _fail("E_TRUST", "Codex project configuration changed after preflight")
-        self._verify_client_identity()
+        binary = self._verify_client_identity()
         self._verify_project_trust(root)
         for path, digest in inspection.source_sha256.items():
             if _sha256(root / path) != digest:
                 _fail("E_NATIVE_EVIDENCE", "native instruction source changed after inspection")
+        if self.strict_trust_identity:
+            selected = tuple(
+                root.joinpath(*entry["path"].split("/"))
+                for entry in inspection.trust_identity["children"]
+            )
+            verify_trust_identity(
+                inspection.trust_identity, workspace_root=root,
+                selected_repositories=selected, capability_path=CAPABILITY_EVIDENCE_PATH,
+                codex_binary=binary, codex_version=inspection.client_version,
+            )
 
     def preflight(self, *, workspace_root: Path, repository_id: str) -> tuple[Path, CodexNativeInspection]:
         """Backward-compatible single-repository preflight entry point."""
@@ -341,13 +420,14 @@ class CodexDeliveryAdapter:
             _fail("E_NATIVE_EVIDENCE", "selected repository lacks a regular native AGENTS.md")
         return candidate
 
-    def _verify_client_identity(self) -> None:
+    def _verify_client_identity(self) -> Path:
         command_path = shutil_which(self.codex_command)
         if command_path is None or _sha256(command_path) != EXPECTED_CODEX_SHA256:
             _fail("E_CAPABILITY", "installed Codex binary identity changed")
         version = self.runner((self.codex_command, "--version"), Path.cwd())
         if version.returncode != 0 or version.stdout.decode("utf-8", "replace").strip() != EXPECTED_CODEX_VERSION:
             _fail("E_CAPABILITY", "installed Codex version changed")
+        return command_path
 
     def _verify_project_trust(self, root: Path) -> None:
         codex_home = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
@@ -361,51 +441,39 @@ class CodexDeliveryAdapter:
             _fail("E_TRUST", "Codex project is not explicitly trusted")
 
     def _inspect_native_sources(
-        self, root: Path, repositories: Sequence[Path], config: Path, *, active_repository: Path,
+        self, root: Path, repositories: Sequence[Path], config: Path,
     ) -> CodexNativeInspection:
         source_paths = ("AGENTS.md", *[f"{repository.name}/AGENTS.md" for repository in repositories])
         source_sha256 = {path: _sha256(root / path) for path in source_paths}
         marker = "M8_CODEX_PREFLIGHT_20260720"
         override = f"developer_instructions={json.dumps(marker)}"
-        visible_parts: list[str] = []
-        for directory in (root, *repositories):
-            result = self.runner(
-                # ``-c`` is a top-level Codex option.  Keeping it before the
-                # debug subcommand is required by the evidence-pinned CLI.
-                (self.codex_command, "-c", override, "debug", "prompt-input", marker), directory,
-            )
-            if result.returncode != 0:
-                _fail("E_NATIVE_EVIDENCE", "Codex native prompt inspection did not complete")
-            try:
-                messages = json.loads(result.stdout)
-                texts = [part["text"] for message in messages for part in message.get("content", [])
-                         if part.get("type") == "input_text" and isinstance(part.get("text"), str)]
-            except (TypeError, ValueError, KeyError) as error:
-                _fail("E_NATIVE_EVIDENCE", f"Codex native inspection output is invalid: {error}")
-            if marker not in texts:
-                _fail("E_CHANNEL", "Codex inspection did not preserve the direct full-content channel")
-            expected = (
-                ("AGENTS.md",)
-                if directory == root
-                else (f"{directory.name}/AGENTS.md",)
-            )
-            for path in expected:
-                try:
-                    source_text = (root / path).read_bytes().decode("utf-8")
-                except UnicodeDecodeError:
-                    _fail("E_SOURCE", "native AGENTS.md is not strict UTF-8")
-                if sum(text.count(source_text) for text in texts) != 1:
-                    _fail("E_NATIVE_EVIDENCE", "Codex did not prove exactly one active native instruction source")
-            visible_parts.extend(texts)
+        result = self.runner(
+            # Root is the one reviewed execution directory.  Inspecting a
+            # child here would make its AGENTS.md native and invalidate W9d1.
+            (self.codex_command, "-c", override, "debug", "prompt-input", marker), root,
+        )
+        if result.returncode != 0:
+            _fail("E_NATIVE_EVIDENCE", "Codex native prompt inspection did not complete")
+        try:
+            messages = json.loads(result.stdout)
+            texts = [part["text"] for message in messages for part in message.get("content", [])
+                     if part.get("type") == "input_text" and isinstance(part.get("text"), str)]
+        except (TypeError, ValueError, KeyError) as error:
+            _fail("E_NATIVE_EVIDENCE", f"Codex native inspection output is invalid: {error}")
+        if marker not in texts:
+            _fail("E_CHANNEL", "Codex inspection did not preserve the direct full-content channel")
+        try:
+            root_text = (root / "AGENTS.md").read_bytes().decode("utf-8")
+        except UnicodeDecodeError:
+            _fail("E_SOURCE", "root AGENTS.md is not strict UTF-8")
+        if sum(text.count(root_text) for text in texts) != 1:
+            _fail("E_NATIVE_EVIDENCE", "Codex did not prove exactly one active root instruction source")
         return CodexNativeInspection(
             client_identity=str(shutil_which(self.codex_command)), client_version=EXPECTED_CODEX_VERSION,
             config_sha256=_sha256(config), source_sha256=source_sha256,
-            active_source_sha256={
-                f"{active_repository.name}/AGENTS.md": source_sha256[
-                    f"{active_repository.name}/AGENTS.md"
-                ]
-            },
-            visible_text="\n".join(visible_parts),
+            active_source_sha256={"AGENTS.md": source_sha256["AGENTS.md"]},
+            visible_text="\n".join(texts),
+            trust_identity={},
         )
 
     def _native_evidence(self, inspection: CodexNativeInspection) -> dict[str, Any]:
@@ -416,7 +484,7 @@ class CodexDeliveryAdapter:
             "capability_evidence_id": w2b1.canonical_sha256(CURRENT_CODEX_CAPABILITY),
             "trust_state": "trusted", "inspection_mechanism": "codex debug prompt-input",
             "captured_at": _timestamp(),
-            "sources": [{"path": path, "sha256": digest} for path, digest in sorted(inspection.source_sha256.items())],
+            "sources": [{"path": path, "sha256": digest} for path, digest in sorted(inspection.active_source_sha256.items())],
         }
         evidence["native_evidence_id"] = w2b1.canonical_sha256(
             {key: value for key, value in evidence.items() if key != "native_evidence_id"}
@@ -425,6 +493,7 @@ class CodexDeliveryAdapter:
 
     def _injection_evidence(
         self, root: Path, metadata: Mapping[str, Any], native_visible_text: str,
+        repositories: Sequence[Path], generation: int,
     ) -> dict[str, Any]:
         units = metadata.get("units")
         if not isinstance(units, list):
@@ -443,11 +512,40 @@ class CodexDeliveryAdapter:
             if text and text in native_visible_text:
                 _fail("E_NATIVE_EVIDENCE", "policy source was unexpectedly active in Codex native discovery")
             sources[path] = hashlib.sha256(raw).hexdigest()
+        for repository in repositories:
+            path = f"{repository.name}/AGENTS.md"
+            raw = (root / path).read_bytes()
+            try:
+                text = raw.decode("utf-8")
+            except UnicodeDecodeError:
+                _fail("E_SOURCE", "selected child AGENTS.md is not strict UTF-8")
+            if text and text in native_visible_text:
+                _fail("E_NATIVE_EVIDENCE", "selected child instruction was unexpectedly native")
+            sources[path] = hashlib.sha256(raw).hexdigest()
         return {
-            "generation": 0, "native_discovery_disabled": True,
+            "generation": generation, "native_discovery_disabled": True,
             "exact_once_handoff_proven": True,
             "sources": [{"path": path, "sha256": digest} for path, digest in sorted(sources.items())],
         }
+
+    @staticmethod
+    def _instruction_sources(
+        root: Path, repository_ids: Sequence[str], repositories: Sequence[Path],
+    ) -> tuple[dict[str, str], ...]:
+        children = sorted(
+            zip(repository_ids, repositories, strict=True),
+            key=lambda item: item[1].relative_to(root).as_posix(),
+        )
+        return tuple([
+            {"policy_id": "instruction.root.agents", "repository_id": "$workspace",
+             "scope_prefix": ".", "path": "AGENTS.md", "authority_tier": "workspace"},
+            *[
+                {"policy_id": f"instruction.{repository_id}.agents", "repository_id": repository_id,
+                 "scope_prefix": repository.relative_to(root).as_posix(),
+                 "path": f"{repository.relative_to(root).as_posix()}/AGENTS.md", "authority_tier": "repository"}
+                for repository_id, repository in children
+            ],
+        ])
 
 
 @dataclass
@@ -462,6 +560,7 @@ class CodexExecTransport(TransportAdapter):
     expected_native_sources: Mapping[str, str]
     expected_config_sha256: str
     integrity_check: Callable[[], None]
+    resume_session_id: str | None = None
     output: bytes = b""
 
     def deliver(self, *, payload: bytes, envelope_sha256: str, channel_id: str) -> TransportConfirmation:
@@ -479,10 +578,16 @@ class CodexExecTransport(TransportAdapter):
             if _sha256(self.workspace_root / path) != digest:
                 _fail("E_NATIVE_EVIDENCE", "native instruction source changed before transport")
         override = f"developer_instructions={json.dumps(content, ensure_ascii=False)}"
-        result = self.runner(
-            (self.codex_command, "-c", override, "exec", "--strict-config", "--json",
-             "-C", str(self.repository), self.prompt), self.repository,
+        command: tuple[str, ...] = (
+            self.codex_command, "-c", override, "exec", "--strict-config", "--json",
+            "-C", str(self.repository), self.prompt,
         )
+        if self.resume_session_id is not None:
+            command = (
+                self.codex_command, "-c", override, "exec", "resume", self.resume_session_id,
+                "--strict-config", "--json", "-C", str(self.repository), self.prompt,
+            )
+        result = self.runner(command, self.repository)
         self.output = result.stdout
         if result.returncode != 0:
             _fail("E_CHANNEL", "Codex execution did not confirm the pre-task handoff")

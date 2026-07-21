@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "finding": "M-2",
+  "step": "10.8",
+  "validator": "scripts/agent_context/shared_validation.py",
+  "offline_entrypoint": "scripts/agent_context/validate_workspace.py",
+  "live_entrypoint": "scripts/agent_context/delivery_kernel.py",
+  "tests": [
+    "test_authorization_lifecycle_and_receipt_defects_match",
+    "test_native_and_trust_defects_match",
+    "test_source_entry_and_accounting_defects_match",
+    "test_valid_live_delivery_recomputes_exactly"
+  ]
+}

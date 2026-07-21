@@ -11,10 +11,10 @@
   "inspection_message_count": 4,
   "source": {
     "path": "AGENTS.md",
-    "source_bytes": 1965,
-    "source_sha256": "837a63565306ceb1ca3b3f387bfeb73f2f4dae75608eba0b5b6a08f365196a1b",
+    "source_bytes": 2042,
+    "source_sha256": "8b6b743d234696de8fa2b78285d12121cb6d6a747da286a692f037b74e2d07d1",
     "exact_source_substring_occurrences": 1,
-    "model_visible_part_bytes": 2037,
+    "model_visible_part_bytes": 2114,
     "source_offset_in_model_visible_part": 56
   },
   "disposition": "The root AGENTS.md is verified native workspace-controlled context for the Codex devcontainer non-interactive measurement row. The captured prompt input is transient runtime evidence and is not tracked because it contains full model input."

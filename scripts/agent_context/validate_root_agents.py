@@ -61,8 +61,6 @@ def validate_root_agents(workspace: Path) -> RootAgentsValidationReport:
         _fail(f"could not read root AGENTS.md as strict UTF-8: {error}")
     if raw.startswith(b"\xef\xbb\xbf") or b"\r" in raw or not raw.endswith(b"\n"):
         _fail("root AGENTS.md must be UTF-8 without BOM, LF, and final newline")
-    if len(raw) > MAX_BOOTSTRAP_BYTES:
-        _fail(f"root AGENTS.md exceeds {MAX_BOOTSTRAP_BYTES}-byte bootstrap budget")
     if VERSION_MARKER not in text:
         _fail("root AGENTS.md is missing the visible workspace instruction-set marker")
     missing_references = [reference for reference in REQUIRED_REFERENCES if reference not in text]
@@ -74,6 +72,8 @@ def validate_root_agents(workspace: Path) -> RootAgentsValidationReport:
     present_forbidden = [phrase for phrase in FORBIDDEN_PHRASES if phrase.casefold() in text.casefold()]
     if present_forbidden:
         _fail("root AGENTS.md contains forbidden stale or host-specific content: " + ", ".join(present_forbidden))
+    if len(raw) > MAX_BOOTSTRAP_BYTES:
+        _fail(f"root AGENTS.md exceeds {MAX_BOOTSTRAP_BYTES}-byte bootstrap budget")
     return RootAgentsValidationReport(
         byte_count=len(raw), reference_count=len(REQUIRED_REFERENCES)
     )

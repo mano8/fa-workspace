@@ -35,6 +35,13 @@ class WorkspaceValidatorTests(unittest.TestCase):
         (self.root / "scripts").mkdir()
         for name in ("codex-repo.sh", "codex-repo.ps1"):
             shutil.copy2(WORKSPACE / "scripts" / name, self.root / "scripts" / name)
+        evidence = self.root / "scripts" / "agent_context" / "fixtures" / "evidence"
+        evidence.mkdir(parents=True)
+        shutil.copy2(
+            WORKSPACE / "scripts" / "agent_context" / "fixtures" / "evidence"
+            / "capability-evidence-2026-07-19.md",
+            evidence / "capability-evidence-2026-07-19.md",
+        )
         subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
         subprocess.run(["git", "add", "."], cwd=self.root, check=True)
 
@@ -57,7 +64,7 @@ class WorkspaceValidatorTests(unittest.TestCase):
     def test_contract_capability_identity_drift_fails_closed(self) -> None:
         contract = self.root / ".workspace/contracts/agent-context-w2a.contract.md"
         contract.write_text(
-            contract.read_text(encoding="utf-8").replace("3fce2371", "0fce2371", 1),
+            contract.read_text(encoding="utf-8").replace("d921bcdb", "0921bcdb", 1),
             encoding="utf-8", newline="\n",
         )
         with self.assertRaisesRegex(WorkspaceValidationError, "capability-evidence hash"):

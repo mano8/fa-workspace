@@ -1,12 +1,11 @@
-# W2b1 agent-context schemas
+# Agent-context resolver and canonical Codex delivery
 
-This additive, inactive package implements Phases 2.2 through 2.5. It validates the
-frozen faceted v2 registry/index shape, policy units, manifests, sessions, and
-receipts; it also creates RFC 8785 JCS UTF-8 injected envelopes from supplied
-source bytes. The scoped resolver consumes explicit v2 fixture inputs, performs
-authority/scope/authorization/native-evidence checks, and emits deterministic
-manifests plus envelopes. It does not activate transport, write runtime state,
-or invoke an agent.
+This package contains the active root-owned faceted resolver, signed external
+authorization boundary, reviewed trust identity, delivery kernel, canonical
+Codex devcontainer non-interactive adapter, and root-only validators. It
+validates the v2 registry/index, policy units, manifests, journals, sessions,
+receipts, and RFC 8785 JCS UTF-8 injected envelopes. Other client/platform rows
+remain limited or unsupported as recorded by capability evidence.
 
 Run its deterministic suite with the configured devcontainer Python runtime:
 
@@ -32,10 +31,12 @@ policy file.
 
 Phase 4.4 adds opt-in environment, testing, per-operation Git, pull-request,
 release, Headroom, and cross-repository overlays. Default resolution selects
-none of them. Mutating and cross-repository tasks require a closed human
-authorization record whose repository and operation sets match exactly;
-manifests, sessions, and receipts retain only its identifier, canonical record
-hash, and source hash alongside the selected repository/task/operation sets.
+none of them. Mutating and cross-repository tasks require a single-use
+externally signed capability whose launch, repository, task, operation, and
+user-task hash match exactly. The canonical launcher verifies and atomically
+redeems it against owner-only trust/replay stores outside the workspace.
+Manifests, sessions, and receipts retain only verified metadata provenance;
+raw approval and signature content is excluded.
 
 Phase 10 Steps 10.2--10.8 implement the W9b--W9d remediation boundaries. The
 W9b external authorization verifier in
@@ -113,7 +114,7 @@ effort pins. Run its static check with:
 "$M8_PYTHON" scripts/agent_context/validate_codex_config.py --workspace .
 ```
 
-Phase 6 Steps 6.2--6.4 add the Codex-only canonical launcher boundary.
+Phase 6 Steps 6.2--6.4 establish the Codex-only canonical launcher boundary.
 [`codex-repo.sh`](../codex-repo.sh) and
 [`codex-repo.ps1`](../codex-repo.ps1) discover the workspace only through the
 exact root marker, accept a repeatable canonical set of registered direct
@@ -123,8 +124,8 @@ Codex's current instruction wrapper is accepted only when it contains the
 exact source once; accounting includes the selected execution directory's
 active native instruction once. They pass only the resolver's exact JCS
 envelope through the verified `developer_instructions` channel. Mutating and
-multi-repository requests require an exact-scope JSON
-authorization record supplied through a workspace-relative regular file.
+multi-repository requests use a workspace-relative signed capability whose
+trust anchor and replay state remain outside the workspace.
 Traversal, duplicate identifiers, symlinked children/instructions, missing
 direct `.git`, source/config/client/trust drift, and invalid authorization
 records fail before `codex exec`. The adapter delegates runtime state,
@@ -198,22 +199,31 @@ CI or authorize any child edit:
 scripts/codex-repo.sh --repository auth-sdk-m8 "inspect the repository"
 scripts/codex-repo.sh --repository auth-sdk-m8 --repository media-sdk-m8 \
   --task cross-repository --operation analyze \
-  --authorization .workspace/authorizations/approved-cross-sdk.json "compare both SDKs"
+  --prepare-authorization-request "compare both SDKs"
+# An external owner signs the exact request without exposing its private key.
+scripts/codex-repo.sh --repository auth-sdk-m8 --repository media-sdk-m8 \
+  --task cross-repository --operation analyze \
+  --authorization .workspace/authorizations/signed-cross-sdk.json \
+  --authorization-external-root /owner-controlled/authorization \
+  --authorization-trust-store /owner-controlled/authorization/trust-store.json \
+  --authorization-replay-store /owner-controlled/authorization/replay \
+  "compare both SDKs"
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w6_codex_adapter -v
 ```
 
-The faceted resolver mode in [`resolve-context.py`](resolve-context.py) remains
-an explicit, inactive W2b2 tool. It requires a faceted v2 registry/index and policy metadata fixture, then accepts repeatable
+The faceted resolver CLI in [`resolve-context.py`](resolve-context.py) remains
+an explicit inspection/fixture entry point. It requires a faceted v2
+registry/index and policy metadata fixture, then accepts repeatable
 repository, task, exclusion, operation, and authorization arguments. Its
 canonical `resolution` output includes the manifest and envelope; `manifest`
 and `envelope` formats are also available. Native sources need current verified
 native evidence. Injected sources need evidence that native discovery is
 disabled and an exact-once handoff is proven for the requested generation;
-runtime enforcement is provided by the inactive W2b3 client-neutral kernel in
+runtime enforcement is provided by the active client-neutral kernel in
 [`delivery_kernel.py`](delivery_kernel.py). It owns only isolated runtime
 state, source-drift rehashing, receipt transitions, stable exit mapping, and a
-fake exact-payload adapter. It has no Codex/Claude hook, launcher, or real
-transport adapter, and must remain disabled until W2b4 fixtures pass.
+fake exact-payload adapter seam; the Codex adapter is the only currently
+capability-supported real transport and Claude remains fail-closed.
 
 W2b4 keeps that boundary client-neutral. Its deterministic fixtures exercise
 strict faceted-schema failures, scoped multi-repository authorization and authority failures, native

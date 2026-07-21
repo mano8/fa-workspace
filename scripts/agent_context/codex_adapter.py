@@ -180,6 +180,8 @@ class CodexDeliveryAdapter:
         self, *, workspace_root: Path, repository_ids: Sequence[str],
         tasks: Sequence[str] = (), operations: Sequence[str] = (),
         authorizations: Sequence[Mapping[str, Any]] = (),
+        verified_authorization_provenance: Sequence[Mapping[str, Any]] = (),
+        authorization_trust_store: Path | None = None,
         generation: int = 0,
     ) -> tuple[tuple[Path, ...], ResolvedContext, CodexNativeInspection]:
         """Resolve a canonical direct-child set without starting a user task.
@@ -192,11 +194,14 @@ class CodexDeliveryAdapter:
         canonical_repositories = _unique_identifiers(repository_ids, "repository")
         canonical_tasks = _unique_identifiers(tasks, "task")
         canonical_operations = _unique_identifiers(operations, "operation")
+        if self.strict_trust_identity and authorizations and not verified_authorization_provenance:
+            _fail("E_AUTHORIZATION", "canonical launch requires externally verified authorization provenance")
         root = find_workspace_root(workspace_root)
         if root != workspace_root.resolve(strict=True):
             _fail("E_SCOPE_UNAVAILABLE", "canonical launcher root differs from its marker root")
         repositories, inspection = self._preflight_repositories(
             root=root, repository_ids=canonical_repositories,
+            authorization_trust_store=authorization_trust_store,
         )
         root = workspace_root.resolve(strict=True)
         metadata = _load_json(root / ".workspace" / "policy.metadata.json")
@@ -212,6 +217,7 @@ class CodexDeliveryAdapter:
             mode="non-interactive", repositories=canonical_repositories,
             tasks=canonical_tasks, operations=canonical_operations,
             authorizations=tuple(authorizations),
+            verified_authorization_provenance=tuple(verified_authorization_provenance),
             native_evidence=native_evidence, injection_evidence=injection_evidence,
             instruction_sources=self._instruction_sources(root, canonical_repositories, repositories),
             other_model_visible_bootstrap_bytes=sum(
@@ -236,6 +242,9 @@ class CodexDeliveryAdapter:
         self, *, workspace_root: Path, repository_ids: Sequence[str], prompt: str,
         tasks: Sequence[str] = (), operations: Sequence[str] = (),
         authorizations: Sequence[Mapping[str, Any]] = (),
+        verified_authorization_provenance: Sequence[Mapping[str, Any]] = (),
+        authorization_trust_store: Path | None = None,
+        launch_id: str | None = None,
         kernel: DeliveryKernel | None = None,
     ) -> DeliveryResult:
         """Perform exactly one full-content handoff for a resolved generation."""
@@ -244,6 +253,8 @@ class CodexDeliveryAdapter:
         repositories, resolved, inspection = self.resolve_repositories(
             workspace_root=workspace_root, repository_ids=repository_ids,
             tasks=tasks, operations=operations, authorizations=authorizations,
+            verified_authorization_provenance=verified_authorization_provenance,
+            authorization_trust_store=authorization_trust_store,
         )
         root = workspace_root.resolve(strict=True)
         request = DeliveryRequest(
@@ -255,12 +266,15 @@ class CodexDeliveryAdapter:
             # transport and replaces this launch-owned pending value atomically.
             client_session_id="codex.pending", channel_id="cli-config-developer-instructions",
             trust_identity_sha256=inspection.trust_identity.get("trust_identity_sha256", "0" * 64),
+            launch_id=launch_id,
         )
         transport = CodexExecTransport(
             runner=self.runner, codex_command=self.codex_command, repository=root,
             workspace_root=root, prompt=prompt, expected_native_sources=inspection.active_source_sha256,
             expected_config_sha256=inspection.config_sha256,
-            integrity_check=lambda: self._verify_live_integration(root, inspection),
+            integrity_check=lambda: self._verify_live_integration(
+                root, inspection, authorization_trust_store=authorization_trust_store,
+            ),
         )
         delivery_kernel = kernel or DeliveryKernel()
         prepared = delivery_kernel.prepare(request)
@@ -269,7 +283,11 @@ class CodexDeliveryAdapter:
     def resume_and_handoff_repositories(
         self, *, workspace_root: Path, runtime_dir: Path, repository_ids: Sequence[str], prompt: str,
         tasks: Sequence[str] = (), operations: Sequence[str] = (),
-        authorizations: Sequence[Mapping[str, Any]] = (), kernel: DeliveryKernel | None = None,
+        authorizations: Sequence[Mapping[str, Any]] = (),
+        verified_authorization_provenance: Sequence[Mapping[str, Any]] = (),
+        authorization_trust_store: Path | None = None,
+        launch_id: str | None = None,
+        kernel: DeliveryKernel | None = None,
     ) -> DeliveryResult:
         """Resume only a completed, identity-matched Codex thread once.
 
@@ -285,7 +303,10 @@ class CodexDeliveryAdapter:
             _fail("E_LIFECYCLE", "only a completed generation may resume")
         _, resolved, inspection = self.resolve_repositories(
             workspace_root=workspace_root, repository_ids=repository_ids, tasks=tasks,
-            operations=operations, authorizations=authorizations, generation=prior["generation"] + 1,
+            operations=operations, authorizations=authorizations,
+            verified_authorization_provenance=verified_authorization_provenance,
+            authorization_trust_store=authorization_trust_store,
+            generation=prior["generation"] + 1,
         )
         root = workspace_root.resolve(strict=True)
         request = DeliveryRequest(
@@ -294,19 +315,23 @@ class CodexDeliveryAdapter:
             capability_evidence_id=w2b1.canonical_sha256(CURRENT_CODEX_CAPABILITY),
             client_session_id=prior["client_session_id"], channel_id="cli-config-developer-instructions",
             trust_identity_sha256=inspection.trust_identity.get("trust_identity_sha256", "0" * 64),
+            launch_id=launch_id,
         )
         prepared = delivery_kernel.resume(runtime_dir, request)
         transport = CodexExecTransport(
             runner=self.runner, codex_command=self.codex_command, repository=root,
             workspace_root=root, prompt=prompt, expected_native_sources=inspection.active_source_sha256,
             expected_config_sha256=inspection.config_sha256,
-            integrity_check=lambda: self._verify_live_integration(root, inspection),
+            integrity_check=lambda: self._verify_live_integration(
+                root, inspection, authorization_trust_store=authorization_trust_store,
+            ),
             resume_session_id=prior["client_session_id"],
         )
         return delivery_kernel.handoff(prepared, transport)
 
     def _preflight_repositories(
         self, *, root: Path, repository_ids: tuple[str, ...],
+        authorization_trust_store: Path | None = None,
     ) -> tuple[tuple[Path, ...], CodexNativeInspection]:
         if not Path("/.dockerenv").is_file():
             _fail("E_UNSUPPORTED_MODE", "only the evidence-backed devcontainer mode is canonical")
@@ -325,6 +350,7 @@ class CodexDeliveryAdapter:
                 workspace_root=root, selected_repositories=repositories,
                 capability_path=CAPABILITY_EVIDENCE_PATH, codex_binary=binary,
                 codex_version=inspection.client_version,
+                authorization_trust_store=authorization_trust_store,
             )
         return repositories, CodexNativeInspection(
             client_identity=inspection.client_identity,
@@ -348,7 +374,10 @@ class CodexDeliveryAdapter:
         }:
             _fail("E_TRUST", "Codex project configuration differs from frozen least-privilege settings")
 
-    def _verify_live_integration(self, root: Path, inspection: CodexNativeInspection) -> None:
+    def _verify_live_integration(
+        self, root: Path, inspection: CodexNativeInspection,
+        *, authorization_trust_store: Path | None = None,
+    ) -> None:
         """Reject drift between native inspection and the actual exec boundary."""
         config = root / ".codex" / "config.toml"
         self._verify_project_config(config)
@@ -368,6 +397,7 @@ class CodexDeliveryAdapter:
                 inspection.trust_identity, workspace_root=root,
                 selected_repositories=selected, capability_path=CAPABILITY_EVIDENCE_PATH,
                 codex_binary=binary, codex_version=inspection.client_version,
+                authorization_trust_store=authorization_trust_store,
             )
 
     def preflight(self, *, workspace_root: Path, repository_id: str) -> tuple[Path, CodexNativeInspection]:

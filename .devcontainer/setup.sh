@@ -39,7 +39,6 @@ echo "[4/7] Configuration de l'environnement Python PARTAGÉ..."
 cd /workspace
 
 python3 -m venv .shared-venv
-./.shared-venv/bin/pip install --upgrade pip
 
 ./.shared-venv/bin/pip install \
     -r /workspace/fa-auth-m8/auth_user_service/requirements_dev.txt \
@@ -58,11 +57,11 @@ test "$(codex --version)" = "codex-cli ${CODEX_VERSION}"
 
 echo "[6/7] Installation verrouillée de Headroom MCP CLI dans un venv isolé..."
 python3 -m venv "${HOME}/.venvs/headroom"
-# The direct Headroom wheel is pinned and its installed RECORD is checked
-# below.  Its transitive lock remains an open Step 10.5 build-verification
-# requirement; use of the versioned direct requirement keeps the bootstrap
-# functional until that clean-build evidence can be produced.
-"${HOME}/.venvs/headroom/bin/pip" install "headroom-ai[mcp,proxy,code]==0.32.1"
+"${HOME}/.venvs/headroom/bin/pip" install \
+    --only-binary=:all: \
+    --require-hashes \
+    --no-deps \
+    -r /workspace/.devcontainer/headroom.requirements.lock
 headroom_record="$(find "${HOME}/.venvs/headroom/lib" -path '*/headroom_ai-0.32.1.dist-info/RECORD' -type f -print -quit)"
 test -n "${headroom_record}"
 test "$(sha256sum "${headroom_record}" | awk '{print $1}')" = "${HEADROOM_RECORD_SHA256}"

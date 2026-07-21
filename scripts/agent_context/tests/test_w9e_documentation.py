@@ -30,6 +30,10 @@ class W9eDocumentationTests(unittest.TestCase):
         self.assertIn("`EXECUTION_AMBIGUOUS`", docs)
         self.assertNotIn("canonical launch remains\ndisabled", docs)
         self.assertNotIn("exact-once `HANDED_OFF`", docs)
+        self.assertNotIn("inactive but validated W2b", docs)
+        self.assertNotIn("workspace-relative regular file.\nTraversal", docs)
+        self.assertIn("externally signed", docs)
+        self.assertIn("atomically", docs)
 
     def test_current_historical_and_parent_final_tree_claims_are_consistent(self) -> None:
         docs = self._docs()

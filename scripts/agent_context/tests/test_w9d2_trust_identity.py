@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import subprocess
+import shutil
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
@@ -37,7 +39,8 @@ class W9d2TrustIdentityTests(unittest.TestCase):
         (self.child / "AGENTS.md").write_text("child\n", encoding="utf-8")
         self._commit(self.child)
         self._commit(self.root)
-        self.binary = Path(sys.executable).resolve()
+        self.binary = Path(self.temporary.name) / "codex-fixture"
+        shutil.copyfile(Path(sys.executable).resolve(), self.binary)
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -119,6 +122,78 @@ class W9d2TrustIdentityTests(unittest.TestCase):
         self.assertEqual(first["children"], second["children"])
         self.assertEqual(first["codex"], second["codex"])
         self.assertEqual(first["critical_files"], second["critical_files"])
+
+    def test_binary_global_config_or_platform_drift_fails(self) -> None:
+        identity = self._identity()
+        original = self.binary.read_bytes()
+        self.binary.write_bytes(original + b"drift")
+        with self.assertRaisesRegex(w2b1.AgentContextError, "drifted"):
+            self._verify(identity)
+        self.binary.write_bytes(original)
+
+        with mock.patch(
+            "agent_context.trust_identity._config_inventory",
+            return_value=[{"kind": "global", "path": "global:config.toml", "sha256": "a" * 64}],
+        ):
+            with self.assertRaisesRegex(w2b1.AgentContextError, "drifted"):
+                self._verify(identity)
+
+        with mock.patch("agent_context.trust_identity.platform.release", return_value="drifted"):
+            with self.assertRaisesRegex(w2b1.AgentContextError, "drifted"):
+                self._verify(identity)
+
+    def test_capability_lock_config_or_instruction_drift_fails(self) -> None:
+        identity = self._identity()
+        cases = (
+            self.root / self.capability,
+            self.root / ".devcontainer/devcontainer-lock.json",
+            self.home / "config.toml",
+            self.child / "AGENTS.md",
+        )
+        for path in cases:
+            with self.subTest(path=path):
+                original = path.read_bytes()
+                path.write_bytes(original + b"drift\n")
+                with self.assertRaises(w2b1.AgentContextError):
+                    self._verify(identity)
+                path.write_bytes(original)
+
+    def test_dirty_or_staged_root_fails(self) -> None:
+        identity = self._identity()
+        agents = self.root / "AGENTS.md"
+        agents.write_text("dirty root\n", encoding="utf-8")
+        with self.assertRaisesRegex(w2b1.AgentContextError, "dirty or staged"):
+            self._verify(identity)
+        subprocess.run(("git", "add", "AGENTS.md"), cwd=self.root, check=True)
+        with self.assertRaisesRegex(w2b1.AgentContextError, "dirty or staged"):
+            self._verify(identity)
+
+    def test_parent_tree_receipt_fails(self) -> None:
+        parent_identity = self._identity()
+        (self.root / "AGENTS.md").write_text("new reviewed tree\n", encoding="utf-8")
+        subprocess.run(("git", "add", "AGENTS.md"), cwd=self.root, check=True)
+        subprocess.run(
+            ("git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+             "commit", "-qm", "new tree"),
+            cwd=self.root, check=True,
+        )
+        with self.assertRaisesRegex(w2b1.AgentContextError, "drifted"):
+            self._verify(parent_identity)
+
+    def test_selected_child_identity_or_instruction_drift_fails(self) -> None:
+        identity = self._identity()
+        instruction = self.child / "AGENTS.md"
+        instruction.write_text("changed child instruction\n", encoding="utf-8")
+        with self.assertRaises(w2b1.AgentContextError):
+            self._verify(identity)
+        subprocess.run(("git", "add", "AGENTS.md"), cwd=self.child, check=True)
+        subprocess.run(
+            ("git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+             "commit", "-qm", "child identity"),
+            cwd=self.child, check=True,
+        )
+        with self.assertRaises(w2b1.AgentContextError):
+            self._verify(identity)
 
 
 if __name__ == "__main__":

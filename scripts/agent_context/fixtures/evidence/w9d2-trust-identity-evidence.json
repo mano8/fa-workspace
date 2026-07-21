@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "finding": "H-2",
+  "step": "10.6",
+  "status": "CURRENT_POST_REMEDIATION",
+  "identity_inputs": [
+    "root commit and tree with tracked-clean proof",
+    "selected child commit, tree, and AGENTS.md hash",
+    "critical tracked files and capability evidence",
+    "Codex and Python binary identities",
+    "project, user, and global Codex configuration identities",
+    "platform identity",
+    "external authorization trust-store identity when authorization is selected"
+  ],
+  "required_tests": [
+    "test_binary_global_config_or_platform_drift_fails",
+    "test_capability_lock_config_or_instruction_drift_fails",
+    "test_dirty_or_staged_root_fails",
+    "test_parent_tree_receipt_fails",
+    "test_selected_child_identity_or_instruction_drift_fails"
+  ],
+  "verification": "PYTHONPATH=scripts python -m unittest scripts.agent_context.tests.test_w9d2_trust_identity"
+}

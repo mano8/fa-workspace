@@ -30,13 +30,25 @@ class W9eSbomTests(unittest.TestCase):
         } for property in sbom["metadata"]["properties"] if property["name"].startswith("m8:source-sha256:")))
         for expected in (
             "application:@openai/codex@0.144.6",
+            "application:node@24.16.0",
+            "application:python@3.12.13",
             "application:headroom-ai[mcp,proxy,code]@0.32.1",
+            "container:ghcr.io/chopratejas/headroom@code-nonroot",
             "container:ghcr.io/devcontainers/features/node:2@2.0.0",
             "container:ghcr.io/devcontainers/features/python:1@1.8.0",
             "application:actions/checkout@v4.2.2",
             "application:actions/setup-python@v5.6.0",
         ):
             self.assertIn(expected, components)
+        by_reference = {component["bom-ref"]: component for component in sbom["components"]}
+        self.assertEqual(
+            by_reference["container:ghcr.io/chopratejas/headroom@code-nonroot"]["hashes"][0]["content"],
+            "71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41",
+        )
+        self.assertEqual(
+            by_reference["application:actions/checkout@v4.2.2"]["properties"][1]["value"],
+            "11bd71901bbe5b1630ceea73d27597364c9af683",
+        )
 
     def test_sbom_is_deterministic_and_schema_valid(self) -> None:
         first = canonical_bytes(ROOT)

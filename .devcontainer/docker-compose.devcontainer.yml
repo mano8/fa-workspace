@@ -27,7 +27,7 @@ services:
     command: sleep infinity
 
   headroom-proxy:
-    image: ghcr.io/chopratejas/headroom:code-nonroot
+    image: ghcr.io/chopratejas/headroom@sha256:71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41
     container_name: fa-headroom-proxy-server
     restart: unless-stopped
     # headroom proxy --host 0.0.0.0 --port 8787 --mode token --no-telemetry --no-subscription-tracking

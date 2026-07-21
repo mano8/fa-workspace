@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "finding": "L-1",
+  "step": "10.10",
+  "status": "CURRENT_POST_REMEDIATION",
+  "workflow": ".github/workflows/workspace-policy-lint.yml",
+  "requirements_lock": ".github/workflows/root-tooling.requirements.lock",
+  "headroom_requirements_lock": ".devcontainer/headroom.requirements.lock",
+  "headroom_proxy": "ghcr.io/chopratejas/headroom@sha256:71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41",
+  "validator": "scripts/agent_context/validate_supply_chain.py",
+  "required_tests": [
+    "test_actions_use_full_commit_sha_with_version_comment",
+    "test_python_inputs_are_hash_verified",
+    "test_unreviewed_dependency_refresh_fails"
+  ]
+}

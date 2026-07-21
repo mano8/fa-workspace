@@ -38,6 +38,10 @@ PROVENANCE_FIELDS = {
     "authorization_id", "issuer", "key_id", "signed_payload_sha256",
     "signature_sha256", "issued_at", "expires_at", "redemption_id",
 }
+REQUEST_FIELDS = {
+    "schema_version", "launch_id", "nonce", "repositories", "tasks",
+    "operations", "user_task_sha256",
+}
 MAX_VALIDITY_SECONDS = 15 * 60
 
 
@@ -138,6 +142,9 @@ class AuthorizationRequest:
             "user_task_sha256": self.user_task_sha256,
         }
 
+    def as_dict(self) -> dict[str, Any]:
+        return {"schema_version": 1, **self.payload_binding()}
+
 
 def create_request(
     *, repositories: Sequence[str], tasks: Sequence[str], operations: Sequence[str], user_task: str,
@@ -155,6 +162,30 @@ def create_request(
         tasks=_canonical_inputs(tasks, "tasks"),
         operations=_canonical_inputs(operations, "operations"),
         user_task_sha256=user_task_sha256(user_task),
+    )
+
+
+def request_from_capability(
+    capability: Mapping[str, Any], *, repositories: Sequence[str],
+    tasks: Sequence[str], operations: Sequence[str], user_task: str,
+) -> AuthorizationRequest:
+    """Reconstruct the exact prepared request carried by a signed capability.
+
+    This performs no authorization.  It extracts only the launch identifier and
+    nonce needed to bind the actual invocation before ``verify_and_redeem``
+    authenticates and atomically consumes the complete payload.
+    """
+    supplied = _closed(dict(capability), CAPABILITY_FIELDS, "authorization capability")
+    if supplied["schema_version"] != 1 or not isinstance(supplied["payload_jcs"], str):
+        _fail("authorization capability version or payload is invalid")
+    try:
+        payload = w2b1.parse_strict_json(supplied["payload_jcs"].encode("utf-8"))
+    except w2b1.AgentContextError as error:
+        _fail(f"authorization payload is invalid: {error}")
+    payload = _closed(payload, PAYLOAD_FIELDS, "authorization payload")
+    return create_request(
+        repositories=repositories, tasks=tasks, operations=operations,
+        user_task=user_task, launch_id=payload["launch_id"], nonce=payload["nonce"],
     )
 
 
@@ -201,6 +232,16 @@ def _external_path(external_root: Path, path: Path, *, directory: bool) -> Path:
         relative = target.relative_to(root)
     except (OSError, ValueError) as error:
         _fail(f"external authorization path is unavailable or escapes its root: {error}")
+    try:
+        root_info = root.lstat()
+    except OSError as error:
+        _fail(f"external authorization root cannot be inspected: {error}")
+    if stat.S_ISLNK(root_info.st_mode) or not stat.S_ISDIR(root_info.st_mode):
+        _fail("external authorization root must be a real directory")
+    if os.name == "posix" and (
+        root_info.st_uid != os.getuid() or stat.S_IMODE(root_info.st_mode) & 0o077
+    ):
+        _fail("external authorization root must be owner-only")
     current = root
     for part in relative.parts:
         current = current / part

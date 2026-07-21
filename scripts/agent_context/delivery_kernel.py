@@ -134,6 +134,9 @@ class DeliveryRequest:
     # The client-neutral test seam uses zero; production adapters provide a
     # nonzero reviewed-tree/environment identity on every launch.
     trust_identity_sha256: str = ZERO_SHA256
+    # A signed authorization capability binds this launcher-generated value.
+    # Synthetic and unauthenticated read-only fixtures may leave it unset.
+    launch_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -404,6 +407,8 @@ class DeliveryKernel:
             raise
         if not request.trusted:
             _fail("E_TRUST", "trusted reviewed workspace identity cannot be proved")
+        if request.launch_id is not None:
+            w2b1._identifier(request.launch_id, "launch_id")
         validate_resolved(
             workspace=request.workspace_root.resolve(), manifest=request.resolved.manifest,
             envelope=request.resolved.envelope, envelope_bytes=request.resolved.envelope_bytes,
@@ -425,7 +430,7 @@ class DeliveryKernel:
         manifest = request.resolved.manifest
         return {
             "schema_version": 2,
-            "launch_id": f"launch-{secrets.token_hex(16)}",
+            "launch_id": request.launch_id or f"launch-{secrets.token_hex(16)}",
             "client_session_id": request.client_session_id,
             "generation": request.resolved.envelope["generation"],
             "state": "RESOLVED",

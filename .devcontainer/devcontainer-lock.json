@@ -9,7 +9,25 @@
       "package": "headroom-ai[mcp,proxy,code]",
       "version": "0.32.1",
       "requirements_lock": ".devcontainer/headroom.requirements.lock",
+      "requirements_sha256": "8fd7b5f1485134c51c7f3aa6166da0abb279400031263eb0ca4066091004e341",
       "record_sha256": "f924558152b73d544efb800d9884db709e4856d4a989b47023864c9a2325aa02"
+    },
+    "headroom_proxy": {
+      "package": "ghcr.io/chopratejas/headroom",
+      "version": "code-nonroot",
+      "type": "container",
+      "resolved": "ghcr.io/chopratejas/headroom@sha256:71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41",
+      "binary_sha256": "71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41"
+    },
+    "node_runtime": {
+      "package": "node",
+      "version": "24.16.0",
+      "binary_sha256": "b2959781cc5a74c357ffa02367efa8a0330cbb1c9cb347732fdfaaaca381cbcd"
+    },
+    "python_runtime": {
+      "package": "python",
+      "version": "3.12.13",
+      "binary_sha256": "f198e482df5d819f064c040a5ffc9e83e702ba41e4fbdd632918bd1123eeb905"
     }
   },
   "base_image": {

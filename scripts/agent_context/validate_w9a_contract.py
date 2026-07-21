@@ -104,7 +104,7 @@ EXPECTED_SOURCES = {
     "w2a-contract": (
         "tracked-normative-input",
         ".workspace/contracts/agent-context-w2a.contract.md",
-        "9bd47076c6a27aca3110f4c8885235368c1bac06c98aa04edf7dbb5d9d3eb6f7",
+        "acdfa4503da251548893e2fd824e21406c2663a24438de0a84be8aa37cb5b7fd",
         True,
     ),
 }
@@ -144,7 +144,7 @@ EXPECTED_FINDINGS = {
 }
 EXPECTED_FINDING_ORDER = tuple(EXPECTED_FINDINGS)
 EXPECTED_CONTRACT_MARKERS = (
-    "`DISABLED_PENDING_REMEDIATION`",
+    "`IMPLEMENTED_PENDING_W9F_FINAL_REVIEW`",
     "Ed25519",
     "SUBMISSION_STARTED",
     "EXECUTION_AMBIGUOUS",

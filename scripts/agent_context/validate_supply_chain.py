@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -15,6 +17,10 @@ REQUIREMENT_RE = re.compile(
     r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\s\\]+)\s*\\?\s*$"
 )
 HASH_RE = re.compile(r"^\s+--hash=sha256:(?P<hash>[0-9a-f]{64})\s*$")
+HEADROOM_REQUIREMENT_RE = re.compile(
+    r"^(?P<name>[A-Za-z0-9_.-]+(?:\[[^]]+\])?)==(?P<version>\S+)"
+    r"\s+--hash=sha256:(?P<hash>[0-9a-f]{64})$"
+)
 
 
 def _fail(message: str) -> None:
@@ -62,6 +68,34 @@ def validate_supply_chain(workspace: Path) -> None:
             _fail(f"{name} is not pinned with at least one SHA-256 hash")
     if "--require-hashes" not in "\n".join(workflow_lines):
         _fail("workflow does not require pip hash verification")
+
+    headroom_lock = workspace / ".devcontainer/headroom.requirements.lock"
+    bootstrap_lock = workspace / ".devcontainer/devcontainer-lock.json"
+    setup = (workspace / ".devcontainer/setup.sh").read_text(encoding="utf-8")
+    compose = (workspace / ".devcontainer/docker-compose.devcontainer.yml").read_text(encoding="utf-8")
+    bootstrap = json.loads(bootstrap_lock.read_text(encoding="utf-8"))["bootstrap"]
+    headroom_lines = [
+        line for line in headroom_lock.read_text(encoding="utf-8").splitlines()
+        if line and not line.startswith("#")
+    ]
+    parsed = [HEADROOM_REQUIREMENT_RE.fullmatch(line) for line in headroom_lines]
+    if len(parsed) < 2 or any(match is None for match in parsed):
+        _fail("Headroom transitive lock is absent or contains an unhashed requirement")
+    names = [match["name"].split("[", 1)[0].lower().replace("_", "-") for match in parsed if match]
+    if len(names) != len(set(names)) or "headroom-ai" not in names:
+        _fail("Headroom transitive lock has duplicate packages or lacks Headroom")
+    lock_sha256 = hashlib.sha256(headroom_lock.read_bytes()).hexdigest()
+    if bootstrap["headroom"].get("requirements_sha256") != lock_sha256:
+        _fail("Headroom lock digest does not match devcontainer-lock.json")
+    if not all(token in setup for token in ("--only-binary=:all:", "--require-hashes", "--no-deps")):
+        _fail("Headroom setup does not enforce the complete hashed wheel lock")
+    proxy = bootstrap["headroom_proxy"]
+    if proxy.get("resolved") not in compose or proxy.get("binary_sha256") not in proxy.get("resolved", ""):
+        _fail("Headroom proxy image is not pinned to the reviewed digest")
+    for item in (bootstrap["codex"], bootstrap["headroom"]):
+        for value in (item["version"], item.get("binary_sha256") or item.get("record_sha256")):
+            if value not in setup:
+                _fail(f"bootstrap setup does not enforce {item['package']} identity")
 
 
 def main() -> int:

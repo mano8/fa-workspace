@@ -41,14 +41,23 @@ CRITICAL_PATHS = (
     "scripts/agent_context/delivery_kernel.py",
     "scripts/agent_context/resolve_context.py",
     "scripts/agent_context/shared_validation.py",
+    "scripts/agent_context/trust_identity.py",
+    "scripts/agent_context/w2b1.py",
     "scripts/agent_context/validate_workspace.py",
+    "scripts/agent_context/review_bundle.py",
+    "scripts/agent_context/validate_supply_chain.py",
+    "scripts/agent_context/generate_root_sbom.py",
     "scripts/codex-repo.sh",
     "scripts/codex-repo.ps1",
     ".devcontainer/devcontainer.json",
     ".devcontainer/devcontainer-lock.json",
     ".devcontainer/docker-compose.devcontainer.yml",
+    ".devcontainer/headroom.requirements.lock",
     ".devcontainer/setup.sh",
     ".devcontainer/configure-mcp.sh",
+    ".github/workflows/workspace-policy-lint.yml",
+    ".github/workflows/root-tooling.requirements.lock",
+    "sbom/root-tooling.cdx.json",
 )
 
 

@@ -223,6 +223,25 @@ class W6CodexAdapterTests(unittest.TestCase):
         self.assertEqual(missing.exception.code, "E_AUTHORIZATION")
         self.assertEqual(self.exec_calls, 0)
 
+    def test_canonical_adapter_rejects_unverified_legacy_authorization(self) -> None:
+        legacy = {
+            "authorization_id": "human.cross", "kind": "explicit-user-message",
+            "authorized_by": "fixture user", "source_ref": "conversation:fixture",
+            "source_sha256": "a" * 64, "repositories": ["repo-a", "repo-b"],
+            "operations": ["analyze"], "issued_at": "2026-07-20T00:00:00Z",
+        }
+        adapter = CodexDeliveryAdapter(
+            runner=self._runner, codex_command="fixture-codex", strict_trust_identity=True,
+        )
+        with self.assertRaisesRegex(w2b1.AgentContextError, "externally verified") as failure:
+            adapter.resolve_repositories(
+                workspace_root=self.root, repository_ids=("repo-a", "repo-b"),
+                tasks=("cross-repository",), operations=("analyze",),
+                authorizations=(legacy,),
+            )
+        self.assertEqual(failure.exception.code, "E_AUTHORIZATION")
+        self.assertEqual(self.exec_calls, 0)
+
     def test_adversarial_identifiers_and_direct_child_escapes_fail_before_exec(self) -> None:
         with self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}):
             with self.assertRaisesRegex(w2b1.AgentContextError, "canonical identifier") as traversal:

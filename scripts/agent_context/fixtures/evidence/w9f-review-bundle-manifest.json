@@ -1,0 +1,24 @@
+{
+  "artifact": ".workspace/status/fa-workspace/agent-configuration-token-efficiency-w9f-review-bundle-2026-07-21.json",
+  "checks": [
+    "authorization-negatives",
+    "budget-reproduction",
+    "child-standalone-static",
+    "documentation-consistency",
+    "invariant-validator",
+    "lifecycle-cleanup",
+    "multi-repository-parity",
+    "root-suite",
+    "ruff",
+    "sbom-freshness",
+    "submission-crash-matrix",
+    "supply-chain",
+    "supply-chain-negatives",
+    "trust-drift",
+    "w9a-validator",
+    "w9f-focused",
+    "workspace-validator"
+  ],
+  "schema_version": 2,
+  "verification": "python scripts/agent_context/review_bundle.py --workspace . --output <artifact> --verify"
+}

@@ -27,6 +27,10 @@
         {
           "name": "m8:source",
           "value": ".github/workflows/workspace-policy-lint.yml"
+        },
+        {
+          "name": "m8:resolved",
+          "value": "11bd71901bbe5b1630ceea73d27597364c9af683"
         }
       ],
       "type": "application",
@@ -39,6 +43,10 @@
         {
           "name": "m8:source",
           "value": ".github/workflows/workspace-policy-lint.yml"
+        },
+        {
+          "name": "m8:resolved",
+          "value": "42375524e23c412d93fb67b49958b491fce71c38"
         }
       ],
       "type": "application",
@@ -63,6 +71,42 @@
       "version": "0.32.1"
     },
     {
+      "bom-ref": "application:node@24.16.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b2959781cc5a74c357ffa02367efa8a0330cbb1c9cb347732fdfaaaca381cbcd"
+        }
+      ],
+      "name": "node",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "application",
+      "version": "24.16.0"
+    },
+    {
+      "bom-ref": "application:python@3.12.13",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f198e482df5d819f064c040a5ffc9e83e702ba41e4fbdd632918bd1123eeb905"
+        }
+      ],
+      "name": "python",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "application",
+      "version": "3.12.13"
+    },
+    {
       "bom-ref": "container:ghcr.io/anthropics/devcontainer-features/claude-code:1.0@1.0.5",
       "hashes": [
         {
@@ -79,6 +123,28 @@
       ],
       "type": "container",
       "version": "1.0.5"
+    },
+    {
+      "bom-ref": "container:ghcr.io/chopratejas/headroom@code-nonroot",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41"
+        }
+      ],
+      "name": "ghcr.io/chopratejas/headroom",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        },
+        {
+          "name": "m8:resolved",
+          "value": "ghcr.io/chopratejas/headroom@sha256:71f3a36be1ca232c96714fbff679fb3b5c7e6970a81b52acb3f0a45328bd2c41"
+        }
+      ],
+      "type": "container",
+      "version": "code-nonroot"
     },
     {
       "bom-ref": "container:ghcr.io/devcontainers/features/docker-outside-of-docker:1@1.10.0",
@@ -153,31 +219,409 @@
       "version": "mcr.microsoft.com/devcontainers/base@sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c"
     },
     {
+      "bom-ref": "library:aiohappyeyeballs@2.7.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9243213661e29250eb41368e5daa826fc017156c3b8a11440826b2e3ed376472"
+        }
+      ],
+      "name": "aiohappyeyeballs",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.7.1"
+    },
+    {
+      "bom-ref": "library:aiohttp@3.14.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d15f618255fcbe5f54689403aa4c2a90b6f2e6ebc96b295b1cb0e868c1c12384"
+        }
+      ],
+      "name": "aiohttp",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.14.2"
+    },
+    {
+      "bom-ref": "library:aiosignal@1.4.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "053243f8b92b990551949e63930a839ff0cf0b0ebbe0597b0f3fb19e1a0fe82e"
+        }
+      ],
+      "name": "aiosignal",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.4.0"
+    },
+    {
+      "bom-ref": "library:annotated-doc@0.0.4",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "571ac1dc6991c450b25a9c2d84a3705e2ae7a53467b5d111c24fa8baabbed320"
+        }
+      ],
+      "name": "annotated-doc",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.0.4"
+    },
+    {
+      "bom-ref": "library:annotated-types@0.7.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"
+        }
+      ],
+      "name": "annotated-types",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.7.0"
+    },
+    {
+      "bom-ref": "library:anyio@4.14.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9f505dda5ac9f0c8309b5e8bd445a8c2bf7246f3ce950121e45ea15bc41d1494"
+        }
+      ],
+      "name": "anyio",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "4.14.2"
+    },
+    {
+      "bom-ref": "library:ast-grep-cli@0.44.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "ad11a5eb8d7bd557754b21a360a3be1bc1b19e7f4bed95b444ffc25b9451844f"
+        }
+      ],
+      "name": "ast-grep-cli",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.44.1"
+    },
+    {
+      "bom-ref": "library:attrs@26.1.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309"
+        }
+      ],
+      "name": "attrs",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "26.1.0"
+    },
+    {
+      "bom-ref": "library:certifi@2026.6.17",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2227dcbaafe0d2f59279d1762ddddc37783ed4354594f194ffc31d20f41fc3db"
+        }
+      ],
+      "name": "certifi",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2026.6.17"
+    },
+    {
       "bom-ref": "library:cffi@2.1.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1e9f50d192a3e525b15a75ab5114e442d83d657b7ec29182a991bc9a88fd3a66"
+        }
+      ],
       "name": "cffi",
       "properties": [
         {
           "name": "m8:source",
-          "value": ".github/workflows/root-tooling.requirements.lock"
+          "value": ".devcontainer/headroom.requirements.lock"
         }
       ],
       "type": "library",
       "version": "2.1.0"
     },
     {
+      "bom-ref": "library:charset-normalizer@3.4.9",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5e226f6218febc71f6c1fc2fafb91c226f75bdc1d8fb12d66823716e891608fd"
+        }
+      ],
+      "name": "charset-normalizer",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.4.9"
+    },
+    {
+      "bom-ref": "library:click@8.4.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e6f9f66136c816745b9d65817da91d61d957fb16e02e4dcd0552553c5a197b76"
+        }
+      ],
+      "name": "click",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "8.4.2"
+    },
+    {
       "bom-ref": "library:cryptography@49.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "cbc77da8c523d5abd028635ba850a6966fcee2c82e2bf65a41d1d8afe0f98be9"
+        }
+      ],
       "name": "cryptography",
       "properties": [
         {
           "name": "m8:source",
-          "value": ".github/workflows/root-tooling.requirements.lock"
+          "value": ".devcontainer/headroom.requirements.lock"
         }
       ],
       "type": "library",
       "version": "49.0.0"
     },
     {
+      "bom-ref": "library:distro@1.9.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2"
+        }
+      ],
+      "name": "distro",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.9.0"
+    },
+    {
+      "bom-ref": "library:fastapi@0.139.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b9ad015a835173d59865e2f5d8296fbc2b317bf56a2ba1a5bfbdd03de2fd4b1c"
+        }
+      ],
+      "name": "fastapi",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.139.2"
+    },
+    {
+      "bom-ref": "library:fastuuid@0.14.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "808527f2407f58a76c916d6aa15d58692a4a019fdf8d4c32ac7ff303b7d7af09"
+        }
+      ],
+      "name": "fastuuid",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.14.0"
+    },
+    {
+      "bom-ref": "library:filelock@3.32.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d396bea984af47333ef05e50eae7eff88c84256de6112aea0ec48a233c064fe3"
+        }
+      ],
+      "name": "filelock",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.32.0"
+    },
+    {
+      "bom-ref": "library:flatbuffers@25.12.19",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4"
+        }
+      ],
+      "name": "flatbuffers",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "25.12.19"
+    },
+    {
+      "bom-ref": "library:frozenlist@1.8.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "494a5952b1c597ba44e0e78113a7266e656b9794eec897b19ead706bd7074383"
+        }
+      ],
+      "name": "frozenlist",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.8.0"
+    },
+    {
+      "bom-ref": "library:fsspec@2026.6.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "02e0b71817df9b2169dc30a16832045764def1191b43dcff5bb85bdee212d2a1"
+        }
+      ],
+      "name": "fsspec",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2026.6.0"
+    },
+    {
+      "bom-ref": "library:h11@0.16.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86"
+        }
+      ],
+      "name": "h11",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.16.0"
+    },
+    {
+      "bom-ref": "library:h2@4.3.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c438f029a25f7945c69e0ccf0fb951dc3f73a5f6412981daee861431b70e2bdd"
+        }
+      ],
+      "name": "h2",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "4.3.0"
+    },
+    {
       "bom-ref": "library:headroom-ai[mcp,proxy,code]@0.32.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "00190bb57ae063199bd1460ec8cf50845d9293a8724c21fcef4dfb5cca27df2e"
+        }
+      ],
       "name": "headroom-ai[mcp,proxy,code]",
       "properties": [
         {
@@ -189,35 +633,1235 @@
       "version": "0.32.1"
     },
     {
+      "bom-ref": "library:hf-xet@1.5.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "db78c39c83d6279daddc98e2238f373ab8980685556d42472b4ec51abcf03e8c"
+        }
+      ],
+      "name": "hf-xet",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.5.2"
+    },
+    {
+      "bom-ref": "library:hpack@4.2.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "858ac0b02280fa582b5080d68db0899c62a80375e0e5413a74970c5e518b6986"
+        }
+      ],
+      "name": "hpack",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "4.2.0"
+    },
+    {
+      "bom-ref": "library:httpcore@1.0.9",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55"
+        }
+      ],
+      "name": "httpcore",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.0.9"
+    },
+    {
+      "bom-ref": "library:httpx-sse@0.4.3",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0ac1c9fe3c0afad2e0ebb25a934a59f4c7823b60792691f779fad2c5568830fc"
+        }
+      ],
+      "name": "httpx-sse",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.4.3"
+    },
+    {
+      "bom-ref": "library:httpx@0.28.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"
+        }
+      ],
+      "name": "httpx",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.28.1"
+    },
+    {
+      "bom-ref": "library:huggingface-hub@1.24.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6ed4120a84a6beec900640aa7e346bd766a6b7341e41526fef5dc8bd81fb7d59"
+        }
+      ],
+      "name": "huggingface-hub",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.24.0"
+    },
+    {
+      "bom-ref": "library:hyperframe@6.1.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b03380493a519fce58ea5af42e4a42317bf9bd425596f7a0835ffce80f1a42e5"
+        }
+      ],
+      "name": "hyperframe",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "6.1.0"
+    },
+    {
+      "bom-ref": "library:idna@3.18",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7f952cbe720b688055e3f87de14f5c3e5fdaa8bc3928985c4077ca689de849a2"
+        }
+      ],
+      "name": "idna",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.18"
+    },
+    {
+      "bom-ref": "library:importlib-metadata@8.9.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e0f761b6ea91ced3b0844c14c9d955224d538105921f8e6754c00f6ca79fba7f"
+        }
+      ],
+      "name": "importlib-metadata",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "8.9.0"
+    },
+    {
+      "bom-ref": "library:jinja2@3.1.6",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"
+        }
+      ],
+      "name": "jinja2",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.1.6"
+    },
+    {
+      "bom-ref": "library:jiter@0.16.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "46add52f4ad47a08bfb1219f3e673da972191489a33016edefdb5ea55bfa8c48"
+        }
+      ],
+      "name": "jiter",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.16.0"
+    },
+    {
+      "bom-ref": "library:jsonschema-specifications@2025.9.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe"
+        }
+      ],
+      "name": "jsonschema-specifications",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2025.9.1"
+    },
+    {
+      "bom-ref": "library:jsonschema@4.26.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce"
+        }
+      ],
+      "name": "jsonschema",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "4.26.0"
+    },
+    {
+      "bom-ref": "library:litellm@1.93.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0784172435de48f66ef7ad89d421604db1ad0db1321ef7f39dbcfe6b20111417"
+        }
+      ],
+      "name": "litellm",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.93.0"
+    },
+    {
+      "bom-ref": "library:magika@1.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3e9b49134e8116ee40b431664dcbed9e199413efddcce1a173c734b4e0521529"
+        }
+      ],
+      "name": "magika",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.0.3"
+    },
+    {
+      "bom-ref": "library:markdown-it-py@4.2.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a"
+        }
+      ],
+      "name": "markdown-it-py",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "4.2.0"
+    },
+    {
+      "bom-ref": "library:markupsafe@3.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d6dd0be5b5b189d31db7cda48b91d7e0a9795f31430b7f271219ab30f1d3ac9d"
+        }
+      ],
+      "name": "markupsafe",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.0.3"
+    },
+    {
+      "bom-ref": "library:mcp@1.28.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2726bca5e7193f61c5dde8b12500a6de2d9acf6d1a1c0be9e8c2e706437991df"
+        }
+      ],
+      "name": "mcp",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.28.1"
+    },
+    {
+      "bom-ref": "library:mdurl@0.1.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"
+        }
+      ],
+      "name": "mdurl",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.1.2"
+    },
+    {
+      "bom-ref": "library:multidict@6.7.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "bfde23ef6ed9db7eaee6c37dcec08524cb43903c60b285b172b6c094711b3961"
+        }
+      ],
+      "name": "multidict",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "6.7.1"
+    },
+    {
+      "bom-ref": "library:numpy@2.5.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "59fda5e192b570217ec2580c96f00e9a7e12ef6866a900eb089b62c1a32545ca"
+        }
+      ],
+      "name": "numpy",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.5.1"
+    },
+    {
+      "bom-ref": "library:onnxruntime@1.27.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7c65a7438632d55dfbc8a02ee60bd6cf7dd9d1ba05a43d4b851452f32338e194"
+        }
+      ],
+      "name": "onnxruntime",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.27.0"
+    },
+    {
+      "bom-ref": "library:openai@2.46.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "672381db55efb3a1e2610f29304c130cccdd0b319bace4d492b2443cb64c1e7c"
+        }
+      ],
+      "name": "openai",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.46.0"
+    },
+    {
+      "bom-ref": "library:opentelemetry-api@1.44.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "94b98c893a91b88657eaac1e3ba89618cdb85be6918196705354f34728b2cdef"
+        }
+      ],
+      "name": "opentelemetry-api",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.44.0"
+    },
+    {
+      "bom-ref": "library:orjson@3.11.9",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "be4fa4f0af7fa18951f7ab3fc2148e223af211bf03f59e1c6034ec3f97f21d61"
+        }
+      ],
+      "name": "orjson",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.11.9"
+    },
+    {
+      "bom-ref": "library:packaging@26.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e"
+        }
+      ],
+      "name": "packaging",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "26.2"
+    },
+    {
+      "bom-ref": "library:propcache@0.5.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6f328175a2cde1f0ff2c4ed8ce968b9dcfb55f3a7153f39e2957ed994da13476"
+        }
+      ],
+      "name": "propcache",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.5.2"
+    },
+    {
+      "bom-ref": "library:protobuf@7.35.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "74758715c53d7158fb76caf4f0cfdacc5329a4b1bb994f865d6cf302d413a1c4"
+        }
+      ],
+      "name": "protobuf",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "7.35.1"
+    },
+    {
       "bom-ref": "library:pycparser@3.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"
+        }
+      ],
       "name": "pycparser",
       "properties": [
         {
           "name": "m8:source",
-          "value": ".github/workflows/root-tooling.requirements.lock"
+          "value": ".devcontainer/headroom.requirements.lock"
         }
       ],
       "type": "library",
       "version": "3.0"
     },
     {
-      "bom-ref": "library:ruff@0.15.22",
-      "name": "ruff",
+      "bom-ref": "library:pydantic-core@2.46.4",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "926c9541b14b12b1681dca8a0b75feb510b06c6341b70a8e500c2fdcff837cce"
+        }
+      ],
+      "name": "pydantic-core",
       "properties": [
         {
           "name": "m8:source",
-          "value": ".github/workflows/root-tooling.requirements.lock"
+          "value": ".devcontainer/headroom.requirements.lock"
         }
       ],
       "type": "library",
-      "version": "0.15.22"
+      "version": "2.46.4"
+    },
+    {
+      "bom-ref": "library:pydantic-settings@2.14.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a20c97b37910b6550d5ea50fbcc2d4187defe58cd57070b73863d069419c9440"
+        }
+      ],
+      "name": "pydantic-settings",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.14.2"
+    },
+    {
+      "bom-ref": "library:pydantic@2.13.4",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "45a282cde31d808236fd7ea9d919b128653c8b38b393d1c4ab335c62924d9aba"
+        }
+      ],
+      "name": "pydantic",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.13.4"
+    },
+    {
+      "bom-ref": "library:pygments@2.20.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176"
+        }
+      ],
+      "name": "pygments",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.20.0"
+    },
+    {
+      "bom-ref": "library:pyjwt@2.13.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728"
+        }
+      ],
+      "name": "pyjwt",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.13.0"
+    },
+    {
+      "bom-ref": "library:python-dotenv@1.2.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a"
+        }
+      ],
+      "name": "python-dotenv",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.2.2"
+    },
+    {
+      "bom-ref": "library:python-multipart@0.0.32",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "ff6d3f776f16878c894e52e107296ffc890e913c611b1a4ec6c44e2821fe2e23"
+        }
+      ],
+      "name": "python-multipart",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.0.32"
+    },
+    {
+      "bom-ref": "library:pyyaml@6.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc"
+        }
+      ],
+      "name": "pyyaml",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "6.0.3"
+    },
+    {
+      "bom-ref": "library:referencing@0.37.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231"
+        }
+      ],
+      "name": "referencing",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.37.0"
+    },
+    {
+      "bom-ref": "library:regex@2026.7.19",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9dce8ec9695f531a1b8a6f314fd4b393adcccf2ea861db480cdf97a301d01a68"
+        }
+      ],
+      "name": "regex",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2026.7.19"
+    },
+    {
+      "bom-ref": "library:requests@2.34.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0"
+        }
+      ],
+      "name": "requests",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.34.2"
+    },
+    {
+      "bom-ref": "library:rich@15.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb"
+        }
+      ],
+      "name": "rich",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "15.0.0"
+    },
+    {
+      "bom-ref": "library:rpds-py@2026.6.3",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "ecabd69db66de867690f9797f2f8fa27ba501bbc24540cbdbdc649cd15888ba6"
+        }
+      ],
+      "name": "rpds-py",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2026.6.3"
+    },
+    {
+      "bom-ref": "library:safetensors@0.8.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fd6f3f93c9a0a7cc2788ee63fb763353d4bd2e89b0751bc78fcf7dda00bea774"
+        }
+      ],
+      "name": "safetensors",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.8.0"
+    },
+    {
+      "bom-ref": "library:shellingham@1.5.4",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"
+        }
+      ],
+      "name": "shellingham",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.5.4"
+    },
+    {
+      "bom-ref": "library:sniffio@1.3.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"
+        }
+      ],
+      "name": "sniffio",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.3.1"
+    },
+    {
+      "bom-ref": "library:sqlite-vec@0.1.9",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1515727990b49e79bcaf75fdee2ffc7d461f8b66905013231251f1c8938e7786"
+        }
+      ],
+      "name": "sqlite-vec",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.1.9"
+    },
+    {
+      "bom-ref": "library:sse-starlette@3.4.6",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "56217ab4c9a9f9c5db7b21e08732d3e7c2b807f45231ad23de0551a24c4a41f6"
+        }
+      ],
+      "name": "sse-starlette",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "3.4.6"
+    },
+    {
+      "bom-ref": "library:starlette@1.3.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c7372aae11c3c3f26a42df7bd626cec2f47d03483d261d369516a615a53714c6"
+        }
+      ],
+      "name": "starlette",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.3.1"
+    },
+    {
+      "bom-ref": "library:tiktoken@0.13.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a116178fa7e1b4065bff05214360373a65cac22f965be7b3f73d00a0dbfe7649"
+        }
+      ],
+      "name": "tiktoken",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.13.0"
+    },
+    {
+      "bom-ref": "library:tokenizers@0.22.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "369cc9fc8cc10cb24143873a0d95438bb8ee257bb80c71989e3ee290e8d72c67"
+        }
+      ],
+      "name": "tokenizers",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.22.2"
+    },
+    {
+      "bom-ref": "library:tomlkit@0.15.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "177a05aece5a8ca5266fd3c448abb47b8d352f09d477d3ca8332db4d89b24304"
+        }
+      ],
+      "name": "tomlkit",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.15.1"
+    },
+    {
+      "bom-ref": "library:tqdm@4.69.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9979978912be667a6ef21fd5d8abf54e324e63d82f7f43c360792ebc2bc4e622"
+        }
+      ],
+      "name": "tqdm",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "4.69.0"
+    },
+    {
+      "bom-ref": "library:transformers@5.14.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9db974c4079ede2d1a3ea7ca5a240df33f2cc26fc2b36ba64c5f2a4f43b6e725"
+        }
+      ],
+      "name": "transformers",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "5.14.1"
+    },
+    {
+      "bom-ref": "library:tree-sitter-c-sharp@0.23.5",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "aa88a780204cd153c4c1ae2d59c654cee1402212fa0d069823d6d34301587438"
+        }
+      ],
+      "name": "tree-sitter-c-sharp",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.23.5"
+    },
+    {
+      "bom-ref": "library:tree-sitter-embedded-template@0.25.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a7c88c3dd8b94b3c9efe8ae071ff6b1b936a27ac5f6e651845c3b9631fa4c1c2"
+        }
+      ],
+      "name": "tree-sitter-embedded-template",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.25.0"
+    },
+    {
+      "bom-ref": "library:tree-sitter-language-pack@0.13.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0d4f261fce387ae040dae7e4d1c1aca63d84c88320afcc0961c123bec0be8377"
+        }
+      ],
+      "name": "tree-sitter-language-pack",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.13.0"
+    },
+    {
+      "bom-ref": "library:tree-sitter-yaml@0.7.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f1a5c60c98b6c4c037aae023569f020d0c489fad8dc26fdfd5510363c9c29a41"
+        }
+      ],
+      "name": "tree-sitter-yaml",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.7.2"
+    },
+    {
+      "bom-ref": "library:tree-sitter@0.26.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5a6b333b0282d8bb0af741f9b018bd2523d4eecb2686bf6717066a625fecfaa4"
+        }
+      ],
+      "name": "tree-sitter",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.26.0"
+    },
+    {
+      "bom-ref": "library:typer@0.27.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6f4b27631e47f077871b7dc30e933ec0131c1390fbe0e387ea5574b5bac9ccf1"
+        }
+      ],
+      "name": "typer",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.27.0"
+    },
+    {
+      "bom-ref": "library:typing-extensions@4.16.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+        }
+      ],
+      "name": "typing-extensions",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "4.16.0"
+    },
+    {
+      "bom-ref": "library:typing-inspection@0.4.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7"
+        }
+      ],
+      "name": "typing-inspection",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.4.2"
+    },
+    {
+      "bom-ref": "library:urllib3@2.7.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897"
+        }
+      ],
+      "name": "urllib3",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "2.7.0"
+    },
+    {
+      "bom-ref": "library:uvicorn@0.51.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5d38af6cd620f2ae3849fb44fd4879e0890aa1febe8d47eb355fb45d93fe6a5b"
+        }
+      ],
+      "name": "uvicorn",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.51.0"
+    },
+    {
+      "bom-ref": "library:watchdog@6.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "20ffe5b202af80ab4266dcd3e91aae72bf2da48c0d33bdb15c66658e685e94e2"
+        }
+      ],
+      "name": "watchdog",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "6.0.0"
+    },
+    {
+      "bom-ref": "library:websockets@16.1.1",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0f62863e8a00a6d33c3d6566ec0b89f23787b747ffe0c3bc71ec0e76b82c94b1"
+        }
+      ],
+      "name": "websockets",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "16.1.1"
+    },
+    {
+      "bom-ref": "library:yarl@1.24.5",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f08c7513ecef5aad65687bfdf6bc601ae9fccd04a42904501f8f7141abad9eb9"
+        }
+      ],
+      "name": "yarl",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "1.24.5"
+    },
+    {
+      "bom-ref": "library:zipp@4.1.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "25ad4e16390cd314347dd8f1de67a2ac538ae658ed4ab9db16029c07c188e97f"
+        }
+      ],
+      "name": "zipp",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "4.1.0"
+    },
+    {
+      "bom-ref": "library:zstandard@0.25.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5a56ba0db2d244117ed744dfa8f6f5b366e14148e00de44723413b2f3938a902"
+        }
+      ],
+      "name": "zstandard",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/headroom.requirements.lock"
+        }
+      ],
+      "type": "library",
+      "version": "0.25.0"
     }
   ],
   "metadata": {
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "15fa0108b504684f48c43fe9d8fc940a85a4c8084845c76bc5a17df57778bb37"
+      "version": "04b3d1020873def964af151b6bded87958e3060105b1b34d99e3d35762f6185a"
     },
     "properties": [
       {
@@ -226,19 +1870,23 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer-lock.json",
-        "value": "3bf74f7e0cbea31a1fe936f4aefb7d0abb0cc5ff379210e4cbaec2fb1fc005ed"
+        "value": "95bfa7d7001a14ad7d2e8a4089da2bfcd54225477ef6bb92fecba1008f1f85a2"
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer.json",
         "value": "22d3f3e9b9c9652504a516c372c11907908bd26c70bf855f009f26f605f891ee"
       },
       {
+        "name": "m8:source-sha256:.devcontainer/docker-compose.devcontainer.yml",
+        "value": "b8c63565d2340a09e8182bec1ef2c9ce7a40664f1f0449af91f63fc408cc6d8a"
+      },
+      {
         "name": "m8:source-sha256:.devcontainer/headroom.requirements.lock",
-        "value": "bf968e68d59a5316af6ff0f07114f62c889dac4fbe4bb99776bf3c1e77471559"
+        "value": "8fd7b5f1485134c51c7f3aa6166da0abb279400031263eb0ca4066091004e341"
       },
       {
         "name": "m8:source-sha256:.devcontainer/setup.sh",
-        "value": "dc4f43d2d8f48f4a435640cd8eeb1547cae870bf191a50b1388dd8dbde6e48f3"
+        "value": "6505d75098be6a1d00fc0f5c1deb5b3df0d61397fa4661329a283c48d011ec39"
       },
       {
         "name": "m8:source-sha256:.github/workflows/root-tooling.requirements.lock",
@@ -250,7 +1898,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:01ea52db-5d95-560c-ac60-42c501fe3662",
+  "serialNumber": "urn:uuid:096456d1-4f61-5a1e-8145-69311f42bee0",
   "specVersion": "1.6",
   "version": 1
 }

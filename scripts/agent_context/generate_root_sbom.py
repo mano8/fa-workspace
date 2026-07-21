@@ -16,13 +16,17 @@ SBOM_PATH = Path("sbom/root-tooling.cdx.json")
 SOURCE_PATHS = (
     Path(".devcontainer/devcontainer-lock.json"),
     Path(".devcontainer/devcontainer.json"),
+    Path(".devcontainer/docker-compose.devcontainer.yml"),
     Path(".devcontainer/setup.sh"),
     Path(".devcontainer/headroom.requirements.lock"),
     Path(".github/workflows/workspace-policy-lint.yml"),
     Path(".github/workflows/root-tooling.requirements.lock"),
 )
 ACTION_RE = re.compile(r"^\s*- uses:\s*(?P<name>[^@\s]+)@(?P<ref>[^\s#]+)\s+#\s+(?P<version>v\S+)\s*$")
-REQUIREMENT_RE = re.compile(r"^(?P<name>[A-Za-z0-9_.-]+(?:\[[^]]+\])?)==(?P<version>[^\s\\]+)")
+REQUIREMENT_RE = re.compile(
+    r"^(?P<name>[A-Za-z0-9_.-]+(?:\[[^]]+\])?)==(?P<version>[^\s\\]+)"
+    r".*--hash=sha256:(?P<hash>[0-9a-f]{64})$"
+)
 
 
 class SbomError(ValueError):
@@ -33,7 +37,10 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _component(*, component_type: str, name: str, version: str, source: str, integrity: str | None = None) -> dict[str, Any]:
+def _component(
+    *, component_type: str, name: str, version: str, source: str,
+    integrity: str | None = None, resolved: str | None = None,
+) -> dict[str, Any]:
     reference = f"{component_type}:{name}@{version}"
     component: dict[str, Any] = {
         "bom-ref": reference,
@@ -44,6 +51,8 @@ def _component(*, component_type: str, name: str, version: str, source: str, int
     }
     if integrity:
         component["hashes"] = [{"alg": "SHA-256", "content": integrity.removeprefix("sha256:")}]
+    if resolved:
+        component["properties"].append({"name": "m8:resolved", "value": resolved})
     return component
 
 
@@ -64,23 +73,26 @@ def build_sbom(workspace: Path) -> dict[str, Any]:
         ))
     for name, bootstrap in sorted(lock["bootstrap"].items()):
         components.append(_component(
-            component_type="application", name=bootstrap["package"], version=bootstrap["version"],
+            component_type=bootstrap.get("type", "application"),
+            name=bootstrap["package"], version=bootstrap["version"],
             source=".devcontainer/devcontainer-lock.json",
             integrity=bootstrap.get("binary_sha256") or bootstrap.get("record_sha256"),
+            resolved=bootstrap.get("resolved"),
         ))
     for relative in (".devcontainer/headroom.requirements.lock", ".github/workflows/root-tooling.requirements.lock"):
         for line in (workspace / relative).read_text(encoding="utf-8").splitlines():
             match = REQUIREMENT_RE.match(line)
             if match:
                 components.append(_component(
-                    component_type="library", name=match["name"], version=match["version"], source=relative,
+                    component_type="library", name=match["name"], version=match["version"],
+                    source=relative, integrity=match["hash"],
                 ))
     for line in (workspace / ".github/workflows/workspace-policy-lint.yml").read_text(encoding="utf-8").splitlines():
         match = ACTION_RE.match(line)
         if match:
             components.append(_component(
             component_type="application", name=match["name"], version=match["version"],
-            source=".github/workflows/workspace-policy-lint.yml",
+            source=".github/workflows/workspace-policy-lint.yml", resolved=match["ref"],
             ))
     components.sort(key=lambda component: component["bom-ref"])
     digest = hashlib.sha256(json.dumps(raw_sources, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()

@@ -9,6 +9,14 @@ param(
 
     [string[]] $Authorization = @(),
 
+    [string] $AuthorizationExternalRoot,
+
+    [string] $AuthorizationTrustStore,
+
+    [string] $AuthorizationReplayStore,
+
+    [switch] $PrepareAuthorizationRequest,
+
     [Parameter(Mandatory, Position = 0, ValueFromRemainingArguments = $true)]
     [string] $Prompt
 )
@@ -32,6 +40,10 @@ try {
     foreach ($item in $Task) { $arguments += @("--task", $item) }
     foreach ($item in $Operation) { $arguments += @("--operation", $item) }
     foreach ($item in $Authorization) { $arguments += @("--authorization", $item) }
+    if ($AuthorizationExternalRoot) { $arguments += @("--authorization-external-root", $AuthorizationExternalRoot) }
+    if ($AuthorizationTrustStore) { $arguments += @("--authorization-trust-store", $AuthorizationTrustStore) }
+    if ($AuthorizationReplayStore) { $arguments += @("--authorization-replay-store", $AuthorizationReplayStore) }
+    if ($PrepareAuthorizationRequest) { $arguments += "--prepare-authorization-request" }
     $arguments += $Prompt
     & $pythonCommand @arguments
     exit $LASTEXITCODE

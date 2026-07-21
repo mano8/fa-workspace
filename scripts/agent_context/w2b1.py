@@ -444,17 +444,30 @@ def _authorization_provenance(value: Any, field: str) -> list[str]:
         _fail(f"{field} must be an array")
     identifiers: list[str] = []
     for index, supplied in enumerate(value):
-        item = _closed(
-            supplied,
-            {"authorization_id", "authorization_sha256", "source_sha256"},
-            f"{field}[{index}]",
-        )
+        legacy_fields = {"authorization_id", "authorization_sha256", "source_sha256"}
+        verified_fields = {
+            "authorization_id", "issuer", "key_id", "signed_payload_sha256",
+            "signature_sha256", "issued_at", "expires_at", "redemption_id",
+        }
+        actual = set(supplied) if isinstance(supplied, dict) else set()
+        if actual == legacy_fields:
+            item = _closed(supplied, legacy_fields, f"{field}[{index}]")
+            _sha256(
+                item["authorization_sha256"],
+                f"{field}[{index}].authorization_sha256",
+            )
+            _sha256(item["source_sha256"], f"{field}[{index}].source_sha256")
+        elif actual == verified_fields:
+            item = _closed(supplied, verified_fields, f"{field}[{index}]")
+            for name in ("issuer", "key_id", "redemption_id"):
+                _identifier(item[name], f"{field}[{index}].{name}")
+            for name in ("signed_payload_sha256", "signature_sha256"):
+                _sha256(item[name], f"{field}[{index}].{name}")
+            _timestamp(item["issued_at"], f"{field}[{index}].issued_at")
+            _timestamp(item["expires_at"], f"{field}[{index}].expires_at")
+        else:
+            _fail(f"{field}[{index}] does not have a supported closed provenance shape")
         _identifier(item["authorization_id"], f"{field}[{index}].authorization_id")
-        _sha256(
-            item["authorization_sha256"],
-            f"{field}[{index}].authorization_sha256",
-        )
-        _sha256(item["source_sha256"], f"{field}[{index}].source_sha256")
         identifiers.append(item["authorization_id"])
     if identifiers != sorted(set(identifiers)):
         _fail(f"{field} must have unique authorization IDs in canonical order")

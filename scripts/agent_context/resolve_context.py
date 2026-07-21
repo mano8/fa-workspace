@@ -61,6 +61,10 @@ AUTHORIZATION_FIELDS = {
     "operations",
     "issued_at",
 }
+VERIFIED_AUTHORIZATION_PROVENANCE_FIELDS = {
+    "authorization_id", "issuer", "key_id", "signed_payload_sha256",
+    "signature_sha256", "issued_at", "expires_at", "redemption_id",
+}
 INJECTION_EVIDENCE_FIELDS = {
     "generation",
     "native_discovery_disabled",
@@ -88,6 +92,7 @@ class ResolutionRequest:
     exclusions: tuple[str, ...] = ()
     operations: tuple[str, ...] = ()
     authorizations: tuple[Mapping[str, Any], ...] = ()
+    verified_authorization_provenance: tuple[Mapping[str, Any], ...] = ()
     native_evidence: Mapping[str, Any] | None = None
     injection_evidence: Mapping[str, Any] | None = None
     instruction_sources: tuple[Mapping[str, Any], ...] = ()
@@ -609,7 +614,35 @@ def _validate_authorizations(
     if not valid_records:
         _fail("selected task requires explicit human authorization", "E_AUTHORIZATION")
     ordered_ids = tuple(sorted(valid_records))
-    return ordered_ids, tuple(valid_records[item] for item in ordered_ids)
+    if not request.verified_authorization_provenance:
+        return ordered_ids, tuple(valid_records[item] for item in ordered_ids)
+    verified: dict[str, dict[str, str]] = {}
+    for supplied in request.verified_authorization_provenance:
+        record = _closed(
+            supplied, VERIFIED_AUTHORIZATION_PROVENANCE_FIELDS,
+            "verified authorization provenance", "E_AUTHORIZATION",
+        )
+        authorization_id = _identifier(
+            record["authorization_id"], "verified authorization id", "E_AUTHORIZATION"
+        )
+        for field in ("issuer", "key_id", "redemption_id"):
+            _identifier(record[field], f"verified authorization {field}", "E_AUTHORIZATION")
+        for field in ("signed_payload_sha256", "signature_sha256"):
+            _sha256(record[field], f"verified authorization {field}", "E_AUTHORIZATION")
+        for field in ("issued_at", "expires_at"):
+            try:
+                w2b1._timestamp(record[field], f"verified authorization {field}")
+            except w2b1.AgentContextError as error:
+                _fail(error.message, "E_AUTHORIZATION")
+        if authorization_id in verified:
+            _fail("duplicate verified authorization id", "E_AUTHORIZATION")
+        verified[authorization_id] = dict(record)
+    if tuple(sorted(verified)) != ordered_ids:
+        _fail(
+            "verified authorization provenance does not match authorization records",
+            "E_AUTHORIZATION",
+        )
+    return ordered_ids, tuple(verified[item] for item in ordered_ids)
 
 
 def _manifest_entries(

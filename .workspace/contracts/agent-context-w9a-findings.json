@@ -51,7 +51,7 @@
       "id": "w2a-contract",
       "classification": "tracked-normative-input",
       "path": ".workspace/contracts/agent-context-w2a.contract.md",
-      "sha256": "9bd47076c6a27aca3110f4c8885235368c1bac06c98aa04edf7dbb5d9d3eb6f7",
+      "sha256": "acdfa4503da251548893e2fd824e21406c2663a24438de0a84be8aa37cb5b7fd",
       "required_in_clean_checkout": true
     }
   ],
@@ -442,6 +442,8 @@
       ],
       "closure_artifacts": [
         ".devcontainer/devcontainer-lock.json",
+        ".devcontainer/docker-compose.devcontainer.yml",
+        ".devcontainer/headroom.requirements.lock",
         ".devcontainer/setup.sh",
         ".workspace/contracts/agent-context-w9a-remediation.contract.md",
         "scripts/agent_context/fixtures/evidence/w9d2-bootstrap-reproducibility-evidence.json",
@@ -478,10 +480,10 @@
         "scripts.agent_context.tests.test_w9e_supply_chain.W9eSupplyChainTests.test_unreviewed_dependency_refresh_fails"
       ],
       "closure_artifacts": [
+        ".github/workflows/root-tooling.requirements.lock",
         ".github/workflows/workspace-policy-lint.yml",
         "scripts/agent_context/fixtures/evidence/w9e-supply-chain-evidence.json",
-        "scripts/agent_context/tests/test_w9e_supply_chain.py",
-        "tools/requirements.lock"
+        "scripts/agent_context/tests/test_w9e_supply_chain.py"
       ],
       "amendment_sections": [
         "7"

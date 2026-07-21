@@ -1,19 +1,26 @@
 # Agent context W2a contract
 
-**Contract version:** `2.1.0`
+**Contract version:** `2.1.1`
 
-**Frozen:** 2026-07-19
+**Frozen:** 2026-07-21
 
 **Activation status:** `APPROVED_FOR_W2B`
 
-**Implementation status:** normative schema contract only; no v2 resolver or
-delivery path is enabled
+**Implementation status:** the Codex devcontainer non-interactive required row
+is implemented; the W9a remediation contract governs its signed authorization,
+trust, source, lifecycle, and receipt amendments
 
 **Capability evidence:**
 `scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md`
 
 **Capability evidence SHA-256:**
 `d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b`
+
+**Post-remediation precedence:** Sections 4, 6, 8, 9, 10, 12, and 13 below
+retain the frozen pre-remediation baseline. The tracked W9a contract explicitly
+amends those sections and governs wherever they disagree, including external
+signed authorization provenance and the
+`SUBMISSION_STARTED`/`COMPLETED`/`EXECUTION_AMBIGUOUS` lifecycle.
 
 ## 1. Decision and activation gate
 

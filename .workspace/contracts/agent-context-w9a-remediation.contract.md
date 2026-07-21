@@ -6,7 +6,7 @@
 
 **Activation status:** `APPROVED_FOR_W9B_TO_W9F`
 
-**Canonical runtime status:** `DISABLED_PENDING_REMEDIATION`
+**Canonical runtime status:** `IMPLEMENTED_PENDING_W9F_FINAL_REVIEW`
 
 **Finding register:**
 `.workspace/contracts/agent-context-w9a-findings.json`
@@ -25,8 +25,8 @@ The frozen inputs are:
   `f07be4be2bc39cad5cff72d741b9c84d4f6970b7a83d21d1afb74785d1109078`;
 - the independent French critical audit, SHA-256
   `142bc1658704b1819a4310fb0b791f8cd1761fe2379b98cb854fbd18750132ff`;
-- the W2a contract version 2.1.0, SHA-256
-  `9bd47076c6a27aca3110f4c8885235368c1bac06c98aa04edf7dbb5d9d3eb6f7`;
+- the W2a contract version 2.1.1, SHA-256
+  `acdfa4503da251548893e2fd824e21406c2663a24438de0a84be8aa37cb5b7fd`;
   and
 - the tracked canonical artifact
   `scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md`,
@@ -51,11 +51,12 @@ remain `UNSUPPORTED`. W9a does not infer a client acknowledgement, a separate
 context-acceptance event, interactive approval API, clear command, compaction,
 or multi-working-directory behavior.
 
-Canonical launch is disabled until Steps 10.2 through 10.8 all pass their
-named negative tests and evidence gates. Steps 10.9 through 10.12 then update
-claims, pin the supply chain, assemble the exact-tree bundle, and gate a fresh
-Step 9.5 review. Passing W9a validation proves only that the remediation
-contract and register are complete and internally consistent.
+Steps 10.2 through 10.8 have passed their named negative tests and evidence
+gates. Steps 10.9 through 10.12 update claims, pin the supply chain, assemble
+the exact-tree bundle, and gate a fresh Step 9.5 review. Passing W9a validation
+proves only that the remediation contract and register are complete and
+internally consistent; canonical launch still requires every live fail-closed
+preflight and does not itself constitute Step 9.5 approval.
 
 ## 3. Closed finding register
 

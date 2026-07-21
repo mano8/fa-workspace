@@ -41,10 +41,12 @@ always -> declared repository facets in registry order -> explicit tasks -> excl
 Tasks are opt-in. Environment, testing, Git, release, pull-request,
 Headroom, and cross-repository procedures are not loaded by repository
 selection or agent inference. Mutating and cross-repository tasks require a
-closed human authorization record with the exact repository and operation set;
-the resolver records only its identifier and hashes in manifests, sessions, and
-receipts. Exclusions cannot remove security, ownership, required, or otherwise
-non-waivable units.
+single-use Ed25519 capability signed outside the workspace for the exact launch,
+repository, task, operation, and user-task hash. The launcher redeems it
+atomically against owner-only external trust and replay stores before
+resolution; only metadata-only verified provenance enters manifests, sessions,
+and receipts. Exclusions cannot remove security, ownership, required, or
+otherwise non-waivable units.
 
 The active format is faceted v2. The v1/transitional parser and compatibility
 selectors were removed in Phase 9.2. The historical routing record under
@@ -77,8 +79,9 @@ and do not describe this current tree.
 
 ## Resolution and delivery
 
-The inactive but validated W2b tools live in [`scripts/agent_context/`](../scripts/agent_context/).
-The resolver validates authority, repository/task scope, conflicts,
+The active shared resolver, trust, authorization, delivery, and validation
+stack lives in [`scripts/agent_context/`](../scripts/agent_context/). The
+resolver validates authority, repository/task scope, conflicts,
 overrides, required exclusions, source hashes, and native evidence before it
 creates a deterministic manifest and RFC 8785 JCS UTF-8 envelope.
 
@@ -93,6 +96,14 @@ uncertain persistence terminal `EXECUTION_AMBIGUOUS`. Only a successful
 `COMPLETED` generation may resume. `fresh` starts generation zero with a new
 thread; client-native `clear` and `compact` are not claimed. Claude and
 unsupported client rows remain limited or unsupported and fail closed.
+
+For an authorized launch, first run `scripts/codex-repo.sh` with
+`--prepare-authorization-request`; this emits a metadata-only request and never
+executes Codex. After an external owner signs that exact request, rerun with the
+workspace-relative signed capability plus `--authorization-external-root`,
+`--authorization-trust-store`, and `--authorization-replay-store`. The launcher
+verifies and consumes the capability before it creates runtime state or invokes
+the adapter.
 
 Parent-found mode may add reviewed workspace context. Parent-absent standalone
 mode uses only verified child-owned native instructions; workspace policies,

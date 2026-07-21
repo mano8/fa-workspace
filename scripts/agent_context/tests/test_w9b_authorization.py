@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
@@ -16,6 +17,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from agent_context import authorization, w2b1
+from agent_context.codex_repo_launcher import _verified_authorizations
 
 
 def _b64url(raw: bytes) -> str:
@@ -151,3 +153,29 @@ class W9bAuthorizationTests(unittest.TestCase):
         if os.name == "posix":
             info = next(self.replay.iterdir()).stat()
             self.assertEqual(stat.S_IMODE(info.st_mode), 0o600)
+
+    def test_canonical_launcher_redeems_before_adapter_and_preserves_provenance(self) -> None:
+        capability = self._capability()
+        real_verify = authorization.verify_and_redeem
+
+        def verify_with_frozen_clock(value, **kwargs):
+            return real_verify(value, now=self.now, **kwargs)
+
+        with patch(
+            "agent_context.codex_repo_launcher.authorization.verify_and_redeem",
+            side_effect=verify_with_frozen_clock,
+        ):
+            records, provenance, launch_id, trust_store = _verified_authorizations(
+                root=self.workspace, capabilities=(capability,),
+                repositories=["repo-a", "repo-b"], tasks=["cross-repository"],
+                operations=["push"], prompt="push the validated changes",
+                external_root=self.external, trust_store=self.trust,
+                replay_store=self.replay,
+            )
+        self.assertEqual(launch_id, "launch-fixture")
+        self.assertEqual(trust_store, self.trust)
+        self.assertEqual(records[0]["authorization_id"], "approval.fixture")
+        self.assertEqual(records[0]["source_sha256"], provenance[0]["signed_payload_sha256"])
+        self.assertEqual(provenance[0]["issuer"], "owner")
+        self.assertNotIn(capability["signature"], json.dumps(provenance))
+        self.assertEqual(len(list(self.replay.glob("redeemed-*.json"))), 1)

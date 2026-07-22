@@ -48,6 +48,12 @@ class W9eSupplyChainTests(unittest.TestCase):
         self.assertNotIn("imgtools_m8/requirements.txt", setup)
         self.assertNotIn("media-service-m8/media_service/requirements_dev.txt", setup)
         self.assertNotIn("devcontainers/features/python", devcontainer)
+        self.assertNotIn("anthropics/devcontainer-features/claude-code", devcontainer)
+        self.assertIn('"pnpmVersion": "none"', devcontainer)
+        self.assertIn('"nvmVersion": "0.40.6"', devcontainer)
+        self.assertIn('"dockerDashComposeVersion": "none"', devcontainer)
+        self.assertIn('"installDockerBuildx": false', devcontainer)
+        self.assertIn('@anthropic-ai/claude-code@${CLAUDE_VERSION}', setup)
         self.assertIn(
             "python@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b",
             dockerfile,

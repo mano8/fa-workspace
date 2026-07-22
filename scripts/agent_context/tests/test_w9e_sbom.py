@@ -30,6 +30,7 @@ class W9eSbomTests(unittest.TestCase):
         } for property in sbom["metadata"]["properties"] if property["name"].startswith("m8:source-sha256:")))
         for expected in (
             "application:@openai/codex@0.144.6",
+            "application:@anthropic-ai/claude-code@2.1.217",
             "application:node@24.16.0",
             "application:python@3.12.13",
             "application:headroom-ai[mcp,proxy,code]@0.32.1",

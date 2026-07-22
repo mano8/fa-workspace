@@ -3,6 +3,24 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
+      "bom-ref": "application:@anthropic-ai/claude-code@2.1.217",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2630fc5dc6db61bc03f86b95daf47766e5b61873f7bb7cfea764c5ac5a9ba"
+        }
+      ],
+      "name": "@anthropic-ai/claude-code",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        }
+      ],
+      "type": "application",
+      "version": "2.1.217"
+    },
+    {
       "bom-ref": "application:@openai/codex@0.144.6",
       "hashes": [
         {
@@ -173,24 +191,6 @@
       ],
       "type": "container",
       "version": "3.12.13-slim-bookworm"
-    },
-    {
-      "bom-ref": "container:ghcr.io/anthropics/devcontainer-features/claude-code:1.0@1.0.5",
-      "hashes": [
-        {
-          "alg": "SHA-256",
-          "content": "cfc2e7d3e9fd3b9b01f8d5cb158508a884c8c0ede2e23ed10f32dea5d4ffe69a"
-        }
-      ],
-      "name": "ghcr.io/anthropics/devcontainer-features/claude-code:1.0",
-      "properties": [
-        {
-          "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
-        }
-      ],
-      "type": "container",
-      "version": "1.0.5"
     },
     {
       "bom-ref": "container:ghcr.io/chopratejas/headroom@code-nonroot",
@@ -1969,7 +1969,7 @@
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "eb47a65c9116e2ead5bc6869a6f024dc62eee52f8d99f9ef56cdeb8c530dba8a"
+      "version": "6be8acf47ba483066bc31ba0bbb8c60001d3c57c4d1df5dd6c7afcf4aae8e729"
     },
     "properties": [
       {
@@ -1982,11 +1982,11 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer-lock.json",
-        "value": "ad0ee46f81bd303b8fcdebf5e8c6ef80cba2bf42320a6f5fbad4513fe0155e56"
+        "value": "384e4376601d075e74378a20e4c1299f6949621e42e1f71358f5b1e6e5f51825"
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer.json",
-        "value": "79d44c824eca61545b3c5132da6b84e9ad922b9137341f83e7ba721abe85dcaf"
+        "value": "0bf4f5f36713697e5660b5eeac329118729f7203f4e57a37b4098da54e8656fc"
       },
       {
         "name": "m8:source-sha256:.devcontainer/docker-compose.devcontainer.yml",
@@ -1998,7 +1998,7 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/setup.sh",
-        "value": "d1f9bc56d2640d50fa0582853236b950c8db3d1517b5a6ed8152856b0f742677"
+        "value": "98181494b4361d16a3c5e9dbc90ad02d4a3aaf6b68f16e8b13d05a1a838949c4"
       },
       {
         "name": "m8:source-sha256:.github/workflows/root-tooling.requirements.lock",
@@ -2010,7 +2010,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:ed61c625-f6bb-54f7-85c0-e76027bf61b1",
+  "serialNumber": "urn:uuid:a668227d-c97d-5174-91de-711622556152",
   "specVersion": "1.6",
   "version": 1
 }

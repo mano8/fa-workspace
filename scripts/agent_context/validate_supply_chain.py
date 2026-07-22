@@ -119,6 +119,8 @@ def validate_supply_chain(workspace: Path) -> None:
         _fail("Python bootstrap identity differs from its reviewed runtime image")
     if any("devcontainers/features/python" in feature for feature in devcontainer.get("features", {})):
         _fail("Python must come from the content-addressed runtime image, not a source-building feature")
+    if any("anthropics/devcontainer-features/claude-code" in feature for feature in devcontainer.get("features", {})):
+        _fail("Claude Code must come from the exact hash-verified bootstrap, not a floating feature")
     runtime_features = {
         "node_runtime": "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
     }
@@ -131,8 +133,34 @@ def validate_supply_chain(workspace: Path) -> None:
         )
         if locked["features"][locked_feature].get("options", {}).get("version") != version:
             _fail(f"{runtime} devcontainer lock option differs from bootstrap identity")
+    reviewed_options = {
+        "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f": {
+            "pnpmVersion": "none", "nvmVersion": "0.40.6",
+        },
+        "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e": {
+            "version": "29.6.1", "moby": False,
+            "dockerDashComposeVersion": "none", "installDockerBuildx": False,
+        },
+    }
+    lock_names = {
+        feature: feature.split("@", 1)[0].replace(
+            "ghcr.io/devcontainers/features/node",
+            "ghcr.io/devcontainers/features/node:2",
+        ).replace(
+            "ghcr.io/devcontainers/features/docker-outside-of-docker",
+            "ghcr.io/devcontainers/features/docker-outside-of-docker:1",
+        )
+        for feature in reviewed_options
+    }
+    for feature, expected in reviewed_options.items():
+        actual = devcontainer.get("features", {}).get(feature, {})
+        if any(actual.get(name) != value for name, value in expected.items()):
+            _fail(f"{feature} options are not the reviewed deterministic set")
+        locked_options = locked["features"][lock_names[feature]].get("options", {})
+        if any(locked_options.get(name) != value for name, value in expected.items()):
+            _fail(f"{feature} lock options differ from the reviewed deterministic set")
     enforced = (
-        bootstrap["codex"], bootstrap["headroom"], bootstrap["node_runtime"],
+        bootstrap["claude"], bootstrap["codex"], bootstrap["headroom"], bootstrap["node_runtime"],
         bootstrap["python_runtime"], bootstrap["root_tooling"],
         bootstrap["apt_ca_certificates"], bootstrap["apt_curl"], bootstrap["apt_git"],
         bootstrap["apt_jq"],

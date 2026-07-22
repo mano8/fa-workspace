@@ -27,13 +27,17 @@ workflow. Devcontainer bootstrap identities are maintained separately by
 procedure. CPython comes from the digest-pinned official runtime image in
 `.devcontainer/Dockerfile`; refreshing it requires updating the image digest,
 the verified executable digest, the lock, the supply-chain fixtures, and the
-SBOM together, followed by two independent no-cache Dev Container builds.
+SBOM together. Claude Code and Codex are installed at exact npm versions and
+their executable hashes are verified during post-create. Optional floating
+Node pnpm and Docker Compose/buildx installers are disabled. Any reviewed
+bootstrap refresh must finish with two independent no-cache Dev Container
+builds and matching post-create identity/capability probes.
 
 ## Root-tooling SBOM
 
 `../sbom/root-tooling.cdx.json` is the deterministic CycloneDX 1.6 inventory
 for the root-owned tooling boundary. It covers the pinned devcontainer base,
-features, prebuilt Python runtime image, Node, Codex, Headroom, lock-file Python
+features, prebuilt Python runtime image, Node, Codex, Claude Code, Headroom, lock-file Python
 dependencies, root CI Actions, and the bootstrap/configuration source hashes.
 Regenerate it only when a reviewed input changes:
 

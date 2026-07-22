@@ -35,7 +35,7 @@ class W9eSbomTests(unittest.TestCase):
             "application:headroom-ai[mcp,proxy,code]@0.32.1",
             "container:ghcr.io/chopratejas/headroom@code-nonroot",
             "container:ghcr.io/devcontainers/features/node:2@2.0.0",
-            "container:ghcr.io/devcontainers/features/python:1@1.8.0",
+            "container:docker.io/library/python@3.12.13-slim-bookworm",
             "application:actions/checkout@v4.2.2",
             "application:actions/setup-python@v5.6.0",
             "library:ruff@0.15.22",

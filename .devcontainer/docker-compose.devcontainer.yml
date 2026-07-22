@@ -1,6 +1,8 @@
 services:
   workspace:
-    image: mcr.microsoft.com/devcontainers/base@sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
 
     volumes:
       - ..:/workspace:cached

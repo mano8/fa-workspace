@@ -9,12 +9,11 @@ readonly ROOT_TOOLING_LOCK_VERSION="2026-07-21"
 readonly NODE_VERSION="24.16.0"
 readonly NODE_BINARY_SHA256="b2959781cc5a74c357ffa02367efa8a0330cbb1c9cb347732fdfaaaca381cbcd"
 readonly PYTHON_VERSION="3.12.13"
-readonly PYTHON_BINARY_SHA256="f198e482df5d819f064c040a5ffc9e83e702ba41e4fbdd632918bd1123eeb905"
+readonly PYTHON_BINARY_SHA256="4dbf3143240288fb2170257ffaa7bd030cdda5d2703d1f5f30b627042267e2e3"
 readonly CA_CERTIFICATES_VERSION="20260601~26.04.1"
 readonly CURL_VERSION="8.18.0-1ubuntu2.3"
 readonly GIT_VERSION="1:2.53.0-1ubuntu1"
 readonly JQ_VERSION="1.8.1-4ubuntu2"
-readonly PYTHON_VENV_VERSION="3.14.3-0ubuntu2"
 
 echo "[1/7] Mise à jour des outils système..."
 sudo apt-get update
@@ -22,14 +21,12 @@ sudo apt-get install -y --no-install-recommends \
     "ca-certificates=${CA_CERTIFICATES_VERSION}" \
     "curl=${CURL_VERSION}" \
     "git=${GIT_VERSION}" \
-    "jq=${JQ_VERSION}" \
-    "python3-venv=${PYTHON_VENV_VERSION}"
+    "jq=${JQ_VERSION}"
 
 test "$(dpkg-query -W -f='${Version}' ca-certificates)" = "${CA_CERTIFICATES_VERSION}"
 test "$(dpkg-query -W -f='${Version}' curl)" = "${CURL_VERSION}"
 test "$(dpkg-query -W -f='${Version}' git)" = "${GIT_VERSION}"
 test "$(dpkg-query -W -f='${Version}' jq)" = "${JQ_VERSION}"
-test "$(dpkg-query -W -f='${Version}' python3-venv)" = "${PYTHON_VENV_VERSION}"
 test "$(node --version)" = "v${NODE_VERSION}"
 test "$(sha256sum "$(command -v node)" | awk '{print $1}')" = "${NODE_BINARY_SHA256}"
 test "$(python3 --version)" = "Python ${PYTHON_VERSION}"

@@ -117,7 +117,7 @@
       "hashes": [
         {
           "alg": "SHA-256",
-          "content": "f198e482df5d819f064c040a5ffc9e83e702ba41e4fbdd632918bd1123eeb905"
+          "content": "4dbf3143240288fb2170257ffaa7bd030cdda5d2703d1f5f30b627042267e2e3"
         }
       ],
       "name": "python",
@@ -125,6 +125,10 @@
         {
           "name": "m8:source",
           "value": ".devcontainer/devcontainer-lock.json"
+        },
+        {
+          "name": "m8:resolved",
+          "value": "docker.io/library/python@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b"
         }
       ],
       "type": "application",
@@ -147,6 +151,28 @@
       ],
       "type": "application",
       "version": "2026-07-21"
+    },
+    {
+      "bom-ref": "container:docker.io/library/python@3.12.13-slim-bookworm",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b"
+        }
+      ],
+      "name": "docker.io/library/python",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/devcontainer-lock.json"
+        },
+        {
+          "name": "m8:resolved",
+          "value": "docker.io/library/python@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b"
+        }
+      ],
+      "type": "container",
+      "version": "3.12.13-slim-bookworm"
     },
     {
       "bom-ref": "container:ghcr.io/anthropics/devcontainer-features/claude-code:1.0@1.0.5",
@@ -223,24 +249,6 @@
       ],
       "type": "container",
       "version": "2.0.0"
-    },
-    {
-      "bom-ref": "container:ghcr.io/devcontainers/features/python:1@1.8.0",
-      "hashes": [
-        {
-          "alg": "SHA-256",
-          "content": "fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511"
-        }
-      ],
-      "name": "ghcr.io/devcontainers/features/python:1",
-      "properties": [
-        {
-          "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
-        }
-      ],
-      "type": "container",
-      "version": "1.8.0"
     },
     {
       "bom-ref": "container:mcr.microsoft.com/devcontainers/base:ubuntu@mcr.microsoft.com/devcontainers/base@sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c",
@@ -1363,18 +1371,6 @@
       "version": "0.0.32"
     },
     {
-      "bom-ref": "library:python3-venv@3.14.3-0ubuntu2",
-      "name": "python3-venv",
-      "properties": [
-        {
-          "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
-        }
-      ],
-      "type": "library",
-      "version": "3.14.3-0ubuntu2"
-    },
-    {
       "bom-ref": "library:pyyaml@6.0.3",
       "hashes": [
         {
@@ -1973,7 +1969,7 @@
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "ad2ad2e5061bc6c5e027b605a0fe0523b805539da1f1859159b1bf304edf11c3"
+      "version": "eb47a65c9116e2ead5bc6869a6f024dc62eee52f8d99f9ef56cdeb8c530dba8a"
     },
     "properties": [
       {
@@ -1981,16 +1977,20 @@
         "value": "true"
       },
       {
+        "name": "m8:source-sha256:.devcontainer/Dockerfile",
+        "value": "c55ca3afbdb333e69a7267694dbe9906f6240a1204c9d60f6d51f694d1afeb65"
+      },
+      {
         "name": "m8:source-sha256:.devcontainer/devcontainer-lock.json",
-        "value": "f8be25b951f06c0a132236d994dc83fe1270c5dca5508bf9b1d7d97042162890"
+        "value": "ad0ee46f81bd303b8fcdebf5e8c6ef80cba2bf42320a6f5fbad4513fe0155e56"
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer.json",
-        "value": "fb883c707697ce0252d40fdf59e0cb15ae3ed3f89bce49419612b6b11cb475fc"
+        "value": "79d44c824eca61545b3c5132da6b84e9ad922b9137341f83e7ba721abe85dcaf"
       },
       {
         "name": "m8:source-sha256:.devcontainer/docker-compose.devcontainer.yml",
-        "value": "b8c63565d2340a09e8182bec1ef2c9ce7a40664f1f0449af91f63fc408cc6d8a"
+        "value": "fabc4f57436d63ce9dd04210a0b331605b31a63fd8f1bc8e3a2b49a6449bfb34"
       },
       {
         "name": "m8:source-sha256:.devcontainer/headroom.requirements.lock",
@@ -1998,7 +1998,7 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/setup.sh",
-        "value": "90e5a383d75fbd5be19d337b2555f0b5801f66b963a6398e364b868076660dc7"
+        "value": "d1f9bc56d2640d50fa0582853236b950c8db3d1517b5a6ed8152856b0f742677"
       },
       {
         "name": "m8:source-sha256:.github/workflows/root-tooling.requirements.lock",
@@ -2010,7 +2010,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:39ce1b71-7ce7-57c6-8908-7e3d2dc12744",
+  "serialNumber": "urn:uuid:ed61c625-f6bb-54f7-85c0-e76027bf61b1",
   "specVersion": "1.6",
   "version": 1
 }

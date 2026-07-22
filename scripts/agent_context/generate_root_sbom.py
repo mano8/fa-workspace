@@ -16,6 +16,7 @@ SBOM_PATH = Path("sbom/root-tooling.cdx.json")
 SOURCE_PATHS = (
     Path(".devcontainer/devcontainer-lock.json"),
     Path(".devcontainer/devcontainer.json"),
+    Path(".devcontainer/Dockerfile"),
     Path(".devcontainer/docker-compose.devcontainer.yml"),
     Path(".devcontainer/setup.sh"),
     Path(".devcontainer/headroom.requirements.lock"),
@@ -116,6 +117,12 @@ def build_sbom(workspace: Path) -> dict[str, Any]:
         version=lock["base_image"]["resolved"], source=".devcontainer/devcontainer-lock.json",
         integrity=lock["base_image"]["integrity"],
     ))
+    for name, image in sorted(lock.get("runtime_images", {}).items()):
+        components.append(_component(
+            component_type="container", name=image["reference"],
+            version=image["version"], source=".devcontainer/devcontainer-lock.json",
+            integrity=image["integrity"], resolved=image["resolved"],
+        ))
     for name, feature in sorted(lock["features"].items()):
         components.append(_component(
             component_type="container", name=name, version=feature["version"],

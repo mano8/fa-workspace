@@ -52,6 +52,7 @@ CRITICAL_PATHS = (
     "scripts/codex-repo.ps1",
     ".devcontainer/devcontainer.json",
     ".devcontainer/devcontainer-lock.json",
+    ".devcontainer/Dockerfile",
     ".devcontainer/docker-compose.devcontainer.yml",
     ".devcontainer/headroom.requirements.lock",
     ".devcontainer/setup.sh",

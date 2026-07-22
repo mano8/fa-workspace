@@ -39,11 +39,6 @@
       "version": "1.8.1-4ubuntu2",
       "type": "application"
     },
-    "apt_python_venv": {
-      "package": "python3-venv",
-      "version": "3.14.3-0ubuntu2",
-      "type": "library"
-    },
     "node_runtime": {
       "package": "node",
       "version": "24.16.0",
@@ -52,7 +47,8 @@
     "python_runtime": {
       "package": "python",
       "version": "3.12.13",
-      "binary_sha256": "f198e482df5d819f064c040a5ffc9e83e702ba41e4fbdd632918bd1123eeb905"
+      "resolved": "docker.io/library/python@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b",
+      "binary_sha256": "4dbf3143240288fb2170257ffaa7bd030cdda5d2703d1f5f30b627042267e2e3"
     },
     "root_tooling": {
       "package": "root-tooling-python-lock",
@@ -66,6 +62,14 @@
     "reference": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "resolved": "mcr.microsoft.com/devcontainers/base@sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c",
     "integrity": "sha256:36c0ae9fe6bfa914cf7eb05b08b09a3a31961dc76eed6fbb75179382c817582c"
+  },
+  "runtime_images": {
+    "python": {
+      "reference": "docker.io/library/python",
+      "version": "3.12.13-slim-bookworm",
+      "resolved": "docker.io/library/python@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b",
+      "integrity": "sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b"
+    }
   },
   "features": {
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {
@@ -88,14 +92,6 @@
       "integrity": "sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
       "options": {
         "version": "24.16.0"
-      }
-    },
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "1.8.0",
-      "resolved": "ghcr.io/devcontainers/features/python@sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511",
-      "integrity": "sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511",
-      "options": {
-        "version": "3.12.13"
       }
     }
   }

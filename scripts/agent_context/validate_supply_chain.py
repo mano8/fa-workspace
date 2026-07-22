@@ -76,6 +76,7 @@ def validate_supply_chain(workspace: Path) -> None:
     )
     setup = (workspace / ".devcontainer/setup.sh").read_text(encoding="utf-8")
     compose = (workspace / ".devcontainer/docker-compose.devcontainer.yml").read_text(encoding="utf-8")
+    dockerfile = (workspace / ".devcontainer/Dockerfile").read_text(encoding="utf-8")
     locked = json.loads(bootstrap_lock.read_text(encoding="utf-8"))
     bootstrap = locked["bootstrap"]
     headroom_lines = [
@@ -108,9 +109,18 @@ def validate_supply_chain(workspace: Path) -> None:
     proxy = bootstrap["headroom_proxy"]
     if proxy.get("resolved") not in compose or proxy.get("binary_sha256") not in proxy.get("resolved", ""):
         _fail("Headroom proxy image is not pinned to the reviewed digest")
+    base_image = locked["base_image"]
+    python_image = locked.get("runtime_images", {}).get("python", {})
+    if base_image.get("resolved") not in dockerfile:
+        _fail("Dev Container base image is not pinned to the reviewed digest in Dockerfile")
+    if python_image.get("resolved") not in dockerfile:
+        _fail("Python runtime image is not pinned to the reviewed digest in Dockerfile")
+    if bootstrap["python_runtime"].get("resolved") != python_image.get("resolved"):
+        _fail("Python bootstrap identity differs from its reviewed runtime image")
+    if any("devcontainers/features/python" in feature for feature in devcontainer.get("features", {})):
+        _fail("Python must come from the content-addressed runtime image, not a source-building feature")
     runtime_features = {
         "node_runtime": "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
-        "python_runtime": "ghcr.io/devcontainers/features/python@sha256:fbcad6955caeecc5ad3f7886baf652e25cba5225a6c4c2287c536de2e5607511",
     }
     for runtime, feature in runtime_features.items():
         version = bootstrap[runtime]["version"]
@@ -118,8 +128,6 @@ def validate_supply_chain(workspace: Path) -> None:
             _fail(f"{runtime} feature option is not exact or differs from its lock")
         locked_feature = feature.split("@", 1)[0].replace(
             "ghcr.io/devcontainers/features/node", "ghcr.io/devcontainers/features/node:2"
-        ).replace(
-            "ghcr.io/devcontainers/features/python", "ghcr.io/devcontainers/features/python:1"
         )
         if locked["features"][locked_feature].get("options", {}).get("version") != version:
             _fail(f"{runtime} devcontainer lock option differs from bootstrap identity")
@@ -127,7 +135,7 @@ def validate_supply_chain(workspace: Path) -> None:
         bootstrap["codex"], bootstrap["headroom"], bootstrap["node_runtime"],
         bootstrap["python_runtime"], bootstrap["root_tooling"],
         bootstrap["apt_ca_certificates"], bootstrap["apt_curl"], bootstrap["apt_git"],
-        bootstrap["apt_jq"], bootstrap["apt_python_venv"],
+        bootstrap["apt_jq"],
     )
     for item in enforced:
         for value in (item["version"], item.get("binary_sha256") or item.get("record_sha256")):

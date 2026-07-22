@@ -24,13 +24,16 @@ The refresh is intentionally manual and review-gated. Do not replace a SHA
 with a tag, add an un-hashed install, or use an installer script in this
 workflow. Devcontainer bootstrap identities are maintained separately by
 `.devcontainer/devcontainer-lock.json` and Step 10.5's reviewed bootstrap
-procedure.
+procedure. CPython comes from the digest-pinned official runtime image in
+`.devcontainer/Dockerfile`; refreshing it requires updating the image digest,
+the verified executable digest, the lock, the supply-chain fixtures, and the
+SBOM together, followed by two independent no-cache Dev Container builds.
 
 ## Root-tooling SBOM
 
 `../sbom/root-tooling.cdx.json` is the deterministic CycloneDX 1.6 inventory
-for the root-owned tooling boundary. It covers the pinned devcontainer base
-image/features (including Node and Python), Codex, Headroom, lock-file Python
+for the root-owned tooling boundary. It covers the pinned devcontainer base,
+features, prebuilt Python runtime image, Node, Codex, Headroom, lock-file Python
 dependencies, root CI Actions, and the bootstrap/configuration source hashes.
 Regenerate it only when a reviewed input changes:
 

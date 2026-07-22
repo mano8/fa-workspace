@@ -1,11 +1,18 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "autoMemoryEnabled": false,
   "permissions": {
-    "defaultMode": "default",
-    "disableAutoMode": "disable",
-    "disableBypassPermissionsMode": "disable",
-    "allow": [],
+    "allow": [
+      "Bash(pip-audit -r *)",
+      "Bash(bandit -r *)",
+      "Bash(python -m pytest *)",
+      "Bash(ruff format *)",
+      "Bash(ruff format --check *)"
+    ],
+    "deny": [
+      "Read(./.env.local)",
+      "Read(./.env.devcontainer)",
+      "Read(./.claude/settings.local.json)"
+    ],
     "ask": [
       "Bash(rm *)",
       "Bash(git clean *)",
@@ -14,14 +21,10 @@
       "Bash(git push *)",
       "Bash(curl *)",
       "Bash(wget *)",
-      "WebFetch"
+      "WebFetch",
+      "Bash(docker compose *)"
     ],
-    "deny": [
-      "Read(./.env.local)",
-      "Read(./.env.devcontainer)",
-      "Read(./.claude/settings.local.json)",
-      "Read(./.claude/.claude/settings.json)",
-      "Read(./.claude/memory/**)"
-    ]
-  }
+    "defaultMode": "default"
+  },
+  "autoMemoryEnabled": false
 }

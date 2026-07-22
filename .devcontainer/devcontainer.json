@@ -8,12 +8,12 @@
   "remoteUser": "vscode",
 
   "features": {
-    "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f": {
+    "ghcr.io/devcontainers/features/node:2": {
       "version": "24.16.0",
       "pnpmVersion": "none",
       "nvmVersion": "0.40.6"
     },
-    "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "version": "29.6.1",
       "moby": false,
       "dockerDashComposeVersion": "none",

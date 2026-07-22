@@ -122,41 +122,36 @@ def validate_supply_chain(workspace: Path) -> None:
     if any("anthropics/devcontainer-features/claude-code" in feature for feature in devcontainer.get("features", {})):
         _fail("Claude Code must come from the exact hash-verified bootstrap, not a floating feature")
     runtime_features = {
-        "node_runtime": "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
+        "node_runtime": "ghcr.io/devcontainers/features/node:2",
     }
     for runtime, feature in runtime_features.items():
         version = bootstrap[runtime]["version"]
         if devcontainer.get("features", {}).get(feature, {}).get("version") != version:
             _fail(f"{runtime} feature option is not exact or differs from its lock")
-        locked_feature = feature.split("@", 1)[0].replace(
-            "ghcr.io/devcontainers/features/node", "ghcr.io/devcontainers/features/node:2"
-        )
-        if locked["features"][locked_feature].get("options", {}).get("version") != version:
+        if locked["features"][feature].get("options", {}).get("version") != version:
             _fail(f"{runtime} devcontainer lock option differs from bootstrap identity")
     reviewed_options = {
-        "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f": {
+        "ghcr.io/devcontainers/features/node:2": {
             "pnpmVersion": "none", "nvmVersion": "0.40.6",
         },
-        "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e": {
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
             "version": "29.6.1", "moby": False,
             "dockerDashComposeVersion": "none", "installDockerBuildx": False,
         },
-    }
-    lock_names = {
-        feature: feature.split("@", 1)[0].replace(
-            "ghcr.io/devcontainers/features/node",
-            "ghcr.io/devcontainers/features/node:2",
-        ).replace(
-            "ghcr.io/devcontainers/features/docker-outside-of-docker",
-            "ghcr.io/devcontainers/features/docker-outside-of-docker:1",
-        )
-        for feature in reviewed_options
     }
     for feature, expected in reviewed_options.items():
         actual = devcontainer.get("features", {}).get(feature, {})
         if any(actual.get(name) != value for name, value in expected.items()):
             _fail(f"{feature} options are not the reviewed deterministic set")
-        locked_options = locked["features"][lock_names[feature]].get("options", {})
+        locked_feature = locked["features"].get(feature)
+        if not isinstance(locked_feature, dict) or not re.fullmatch(
+            r"sha256:[0-9a-f]{64}", locked_feature.get("integrity", ""),
+        ):
+            _fail(f"{feature} is not content-bound by the Dev Container lock")
+        feature_resource = feature.rsplit(":", 1)[0]
+        if locked_feature.get("resolved") != f"{feature_resource}@{locked_feature['integrity']}":
+            _fail(f"{feature} resolved digest differs from its integrity lock")
+        locked_options = locked_feature.get("options", {})
         if any(locked_options.get(name) != value for name, value in expected.items()):
             _fail(f"{feature} lock options differ from the reviewed deterministic set")
     enforced = (

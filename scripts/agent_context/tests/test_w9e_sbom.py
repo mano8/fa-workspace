@@ -74,6 +74,8 @@ class W9eSbomTests(unittest.TestCase):
             )
 
     def test_sbom_is_deterministic_and_schema_valid(self) -> None:
+        for path in SOURCE_PATHS:
+            self.assertNotIn(b"\r\n", (ROOT / path).read_bytes(), path)
         first = canonical_bytes(ROOT)
         self.assertEqual(first, canonical_bytes(ROOT))
         parsed = json.loads(first)

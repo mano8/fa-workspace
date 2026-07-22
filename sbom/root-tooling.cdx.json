@@ -1969,7 +1969,7 @@
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "6be8acf47ba483066bc31ba0bbb8c60001d3c57c4d1df5dd6c7afcf4aae8e729"
+      "version": "03f206b0409a60a729acb6fd835283977095bc8f37cc9ab02cbe2b5cd94187b3"
     },
     "properties": [
       {
@@ -1986,7 +1986,7 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer.json",
-        "value": "0bf4f5f36713697e5660b5eeac329118729f7203f4e57a37b4098da54e8656fc"
+        "value": "8fe6a4b3ff16e422112d2d516a358d79a17de89cda3ac4ad7e1444b5976760ce"
       },
       {
         "name": "m8:source-sha256:.devcontainer/docker-compose.devcontainer.yml",
@@ -2010,7 +2010,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:a668227d-c97d-5174-91de-711622556152",
+  "serialNumber": "urn:uuid:27c98283-2d95-5c49-bc5e-56d0929f6d0f",
   "specVersion": "1.6",
   "version": 1
 }

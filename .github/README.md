@@ -33,6 +33,11 @@ Node pnpm and Docker Compose/buildx installers are disabled. Any reviewed
 bootstrap refresh must finish with two independent no-cache Dev Container
 builds and matching post-create identity/capability probes.
 
+Feature keys use the portable major-tag syntax required by Dev Container
+clients. Their exact OCI manifest digests and option sets are enforced in
+`.devcontainer/devcontainer-lock.json`; verification builds use
+`--frozen-lockfile`, so the tag cannot silently update the reviewed feature.
+
 ## Root-tooling SBOM
 
 `../sbom/root-tooling.cdx.json` is the deterministic CycloneDX 1.6 inventory

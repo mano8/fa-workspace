@@ -55,7 +55,7 @@ class W9aContractTests(unittest.TestCase):
         self.assertEqual(report.blocking_count, 5)
         self.assertEqual(report.limitation_count, 1)
         self.assertEqual(report.named_negative_test_count, 52)
-        self.assertEqual(report.named_closure_artifact_count, 52)
+        self.assertEqual(report.named_closure_artifact_count, 53)
 
     def test_clean_checkout_does_not_require_ignored_audit_files(self) -> None:
         report = validate_w9a_contract(self.root)

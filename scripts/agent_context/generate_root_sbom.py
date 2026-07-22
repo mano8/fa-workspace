@@ -14,6 +14,7 @@ from typing import Any
 
 SBOM_PATH = Path("sbom/root-tooling.cdx.json")
 SOURCE_PATHS = (
+    Path(".devcontainer/bootstrap-lock.json"),
     Path(".devcontainer/devcontainer-lock.json"),
     Path(".devcontainer/devcontainer.json"),
     Path(".devcontainer/Dockerfile"),
@@ -110,29 +111,35 @@ def _merge_components(components: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def build_sbom(workspace: Path) -> dict[str, Any]:
     workspace = workspace.resolve()
     raw_sources = {path.as_posix(): _sha256(workspace / path) for path in SOURCE_PATHS}
-    lock = json.loads((workspace / ".devcontainer/devcontainer-lock.json").read_text(encoding="utf-8"))
+    bootstrap_lock = json.loads(
+        (workspace / ".devcontainer/bootstrap-lock.json").read_text(encoding="utf-8")
+    )
+    feature_lock = json.loads(
+        (workspace / ".devcontainer/devcontainer-lock.json").read_text(encoding="utf-8")
+    )
     components: list[dict[str, Any]] = []
     components.append(_component(
-        component_type="container", name=lock["base_image"]["reference"],
-        version=lock["base_image"]["resolved"], source=".devcontainer/devcontainer-lock.json",
-        integrity=lock["base_image"]["integrity"],
+        component_type="container", name=bootstrap_lock["base_image"]["reference"],
+        version=bootstrap_lock["base_image"]["resolved"],
+        source=".devcontainer/bootstrap-lock.json",
+        integrity=bootstrap_lock["base_image"]["integrity"],
     ))
-    for name, image in sorted(lock.get("runtime_images", {}).items()):
+    for name, image in sorted(bootstrap_lock.get("runtime_images", {}).items()):
         components.append(_component(
             component_type="container", name=image["reference"],
-            version=image["version"], source=".devcontainer/devcontainer-lock.json",
+            version=image["version"], source=".devcontainer/bootstrap-lock.json",
             integrity=image["integrity"], resolved=image["resolved"],
         ))
-    for name, feature in sorted(lock["features"].items()):
+    for name, feature in sorted(feature_lock["features"].items()):
         components.append(_component(
             component_type="container", name=name, version=feature["version"],
             source=".devcontainer/devcontainer-lock.json", integrity=feature["integrity"],
         ))
-    for name, bootstrap in sorted(lock["bootstrap"].items()):
+    for name, bootstrap in sorted(bootstrap_lock["bootstrap"].items()):
         components.append(_component(
             component_type=bootstrap.get("type", "application"),
             name=bootstrap["package"], version=bootstrap["version"],
-            source=".devcontainer/devcontainer-lock.json",
+            source=".devcontainer/bootstrap-lock.json",
             integrity=bootstrap.get("binary_sha256") or bootstrap.get("record_sha256"),
             resolved=bootstrap.get("resolved"),
         ))

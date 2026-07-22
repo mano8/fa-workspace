@@ -441,6 +441,7 @@
         "scripts.agent_context.tests.test_w9d2_trust_identity.W9d2TrustIdentityTests.test_two_clean_build_identities_match"
       ],
       "closure_artifacts": [
+        ".devcontainer/bootstrap-lock.json",
         ".devcontainer/devcontainer-lock.json",
         ".devcontainer/docker-compose.devcontainer.yml",
         ".devcontainer/headroom.requirements.lock",

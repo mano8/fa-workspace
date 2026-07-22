@@ -70,7 +70,8 @@ def validate_supply_chain(workspace: Path) -> None:
         _fail("workflow does not require pip hash verification")
 
     headroom_lock = workspace / ".devcontainer/headroom.requirements.lock"
-    bootstrap_lock = workspace / ".devcontainer/devcontainer-lock.json"
+    bootstrap_lock = workspace / ".devcontainer/bootstrap-lock.json"
+    feature_lock = workspace / ".devcontainer/devcontainer-lock.json"
     devcontainer = json.loads(
         (workspace / ".devcontainer/devcontainer.json").read_text(encoding="utf-8")
     )
@@ -78,6 +79,7 @@ def validate_supply_chain(workspace: Path) -> None:
     compose = (workspace / ".devcontainer/docker-compose.devcontainer.yml").read_text(encoding="utf-8")
     dockerfile = (workspace / ".devcontainer/Dockerfile").read_text(encoding="utf-8")
     locked = json.loads(bootstrap_lock.read_text(encoding="utf-8"))
+    locked_features = json.loads(feature_lock.read_text(encoding="utf-8"))
     bootstrap = locked["bootstrap"]
     headroom_lines = [
         line for line in headroom_lock.read_text(encoding="utf-8").splitlines()
@@ -91,12 +93,12 @@ def validate_supply_chain(workspace: Path) -> None:
         _fail("Headroom transitive lock has duplicate packages or lacks Headroom")
     lock_sha256 = hashlib.sha256(headroom_lock.read_bytes()).hexdigest()
     if bootstrap["headroom"].get("requirements_sha256") != lock_sha256:
-        _fail("Headroom lock digest does not match devcontainer-lock.json")
+        _fail("Headroom lock digest does not match bootstrap-lock.json")
     if not all(token in setup for token in ("--only-binary=:all:", "--require-hashes", "--no-deps")):
         _fail("Headroom setup does not enforce the complete hashed wheel lock")
     root_lock_sha256 = hashlib.sha256(lock.read_bytes()).hexdigest()
     if bootstrap["root_tooling"].get("record_sha256") != root_lock_sha256:
-        _fail("root-tooling lock digest does not match devcontainer-lock.json")
+        _fail("root-tooling lock digest does not match bootstrap-lock.json")
     if "/workspace/.github/workflows/root-tooling.requirements.lock" not in setup:
         _fail("shared root venv is not installed from the hashed root-tooling lock")
     child_requirements = (
@@ -128,7 +130,7 @@ def validate_supply_chain(workspace: Path) -> None:
         version = bootstrap[runtime]["version"]
         if devcontainer.get("features", {}).get(feature, {}).get("version") != version:
             _fail(f"{runtime} feature option is not exact or differs from its lock")
-        if locked["features"][feature].get("options", {}).get("version") != version:
+        if locked["feature_options"][feature].get("version") != version:
             _fail(f"{runtime} devcontainer lock option differs from bootstrap identity")
     reviewed_options = {
         "ghcr.io/devcontainers/features/node:2": {
@@ -139,11 +141,17 @@ def validate_supply_chain(workspace: Path) -> None:
             "dockerDashComposeVersion": "none", "installDockerBuildx": False,
         },
     }
+    if set(locked_features) != {"features"}:
+        _fail("Dev Container lock must contain only the canonical features object")
+    if set(locked_features["features"]) != set(reviewed_options):
+        _fail("Dev Container feature lock differs from the reviewed feature set")
+    if set(locked.get("feature_options", {})) != set(reviewed_options):
+        _fail("bootstrap feature options differ from the reviewed feature set")
     for feature, expected in reviewed_options.items():
         actual = devcontainer.get("features", {}).get(feature, {})
         if any(actual.get(name) != value for name, value in expected.items()):
             _fail(f"{feature} options are not the reviewed deterministic set")
-        locked_feature = locked["features"].get(feature)
+        locked_feature = locked_features["features"].get(feature)
         if not isinstance(locked_feature, dict) or not re.fullmatch(
             r"sha256:[0-9a-f]{64}", locked_feature.get("integrity", ""),
         ):
@@ -151,7 +159,7 @@ def validate_supply_chain(workspace: Path) -> None:
         feature_resource = feature.rsplit(":", 1)[0]
         if locked_feature.get("resolved") != f"{feature_resource}@{locked_feature['integrity']}":
             _fail(f"{feature} resolved digest differs from its integrity lock")
-        locked_options = locked_feature.get("options", {})
+        locked_options = locked["feature_options"][feature]
         if any(locked_options.get(name) != value for name, value in expected.items()):
             _fail(f"{feature} lock options differ from the reviewed deterministic set")
     enforced = (

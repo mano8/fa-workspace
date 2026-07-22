@@ -14,7 +14,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "application",
@@ -32,7 +32,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "application",
@@ -76,7 +76,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "application",
@@ -94,7 +94,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "application",
@@ -106,7 +106,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "application",
@@ -124,7 +124,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "application",
@@ -142,7 +142,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         },
         {
           "name": "m8:resolved",
@@ -164,7 +164,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "application",
@@ -182,7 +182,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         },
         {
           "name": "m8:resolved",
@@ -204,7 +204,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         },
         {
           "name": "m8:resolved",
@@ -262,7 +262,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "container",
@@ -418,7 +418,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "library",
@@ -532,7 +532,7 @@
       "properties": [
         {
           "name": "m8:source",
-          "value": ".devcontainer/devcontainer-lock.json"
+          "value": ".devcontainer/bootstrap-lock.json"
         }
       ],
       "type": "library",
@@ -1969,7 +1969,7 @@
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "03f206b0409a60a729acb6fd835283977095bc8f37cc9ab02cbe2b5cd94187b3"
+      "version": "32ad47fc0171cad9272a3b99cf15c8316fc4ee24a5dcca52304b6877d0d86a49"
     },
     "properties": [
       {
@@ -1981,8 +1981,12 @@
         "value": "c55ca3afbdb333e69a7267694dbe9906f6240a1204c9d60f6d51f694d1afeb65"
       },
       {
+        "name": "m8:source-sha256:.devcontainer/bootstrap-lock.json",
+        "value": "f0e5b23b8636337de1fcce2e57164847a4b456bd30ceb8bcdd041ff911500621"
+      },
+      {
         "name": "m8:source-sha256:.devcontainer/devcontainer-lock.json",
-        "value": "384e4376601d075e74378a20e4c1299f6949621e42e1f71358f5b1e6e5f51825"
+        "value": "f89f6ff0eaf03ebff52169032b800168d94f250e127fdb9eb51b51dc74238789"
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer.json",
@@ -2010,7 +2014,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:27c98283-2d95-5c49-bc5e-56d0929f6d0f",
+  "serialNumber": "urn:uuid:cbe2daf0-dff0-5a9a-8f1f-d478d7a758c1",
   "specVersion": "1.6",
   "version": 1
 }

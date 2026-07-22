@@ -22,9 +22,11 @@ runtime; platform expansion requires a separate reviewed hash set.
 
 The refresh is intentionally manual and review-gated. Do not replace a SHA
 with a tag, add an un-hashed install, or use an installer script in this
-workflow. Devcontainer bootstrap identities are maintained separately by
-`.devcontainer/devcontainer-lock.json` and Step 10.5's reviewed bootstrap
-procedure. CPython comes from the digest-pinned official runtime image in
+workflow. The CLI-owned feature manifest lock is
+`.devcontainer/devcontainer-lock.json`; the broader reviewed bootstrap, image,
+and feature-option identities are maintained separately in
+`.devcontainer/bootstrap-lock.json` by Step 10.5's bootstrap procedure. CPython
+comes from the digest-pinned official runtime image in
 `.devcontainer/Dockerfile`; refreshing it requires updating the image digest,
 the verified executable digest, the lock, the supply-chain fixtures, and the
 SBOM together. Claude Code and Codex are installed at exact npm versions and
@@ -34,9 +36,10 @@ bootstrap refresh must finish with two independent no-cache Dev Container
 builds and matching post-create identity/capability probes.
 
 Feature keys use the portable major-tag syntax required by Dev Container
-clients. Their exact OCI manifest digests and option sets are enforced in
-`.devcontainer/devcontainer-lock.json`; verification builds use
-`--frozen-lockfile`, so the tag cannot silently update the reviewed feature.
+clients. Their exact OCI manifest digests are enforced by the canonical
+`.devcontainer/devcontainer-lock.json`; exact options are independently bound
+by `.devcontainer/bootstrap-lock.json`. Verification builds use
+`--frozen-lockfile`, so the tags cannot silently update the reviewed features.
 
 ## Root-tooling SBOM
 

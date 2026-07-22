@@ -157,6 +157,7 @@ class W9d2TrustIdentityTests(unittest.TestCase):
         identity = self._identity()
         cases = (
             self.root / self.capability,
+            self.root / ".devcontainer/bootstrap-lock.json",
             self.root / ".devcontainer/devcontainer-lock.json",
             self.home / "config.toml",
             self.child / "AGENTS.md",

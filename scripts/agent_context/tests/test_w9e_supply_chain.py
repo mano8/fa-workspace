@@ -74,7 +74,7 @@ class W9eSupplyChainTests(unittest.TestCase):
             workflow = root / WORKFLOW
             workflow.write_text(
                 workflow.read_text(encoding="utf-8").replace(
-                    "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+                    "actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8",
                     "actions/checkout@v4",
                 ),
                 encoding="utf-8",

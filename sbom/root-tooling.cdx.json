@@ -39,7 +39,7 @@
       "version": "0.144.6"
     },
     {
-      "bom-ref": "application:actions/checkout@v4.2.2",
+      "bom-ref": "application:actions/checkout@v6.0.1",
       "name": "actions/checkout",
       "properties": [
         {
@@ -48,14 +48,14 @@
         },
         {
           "name": "m8:resolved",
-          "value": "11bd71901bbe5b1630ceea73d27597364c9af683"
+          "value": "8e8c483db84b4bee98b60c0593521ed34d9990e8"
         }
       ],
       "type": "application",
-      "version": "v4.2.2"
+      "version": "v6.0.1"
     },
     {
-      "bom-ref": "application:actions/setup-python@v5.6.0",
+      "bom-ref": "application:actions/setup-python@v6.2.0",
       "name": "actions/setup-python",
       "properties": [
         {
@@ -64,11 +64,11 @@
         },
         {
           "name": "m8:resolved",
-          "value": "42375524e23c412d93fb67b49958b491fce71c38"
+          "value": "a309ff8b426b58ec0e2a45f0f869d46889d02405"
         }
       ],
       "type": "application",
-      "version": "v5.6.0"
+      "version": "v6.2.0"
     },
     {
       "bom-ref": "application:git@1:2.53.0-1ubuntu1",
@@ -1969,7 +1969,7 @@
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "32ad47fc0171cad9272a3b99cf15c8316fc4ee24a5dcca52304b6877d0d86a49"
+      "version": "f07e2a686e099cbb79cc3a1be7a2dc59f96daea82e193f197d92e4a075eb800f"
     },
     "properties": [
       {
@@ -2010,11 +2010,11 @@
       },
       {
         "name": "m8:source-sha256:.github/workflows/workspace-policy-lint.yml",
-        "value": "ea42d5b59e1b598c1c14171fdf345a153edaa1fab0f7df544da2837c7e3fbf6d"
+        "value": "3caba7c7c8f7428e93f7c92f0fcb0fe990a0d1eee70774c378ce5e19762a4e4b"
       }
     ]
   },
-  "serialNumber": "urn:uuid:cbe2daf0-dff0-5a9a-8f1f-d478d7a758c1",
+  "serialNumber": "urn:uuid:ecf902a8-f37c-5d57-a9b5-91ac76256b27",
   "specVersion": "1.6",
   "version": 1
 }

@@ -37,8 +37,8 @@ class W9eSbomTests(unittest.TestCase):
             "container:ghcr.io/chopratejas/headroom@code-nonroot",
             "container:ghcr.io/devcontainers/features/node:2@2.0.0",
             "container:docker.io/library/python@3.12.13-slim-bookworm",
-            "application:actions/checkout@v4.2.2",
-            "application:actions/setup-python@v5.6.0",
+            "application:actions/checkout@v6.0.1",
+            "application:actions/setup-python@v6.2.0",
             "library:ruff@0.15.22",
             "library:cryptography@49.0.0",
             "library:cffi@2.1.0",
@@ -53,10 +53,10 @@ class W9eSbomTests(unittest.TestCase):
         self.assertEqual(
             next(
                 property["value"]
-                for property in by_reference["application:actions/checkout@v4.2.2"]["properties"]
+                for property in by_reference["application:actions/checkout@v6.0.1"]["properties"]
                 if property["name"] == "m8:resolved"
             ),
-            "11bd71901bbe5b1630ceea73d27597364c9af683",
+            "8e8c483db84b4bee98b60c0593521ed34d9990e8",
         )
         for reference in (
             "library:ruff@0.15.22", "library:cryptography@49.0.0",

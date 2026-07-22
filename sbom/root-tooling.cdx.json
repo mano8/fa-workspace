@@ -1969,7 +1969,7 @@
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "f07e2a686e099cbb79cc3a1be7a2dc59f96daea82e193f197d92e4a075eb800f"
+      "version": "f30f8f3456d203bac28848d4e61834e0f16e7eaa83bc27821fe5fbd8d6352add"
     },
     "properties": [
       {
@@ -1982,7 +1982,7 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/bootstrap-lock.json",
-        "value": "f0e5b23b8636337de1fcce2e57164847a4b456bd30ceb8bcdd041ff911500621"
+        "value": "a873b2b6ed5ae5d7242f0a86e767a88a1b0fc1f29a26e2855554db42c0a05415"
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer-lock.json",
@@ -1990,7 +1990,7 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer.json",
-        "value": "8fe6a4b3ff16e422112d2d516a358d79a17de89cda3ac4ad7e1444b5976760ce"
+        "value": "4f4a808e2ce07a34d31eab7f44dcfafe23ecec7b39beebb93d20077c5ea5559f"
       },
       {
         "name": "m8:source-sha256:.devcontainer/docker-compose.devcontainer.yml",
@@ -2014,7 +2014,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:ecf902a8-f37c-5d57-a9b5-91ac76256b27",
+  "serialNumber": "urn:uuid:797fa9e8-50b2-5411-a1c7-84d86aafe2fc",
   "specVersion": "1.6",
   "version": 1
 }

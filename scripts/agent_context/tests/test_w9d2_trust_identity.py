@@ -50,7 +50,12 @@ class W9d2TrustIdentityTests(unittest.TestCase):
     @staticmethod
     def _commit(directory: Path) -> None:
         subprocess.run(("git", "init", "-q"), cwd=directory, check=True)
-        subprocess.run(("git", "add", "."), cwd=directory, check=True)
+        subprocess.run(
+            ("git", "-c", "advice.addEmbeddedRepo=false", "add", "."),
+            cwd=directory,
+            check=True,
+            capture_output=True,
+        )
         subprocess.run(
             ("git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "fixture"),
             cwd=directory, check=True,

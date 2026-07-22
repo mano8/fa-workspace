@@ -86,7 +86,7 @@
     "ghcr.io/devcontainers/features/node:2": {
       "version": "24.16.0",
       "pnpmVersion": "none",
-      "nvmVersion": "0.40.6"
+      "nvmVersion": "0.40.4"
     }
   }
 }

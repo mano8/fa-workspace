@@ -63,6 +63,10 @@ class W9eDocumentationTests(unittest.TestCase):
             self.assertTrue((ROOT / relative).is_file(), relative)
         evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
         self.assertEqual(evidence["status"], "CURRENT_POST_REMEDIATION")
+        self.assertTrue(all(
+            relative.startswith(".workspace/status/")
+            for relative in evidence["historical_artifacts"]
+        ))
         for relative, expected in evidence["sha256"].items():
             self.assertEqual(hashlib.sha256((ROOT / relative).read_bytes()).hexdigest(), expected, relative)
 

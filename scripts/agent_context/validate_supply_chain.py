@@ -134,7 +134,7 @@ def validate_supply_chain(workspace: Path) -> None:
             _fail(f"{runtime} devcontainer lock option differs from bootstrap identity")
     reviewed_options = {
         "ghcr.io/devcontainers/features/node:2": {
-            "pnpmVersion": "none", "nvmVersion": "0.40.6",
+            "pnpmVersion": "none", "nvmVersion": "0.40.4",
         },
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
             "version": "29.6.1", "moby": False,

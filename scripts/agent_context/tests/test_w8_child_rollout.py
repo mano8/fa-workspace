@@ -14,6 +14,17 @@ from agent_context import child_rollout, w2b1
 
 
 WORKSPACE = Path(__file__).resolve().parents[3]
+ROLLED_OUT_REPOSITORIES = (
+    "auth-sdk-m8", "media-sdk-m8", "fastapi-m8", "imgtools_m8",
+    "security-tests-m8", "fa-auth-m8", "media-service-m8", "media-worker-m8",
+    "prompt-engine-m8", "reparto-docente-m8", "fa-ui-m8", "astro-ui-m8",
+    "astro-auth-m8", "astro-media-m8", "astro-prompt-m8", "astro-reparto-m8",
+)
+LIVE_ROLLOUTS_AVAILABLE = all(
+    (WORKSPACE / repository / name).is_file()
+    for repository in ROLLED_OUT_REPOSITORIES
+    for name in ("AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md")
+)
 
 
 class ChildRolloutContractTests(unittest.TestCase):
@@ -40,24 +51,9 @@ class ChildRolloutContractTests(unittest.TestCase):
             )
         )
 
+    @unittest.skipUnless(LIVE_ROLLOUTS_AVAILABLE, "live child repositories are external")
     def test_live_completed_c02_through_c16_rollouts_have_one_neutral_owner(self) -> None:
-        for repository_id in (
-            "media-sdk-m8",
-            "fastapi-m8",
-            "imgtools_m8",
-            "security-tests-m8",
-            "fa-auth-m8",
-            "media-service-m8",
-            "media-worker-m8",
-            "prompt-engine-m8",
-            "reparto-docente-m8",
-            "fa-ui-m8",
-            "astro-ui-m8",
-            "astro-auth-m8",
-            "astro-media-m8",
-            "astro-prompt-m8",
-            "astro-reparto-m8",
-        ):
+        for repository_id in ROLLED_OUT_REPOSITORIES[1:]:
             child = WORKSPACE / repository_id
             sources = {
                 name: (child / name).read_bytes()
@@ -94,6 +90,7 @@ class ChildRolloutContractTests(unittest.TestCase):
                     self.assertEqual(standalone.local_sources, ("REPOSITORY_CONTEXT.md", entrypoint))
                     self.assertFalse(standalone.workspace_enhancement_available)
 
+    @unittest.skipUnless(LIVE_ROLLOUTS_AVAILABLE, "live child repositories are external")
     def test_live_c01_rollout_has_one_neutral_owner_in_both_modes(self) -> None:
         child = WORKSPACE / "auth-sdk-m8"
         sources = {

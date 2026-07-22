@@ -54,7 +54,7 @@ class W9eSupplyChainTests(unittest.TestCase):
         self.assertNotIn("features/node@sha256:", devcontainer)
         self.assertNotIn("docker-outside-of-docker@sha256:", devcontainer)
         self.assertIn('"pnpmVersion": "none"', devcontainer)
-        self.assertIn('"nvmVersion": "0.40.6"', devcontainer)
+        self.assertIn('"nvmVersion": "0.40.4"', devcontainer)
         self.assertIn('"dockerDashComposeVersion": "none"', devcontainer)
         self.assertIn('"installDockerBuildx": false', devcontainer)
         self.assertIn('@anthropic-ai/claude-code@${CLAUDE_VERSION}', setup)

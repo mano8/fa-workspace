@@ -10,6 +10,13 @@ from typing import Any
 
 
 SCHEMA_URL = "https://json.schemastore.org/claude-code-settings.json"
+ALLOW_RULES = (
+    "Bash(pip-audit -r *)",
+    "Bash(bandit -r *)",
+    "Bash(python -m pytest *)",
+    "Bash(ruff format *)",
+    "Bash(ruff format --check *)",
+)
 ASK_RULES = (
     "Bash(rm *)",
     "Bash(git clean *)",
@@ -19,13 +26,12 @@ ASK_RULES = (
     "Bash(curl *)",
     "Bash(wget *)",
     "WebFetch",
+    "Bash(docker compose *)",
 )
 DENY_RULES = (
     "Read(./.env.local)",
     "Read(./.env.devcontainer)",
     "Read(./.claude/settings.local.json)",
-    "Read(./.claude/.claude/settings.json)",
-    "Read(./.claude/memory/**)",
 )
 FORBIDDEN_KEYS = frozenset(
     {
@@ -45,6 +51,7 @@ class ClaudeSettingsValidationError(ValueError):
 @dataclass(frozen=True)
 class ClaudeSettingsValidationReport:
     byte_count: int
+    allow_rule_count: int
     ask_rule_count: int
     deny_rule_count: int
 
@@ -83,24 +90,13 @@ def validate_claude_settings(workspace: Path) -> ClaudeSettingsValidationReport:
     permissions = settings["permissions"]
     if not isinstance(permissions, dict):
         _fail("project Claude permissions must be an object")
-    expected_permission_keys = {
-        "defaultMode",
-        "disableAutoMode",
-        "disableBypassPermissionsMode",
-        "allow",
-        "ask",
-        "deny",
-    }
+    expected_permission_keys = {"defaultMode", "allow", "ask", "deny"}
     if set(permissions) != expected_permission_keys:
         _fail("project Claude permissions contain unsupported or missing keys")
     if permissions["defaultMode"] != "default":
         _fail("project Claude permissions must retain the default approval mode")
-    if permissions["disableAutoMode"] != "disable":
-        _fail("project Claude permissions must disable auto mode")
-    if permissions["disableBypassPermissionsMode"] != "disable":
-        _fail("project Claude permissions must disable bypass mode")
-    if permissions["allow"] != []:
-        _fail("project Claude settings must not track personal command approvals")
+    if tuple(permissions["allow"]) != ALLOW_RULES:
+        _fail("project Claude settings contain unreviewed or personal command approvals")
     if tuple(permissions["ask"]) != ASK_RULES:
         _fail("project Claude confirmation rules must cover only defined destructive/network actions")
     if tuple(permissions["deny"]) != DENY_RULES:
@@ -108,7 +104,8 @@ def validate_claude_settings(workspace: Path) -> ClaudeSettingsValidationReport:
     if FORBIDDEN_KEYS.intersection(settings) or FORBIDDEN_KEYS.intersection(permissions):
         _fail("project Claude settings contain personal paths, attribution, or active tooling")
     return ClaudeSettingsValidationReport(
-        byte_count=len(raw), ask_rule_count=len(ASK_RULES), deny_rule_count=len(DENY_RULES)
+        byte_count=len(raw), allow_rule_count=len(ALLOW_RULES),
+        ask_rule_count=len(ASK_RULES), deny_rule_count=len(DENY_RULES)
     )
 
 
@@ -125,7 +122,8 @@ def main() -> int:
         return 2
     print(
         "Claude settings validation passed: "
-        f"{report.byte_count} bytes, {report.ask_rule_count} confirmation rules, "
+        f"{report.byte_count} bytes, {report.allow_rule_count} shared allow rules, "
+        f"{report.ask_rule_count} confirmation rules, "
         f"{report.deny_rule_count} local-sensitive path rules"
     )
     return 0

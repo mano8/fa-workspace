@@ -10,6 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agent_context.validate_claude_settings import (
+    ALLOW_RULES,
     ASK_RULES,
     DENY_RULES,
     ClaudeSettingsValidationError,
@@ -30,6 +31,7 @@ class W5ClaudeSettingsTests(unittest.TestCase):
 
     def test_current_settings_are_portable_and_least_privilege(self) -> None:
         report = validate_claude_settings(WORKSPACE)
+        self.assertEqual(report.allow_rule_count, len(ALLOW_RULES))
         self.assertEqual(report.ask_rule_count, len(ASK_RULES))
         self.assertEqual(report.deny_rule_count, len(DENY_RULES))
         self.assertGreater(report.byte_count, 0)

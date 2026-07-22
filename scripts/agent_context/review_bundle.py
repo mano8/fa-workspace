@@ -30,7 +30,7 @@ from agent_context import w2b1
 from agent_context.trust_identity import build_trust_identity
 
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 CHECK_COMMANDS: dict[str, tuple[str, ...]] = {
     "authorization-negatives": ("python", "-m", "unittest", "scripts.agent_context.tests.test_w9b_authorization", "-q"),
     "budget-reproduction": ("python", "scripts/agent_context/budget_promotion.py", "--workspace", ".", "--enforce-preferred"),
@@ -55,7 +55,13 @@ CHECK_FIELDS = {"id", "command", "exit_code", "stdout_sha256", "stderr_sha256"}
 FINDING_FIELDS = {"id", "severity", "status", "negative_tests", "closure_artifacts"}
 BUNDLE_FIELDS = {
     "schema_version", "reviewed_root", "children", "trust_identity", "checks",
-    "live_receipt", "closure_inventory", "findings", "input_limitation",
+    "docker_reproduction", "live_receipt", "closure_inventory", "findings",
+    "input_limitation",
+}
+DOCKER_EVIDENCE_FIELDS = {"schema_version", "reviewed_root", "builds"}
+DOCKER_BUILD_FIELDS = {
+    "build_id", "image_id", "no_cache", "post_create_exit_code",
+    "capability_probe_exit_code", "runtime_identity_sha256",
 }
 NORMALIZED_DURATION = re.compile(rb"Ran (\d+) tests? in [0-9.]+s")
 
@@ -189,6 +195,39 @@ def _closure_inventory(workspace: Path) -> dict[str, list[Any]]:
     return {"artifacts": artifacts, "negative_tests": named_tests}
 
 
+def _validate_docker_reproduction(value: Any, root_identity: Mapping[str, str]) -> None:
+    if not isinstance(value, Mapping) or set(value) != DOCKER_EVIDENCE_FIELDS:
+        raise ReviewBundleError("Docker reproduction evidence has an invalid closed shape")
+    if value.get("schema_version") != 1 or value.get("reviewed_root") != root_identity:
+        raise ReviewBundleError("Docker reproduction evidence is stale for the reviewed root")
+    builds = value.get("builds")
+    if not isinstance(builds, list) or len(builds) != 2:
+        raise ReviewBundleError("Docker reproduction evidence must contain exactly two builds")
+    build_ids: set[str] = set()
+    runtime_identities: set[str] = set()
+    for build in builds:
+        if not isinstance(build, Mapping) or set(build) != DOCKER_BUILD_FIELDS:
+            raise ReviewBundleError("Docker build evidence has an invalid closed shape")
+        build_id = build.get("build_id")
+        image_id = build.get("image_id")
+        if not isinstance(build_id, str) or not build_id or build_id in build_ids:
+            raise ReviewBundleError("Docker build identifiers must be non-empty and distinct")
+        build_ids.add(build_id)
+        if not isinstance(image_id, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id):
+            raise ReviewBundleError("Docker image identity is malformed")
+        if (
+            build.get("no_cache") is not True
+            or build.get("post_create_exit_code") != 0
+            or build.get("capability_probe_exit_code") != 0
+        ):
+            raise ReviewBundleError("Docker build or required post-create probe did not pass")
+        runtime_identity = build.get("runtime_identity_sha256")
+        w2b1._sha256(runtime_identity, "Docker runtime_identity_sha256")
+        runtime_identities.add(runtime_identity)
+    if len(runtime_identities) != 1:
+        raise ReviewBundleError("independent Docker builds resolved different runtime identities")
+
+
 def _finding_dispositions(workspace: Path) -> tuple[list[dict[str, Any]], dict[str, str]]:
     register = _read_json(workspace / ".workspace/contracts/agent-context-w9a-findings.json")
     findings = register.get("findings")
@@ -197,11 +236,7 @@ def _finding_dispositions(workspace: Path) -> tuple[list[dict[str, Any]], dict[s
         raise ReviewBundleError("W9a finding register is incomplete")
     disposition = [{
         "id": finding["id"], "severity": finding["severity"],
-        "status": (
-            "IMPLEMENTED_PENDING_DOCKER_REVALIDATION"
-            if finding["id"] == "M-4"
-            else "CLOSED_BY_REPLAYED_W9F_EVIDENCE"
-        ),
+        "status": "CLOSED_BY_REPLAYED_W9F_EVIDENCE",
         "negative_tests": finding["negative_tests"],
         "closure_artifacts": finding["closure_artifacts"],
     } for finding in findings]
@@ -325,7 +360,7 @@ def _validate_live_receipt(live: Any, trust_identity: Mapping[str, Any]) -> None
 
 def build_bundle(
     *, workspace: Path, live_runtime: Path, codex_binary: Path, codex_version: str,
-    authorization_trust_store: Path | None = None,
+    docker_evidence: Path, authorization_trust_store: Path | None = None,
     checks: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Build a W9f bundle only after current evidence has been executed."""
@@ -334,6 +369,8 @@ def build_bundle(
     closure = _closure_inventory(root)
     check_results = [dict(item) for item in checks] if checks is not None else run_checks(root)
     _validate_checks(check_results)
+    docker_reproduction = _read_json(docker_evidence)
+    _validate_docker_reproduction(docker_reproduction, _git_identity(root))
     identity = build_trust_identity(
         workspace_root=root,
         selected_repositories=tuple(root / child["path"] for child in children),
@@ -353,6 +390,7 @@ def build_bundle(
         "children": children,
         "trust_identity": identity,
         "checks": check_results,
+        "docker_reproduction": docker_reproduction,
         "live_receipt": live,
         "closure_inventory": closure,
         "findings": findings,
@@ -376,6 +414,7 @@ def validate_bundle(
     root = workspace.resolve(strict=True)
     if bundle["reviewed_root"] != _git_identity(root):
         raise ReviewBundleError("review bundle root commit/tree or clean proof drifted")
+    _validate_docker_reproduction(bundle["docker_reproduction"], bundle["reviewed_root"])
     expected_children = _children(root)
     if bundle["children"] != expected_children:
         raise ReviewBundleError("review bundle child Git or instruction identity drifted")
@@ -432,6 +471,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--workspace", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--live-runtime", type=Path)
+    parser.add_argument(
+        "--docker-evidence", type=Path,
+        help="external exact-tree evidence from two no-cache builds and probes",
+    )
     parser.add_argument("--verify", action="store_true", help="replay and verify an existing bundle")
     parser.add_argument("--codex-binary", type=Path)
     parser.add_argument("--codex-version")
@@ -451,8 +494,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
         if arguments.live_runtime is None:
             raise ReviewBundleError("--live-runtime is required when building a bundle")
+        if arguments.docker_evidence is None:
+            raise ReviewBundleError("--docker-evidence is required when building a bundle")
         bundle = build_bundle(
             workspace=arguments.workspace, live_runtime=arguments.live_runtime,
+            docker_evidence=arguments.docker_evidence,
             codex_binary=binary, codex_version=version,
             authorization_trust_store=arguments.authorization_trust_store,
         )

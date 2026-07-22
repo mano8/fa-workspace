@@ -19,6 +19,7 @@
     "w9f-focused",
     "workspace-validator"
   ],
-  "schema_version": 2,
+  "schema_version": 3,
+  "build": "python scripts/agent_context/review_bundle.py --workspace . --live-runtime <runtime> --docker-evidence <docker-attestation> --output <artifact>",
   "verification": "python scripts/agent_context/review_bundle.py --workspace . --output <artifact> --verify"
 }

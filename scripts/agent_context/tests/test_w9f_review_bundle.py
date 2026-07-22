@@ -40,6 +40,22 @@ FINDINGS = [{
     "closure_artifacts": ["tracked"],
 }]
 LIMITATION = {"id": "zip-reproducibility", "status": "REPLACED_BY_REPLAYED_EXACT_TREE_BUNDLE"}
+DOCKER = {
+    "schema_version": 1,
+    "reviewed_root": ROOT_IDENTITY,
+    "builds": [
+        {
+            "build_id": "build-a", "image_id": f"sha256:{'4' * 64}",
+            "no_cache": True, "post_create_exit_code": 0,
+            "capability_probe_exit_code": 0, "runtime_identity_sha256": "5" * 64,
+        },
+        {
+            "build_id": "build-b", "image_id": f"sha256:{'6' * 64}",
+            "no_cache": True, "post_create_exit_code": 0,
+            "capability_probe_exit_code": 0, "runtime_identity_sha256": "5" * 64,
+        },
+    ],
+}
 
 
 def _checks() -> list[dict[str, object]]:
@@ -69,8 +85,10 @@ class W9fReviewBundleTests(unittest.TestCase):
             runtime_path = Path(runtime)
             (runtime_path / "session.json").write_text('{"state":"COMPLETED"}\n', encoding="utf-8")
             (runtime_path / "receipt.json").write_text('{"state":"COMPLETED"}\n', encoding="utf-8")
+            docker_evidence = runtime_path / "docker-evidence.json"
+            docker_evidence.write_bytes(canonical_bytes(DOCKER))
             return build_bundle(
-                workspace=ROOT, live_runtime=runtime_path,
+                workspace=ROOT, live_runtime=runtime_path, docker_evidence=docker_evidence,
                 codex_binary=Path(sys.executable), codex_version="fixture",
             )
 
@@ -99,6 +117,25 @@ class W9fReviewBundleTests(unittest.TestCase):
         changed["reviewed_root"]["tree"] = "0" * 40  # type: ignore[index]
         with self.assertRaisesRegex(ReviewBundleError, "root commit/tree"):
             self._validate(changed)
+
+    def test_bundle_rejects_missing_stale_or_failed_docker_reproduction(self) -> None:
+        bundle = self._bundle()
+        missing = deepcopy(bundle)
+        del missing["docker_reproduction"]
+        with self.assertRaisesRegex(ReviewBundleError, "invalid closed shape"):
+            self._validate(missing)
+        stale = deepcopy(bundle)
+        stale["docker_reproduction"]["reviewed_root"]["tree"] = "0" * 40  # type: ignore[index]
+        with self.assertRaisesRegex(ReviewBundleError, "stale"):
+            self._validate(stale)
+        failed = deepcopy(bundle)
+        failed["docker_reproduction"]["builds"][1]["capability_probe_exit_code"] = 1  # type: ignore[index]
+        with self.assertRaisesRegex(ReviewBundleError, "did not pass"):
+            self._validate(failed)
+        divergent = deepcopy(bundle)
+        divergent["docker_reproduction"]["builds"][1]["runtime_identity_sha256"] = "7" * 64  # type: ignore[index]
+        with self.assertRaisesRegex(ReviewBundleError, "different runtime identities"):
+            self._validate(divergent)
 
     def test_self_contained_bundle_replays_minimum_checks(self) -> None:
         bundle = self._bundle()

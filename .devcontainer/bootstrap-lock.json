@@ -3,7 +3,7 @@
     "claude": {
       "package": "@anthropic-ai/claude-code",
       "version": "2.1.217",
-      "binary_sha256": "2630fc5dc6db61bc03f86b95daf47766e5b61873f7bb7cfea764c5ac5a9ba"
+      "binary_sha256": "2630fc5dc6db61bc03f86b95daf47766e5ed5b61873f7bb7cfea764c5ac5a9ba"
     },
     "codex": {
       "package": "@openai/codex",
@@ -33,6 +33,11 @@
       "package": "curl",
       "version": "8.18.0-1ubuntu2.3",
       "type": "library"
+    },
+    "apt_docker_compose_plugin": {
+      "package": "docker-compose-plugin",
+      "version": "5.3.1-1~ubuntu.26.04~resolute",
+      "type": "application"
     },
     "apt_git": {
       "package": "git",

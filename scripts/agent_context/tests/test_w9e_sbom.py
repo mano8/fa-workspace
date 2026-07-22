@@ -34,6 +34,7 @@ class W9eSbomTests(unittest.TestCase):
             "application:node@24.16.0",
             "application:python@3.12.13",
             "application:headroom-ai[mcp,proxy,code]@0.32.1",
+            "application:docker-compose-plugin@5.3.1-1~ubuntu.26.04~resolute",
             "container:ghcr.io/chopratejas/headroom@code-nonroot",
             "container:ghcr.io/devcontainers/features/node:2@2.0.0",
             "container:docker.io/library/python@3.12.13-slim-bookworm",

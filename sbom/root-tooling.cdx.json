@@ -7,7 +7,7 @@
       "hashes": [
         {
           "alg": "SHA-256",
-          "content": "2630fc5dc6db61bc03f86b95daf47766e5b61873f7bb7cfea764c5ac5a9ba"
+          "content": "2630fc5dc6db61bc03f86b95daf47766e5ed5b61873f7bb7cfea764c5ac5a9ba"
         }
       ],
       "name": "@anthropic-ai/claude-code",
@@ -69,6 +69,18 @@
       ],
       "type": "application",
       "version": "v6.2.0"
+    },
+    {
+      "bom-ref": "application:docker-compose-plugin@5.3.1-1~ubuntu.26.04~resolute",
+      "name": "docker-compose-plugin",
+      "properties": [
+        {
+          "name": "m8:source",
+          "value": ".devcontainer/bootstrap-lock.json"
+        }
+      ],
+      "type": "application",
+      "version": "5.3.1-1~ubuntu.26.04~resolute"
     },
     {
       "bom-ref": "application:git@1:2.53.0-1ubuntu1",
@@ -1969,7 +1981,7 @@
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "f30f8f3456d203bac28848d4e61834e0f16e7eaa83bc27821fe5fbd8d6352add"
+      "version": "9ac4958386258d8189f630386a73967499ae14ec90d7150524caa8785dfbb220"
     },
     "properties": [
       {
@@ -1982,7 +1994,7 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/bootstrap-lock.json",
-        "value": "a873b2b6ed5ae5d7242f0a86e767a88a1b0fc1f29a26e2855554db42c0a05415"
+        "value": "4d6caca02cf82b993ac88ff5487f5ebe8196fb3468f39599c5a451abb6d42a6f"
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer-lock.json",
@@ -2002,7 +2014,7 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/setup.sh",
-        "value": "98181494b4361d16a3c5e9dbc90ad02d4a3aaf6b68f16e8b13d05a1a838949c4"
+        "value": "21a3f2d9305b44a81ba52cee74d4c87b9be85be5ff520c8a6052df6646180ffc"
       },
       {
         "name": "m8:source-sha256:.github/workflows/root-tooling.requirements.lock",
@@ -2014,7 +2026,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:797fa9e8-50b2-5411-a1c7-84d86aafe2fc",
+  "serialNumber": "urn:uuid:69badec0-fe28-5670-ae2a-c19f5580cd4d",
   "specVersion": "1.6",
   "version": 1
 }

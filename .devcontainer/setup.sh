@@ -4,7 +4,7 @@ set -euo pipefail
 readonly CODEX_VERSION="0.144.6"
 readonly CODEX_BINARY_SHA256="134063e133f0b4244fa3b251acf973d4fe4b4aeeacbdc135211bf480f59f1477"
 readonly CLAUDE_VERSION="2.1.217"
-readonly CLAUDE_BINARY_SHA256="2630fc5dc6db61bc03f86b95daf47766e5b61873f7bb7cfea764c5ac5a9ba"
+readonly CLAUDE_BINARY_SHA256="2630fc5dc6db61bc03f86b95daf47766e5ed5b61873f7bb7cfea764c5ac5a9ba"
 readonly HEADROOM_RECORD_SHA256="f924558152b73d544efb800d9884db709e4856d4a989b47023864c9a2325aa02"
 readonly ROOT_TOOLING_LOCK_SHA256="a0da875a5c7c202a95fa7963d2b1b1132a47bb32fa25140aa58a52a95d85b368"
 readonly ROOT_TOOLING_LOCK_VERSION="2026-07-21"
@@ -14,6 +14,7 @@ readonly PYTHON_VERSION="3.12.13"
 readonly PYTHON_BINARY_SHA256="4dbf3143240288fb2170257ffaa7bd030cdda5d2703d1f5f30b627042267e2e3"
 readonly CA_CERTIFICATES_VERSION="20260601~26.04.1"
 readonly CURL_VERSION="8.18.0-1ubuntu2.3"
+readonly DOCKER_COMPOSE_PLUGIN_VERSION="5.3.1-1~ubuntu.26.04~resolute"
 readonly GIT_VERSION="1:2.53.0-1ubuntu1"
 readonly JQ_VERSION="1.8.1-4ubuntu2"
 
@@ -22,11 +23,14 @@ sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
     "ca-certificates=${CA_CERTIFICATES_VERSION}" \
     "curl=${CURL_VERSION}" \
+    "docker-compose-plugin=${DOCKER_COMPOSE_PLUGIN_VERSION}" \
     "git=${GIT_VERSION}" \
     "jq=${JQ_VERSION}"
 
 test "$(dpkg-query -W -f='${Version}' ca-certificates)" = "${CA_CERTIFICATES_VERSION}"
 test "$(dpkg-query -W -f='${Version}' curl)" = "${CURL_VERSION}"
+test "$(dpkg-query -W -f='${Version}' docker-compose-plugin)" = "${DOCKER_COMPOSE_PLUGIN_VERSION}"
+test "$(docker compose version --short)" = "5.3.1"
 test "$(dpkg-query -W -f='${Version}' git)" = "${GIT_VERSION}"
 test "$(dpkg-query -W -f='${Version}' jq)" = "${JQ_VERSION}"
 test "$(node --version)" = "v${NODE_VERSION}"

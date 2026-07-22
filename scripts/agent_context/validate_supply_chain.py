@@ -165,10 +165,13 @@ def validate_supply_chain(workspace: Path) -> None:
     enforced = (
         bootstrap["claude"], bootstrap["codex"], bootstrap["headroom"], bootstrap["node_runtime"],
         bootstrap["python_runtime"], bootstrap["root_tooling"],
-        bootstrap["apt_ca_certificates"], bootstrap["apt_curl"], bootstrap["apt_git"],
-        bootstrap["apt_jq"],
+        bootstrap["apt_ca_certificates"], bootstrap["apt_curl"],
+        bootstrap["apt_docker_compose_plugin"], bootstrap["apt_git"], bootstrap["apt_jq"],
     )
     for item in enforced:
+        digest = item.get("binary_sha256") or item.get("record_sha256")
+        if digest is not None and not re.fullmatch(r"[0-9a-f]{64}", digest):
+            _fail(f"{item['package']} has a malformed reviewed SHA-256")
         for value in (item["version"], item.get("binary_sha256") or item.get("record_sha256")):
             if value is not None and value not in setup:
                 _fail(f"bootstrap setup does not enforce {item['package']} identity")

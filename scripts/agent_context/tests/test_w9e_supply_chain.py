@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import sys
@@ -20,6 +21,11 @@ LOCK = Path(".github/workflows/root-tooling.requirements.lock")
 
 
 class W9eSupplyChainTests(unittest.TestCase):
+    @staticmethod
+    def _copy_validator_inputs(root: Path) -> None:
+        shutil.copytree(ROOT / ".github", root / ".github")
+        shutil.copytree(ROOT / ".devcontainer", root / ".devcontainer")
+
     def test_actions_use_full_commit_sha_with_version_comment(self) -> None:
         lines = (ROOT / WORKFLOW).read_text(encoding="utf-8").splitlines()
         actions = [line for line in lines if "uses:" in line]
@@ -58,6 +64,8 @@ class W9eSupplyChainTests(unittest.TestCase):
         self.assertIn('"dockerDashComposeVersion": "none"', devcontainer)
         self.assertIn('"installDockerBuildx": false', devcontainer)
         self.assertIn('@anthropic-ai/claude-code@${CLAUDE_VERSION}', setup)
+        self.assertIn('"docker-compose-plugin=${DOCKER_COMPOSE_PLUGIN_VERSION}"', setup)
+        self.assertIn('docker compose version --short', setup)
         self.assertIn(
             "python@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b",
             dockerfile,
@@ -80,6 +88,17 @@ class W9eSupplyChainTests(unittest.TestCase):
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(SystemExit, "unreviewed Action ref"):
+                validate_supply_chain(root)
+
+    def test_malformed_reviewed_binary_sha256_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self._copy_validator_inputs(root)
+            lock_path = root / ".devcontainer/bootstrap-lock.json"
+            lock = json.loads(lock_path.read_text(encoding="utf-8"))
+            lock["bootstrap"]["claude"]["binary_sha256"] = "a" * 61
+            lock_path.write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(SystemExit, "malformed reviewed SHA-256"):
                 validate_supply_chain(root)
 
 

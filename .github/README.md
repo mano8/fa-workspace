@@ -31,9 +31,11 @@ comes from the digest-pinned official runtime image in
 the verified executable digest, the lock, the supply-chain fixtures, and the
 SBOM together. Claude Code and Codex are installed at exact npm versions and
 their executable hashes are verified during post-create. Optional floating
-Node pnpm and Docker Compose/buildx installers are disabled. Any reviewed
-bootstrap refresh must finish with two independent no-cache Dev Container
-builds and matching post-create identity/capability probes.
+Node pnpm, standalone Docker Compose, and buildx installers are disabled. The
+Docker feature's unavoidable apt-provided Compose plugin is exact-version
+installed and verified during post-create. Any reviewed bootstrap refresh must
+finish with two independent no-cache Dev Container builds and matching
+post-create identity/capability probes.
 
 Feature keys use the portable major-tag syntax required by Dev Container
 clients. Their exact OCI manifest digests are enforced by the canonical

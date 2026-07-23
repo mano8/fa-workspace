@@ -1,12 +1,21 @@
 """Cross-repository authorization conformance harness (fa-workspace owned).
 
-This package realises the Phase 5 controller bullet *"Run local-package matrix
-in dependency order and prove issuer/consumer parity for all valid and invalid
-claim combinations, including the concurrent-login-during-downgrade generation
-race and the durable-outbox propagation"* from
+This package realises the Phase 5 controller conformance bullets from
 ``.workspace/plans/stack/todo/auth-role-superuser-consistency/00-execution.md``
 (canonical verification owner: ``50-verification-conformance.md`` §6
-*Cross-repository integration*, ``TEST-CROSS-01``).
+*Cross-repository integration*, ``TEST-CROSS-01``):
+
+* *"Run local-package matrix in dependency order and prove issuer/consumer
+  parity for all valid and invalid claim combinations, including the
+  concurrent-login-during-downgrade generation race and the durable-outbox
+  propagation"* (:mod:`scripts.conformance.local_package_matrix`,
+  :mod:`scripts.conformance.issuer_consumer_parity`).
+* *"API-key principal conformance (§3.12)"* — issuer-local and remote
+  introspection principals reach identical post-admission decisions for every
+  fixture role/flag/access-mode pair, with the fail-closed, quota-parity,
+  no-caching, indistinguishability, capability-ceiling, and route-audit
+  guarantees of ``30-api-key-introspection.md`` (``APIKEY-*``)
+  (:mod:`scripts.conformance.api_key_principal_conformance`).
 
 Ownership boundary (``.workspace/architecture.md``):
 

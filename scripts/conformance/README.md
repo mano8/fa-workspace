@@ -31,6 +31,22 @@ checksum-verified fixture matrix (`FIXTURE-01`).
 4. **Durable-outbox propagation.** The `<` / `==` / `>` generation watermark
    rule with durable `event_id` dedup (v2) and conservative eviction (v1) is
    applied as the outbox delivers events to the consumer.
+5. **API-key principal conformance (§3.12).** For every fixture
+   role/flag/access-mode pair the issuer-local principal (the SDK principal
+   fa-auth builds from its DB read) and the remote principal (an introspection
+   reply parsed by the **real** `fastapi_m8` introspection client) reach
+   **identical** post-admission decisions, delegating to the single canonical
+   `has_api_key_capability`; the intentional admission asymmetry (no audience ⇒
+   remote inactive) holds. It also proves, against the shipped client:
+   `429` quota relay preserving `Retry-After`; a `writer→reader` downgrade
+   denies the next remote request (no positive caching — two requests, two
+   introspections); introspection outage / malformed / unknown-schema /
+   audience-mismatch all fail closed (`503`) with no fallback to bare key
+   validity; every inactive cause is externally indistinguishable (one generic
+   denial); the capability ceiling (`require_api_key_role` above `WRITER`
+   raises — no admin/superuser API-key dependency exists, a dual-evidence
+   superuser owner is still capped at writer); and the static route audit flags
+   a capability route wired to the bare key dependency.
 
 ## Ownership boundary
 

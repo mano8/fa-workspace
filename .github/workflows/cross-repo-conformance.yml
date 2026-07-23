@@ -1,12 +1,13 @@
 name: Cross-repo authorization conformance
 
 # Workspace-owned (fa-workspace) cross-repository conformance gate for the
-# Phase 5 "local-package matrix + issuer/consumer parity" bullet
-# (50-verification-conformance.md §6, TEST-CROSS-01). It installs the local
-# platform packages in dependency order (SDK -> fastapi) and runs the
-# scripts/conformance harness. It is deliberately separate from
-# workspace-policy-lint, which stays child-agnostic and installs no platform
-# packages.
+# Phase 5 conformance bullets — "local-package matrix + issuer/consumer parity"
+# and "API-key principal conformance (§3.12)"
+# (50-verification-conformance.md §6, TEST-CROSS-01; APIKEY-* in
+# 30-api-key-introspection.md). It installs the local platform packages in
+# dependency order (SDK -> fastapi) and runs the scripts/conformance harness.
+# It is deliberately separate from workspace-policy-lint, which stays
+# child-agnostic and installs no platform packages.
 
 on:
   pull_request:
@@ -38,7 +39,7 @@ jobs:
           python -m pip install ./fastapi-m8
       - name: Lint the conformance harness
         run: python -m ruff check scripts/conformance
-      - name: Run the local-package matrix + issuer/consumer parity harness
+      - name: Run the conformance harness (matrix + parity + API-key principal)
         run: python -m scripts.conformance.run_conformance
       - name: Run the conformance unit tests
         run: python -m unittest discover -s scripts/conformance/tests -v

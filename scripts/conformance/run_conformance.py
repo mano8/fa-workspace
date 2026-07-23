@@ -53,6 +53,9 @@ def run(argv: Sequence[str] | None = None) -> int:
     # clean conformance failure rather than a module-load crash.
     from auth_sdk_m8.testing import load_authorization_fixture_matrix
 
+    from scripts.conformance.api_key_principal_conformance import (
+        run_api_key_conformance,
+    )
     from scripts.conformance.issuer_consumer_parity import run_parity_matrix
     from scripts.conformance.local_package_matrix import resolve_local_package_matrix
 
@@ -65,6 +68,12 @@ def run(argv: Sequence[str] | None = None) -> int:
     fixture_matrix = load_authorization_fixture_matrix()
     sections.append(
         ("Issuer/consumer parity", run_parity_matrix(fixture_matrix))
+    )
+    sections.append(
+        (
+            "API-key principal conformance (§3.12)",
+            run_api_key_conformance(fixture_matrix),
+        )
     )
 
     all_ok = True

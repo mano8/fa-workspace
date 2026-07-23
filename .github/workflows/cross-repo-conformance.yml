@@ -1,0 +1,44 @@
+name: Cross-repo authorization conformance
+
+# Workspace-owned (fa-workspace) cross-repository conformance gate for the
+# Phase 5 "local-package matrix + issuer/consumer parity" bullet
+# (50-verification-conformance.md §6, TEST-CROSS-01). It installs the local
+# platform packages in dependency order (SDK -> fastapi) and runs the
+# scripts/conformance harness. It is deliberately separate from
+# workspace-policy-lint, which stays child-agnostic and installs no platform
+# packages.
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cross-repo-conformance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          submodules: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          check-latest: false
+      - name: Install local platform packages in dependency order
+        run: |
+          python -m pip install --disable-pip-version-check --upgrade pip
+          # SDK first so fastapi-m8 resolves the in-workspace SDK, not PyPI.
+          python -m pip install ./auth-sdk-m8[security,fastapi,events,config,observability]
+          python -m pip install ./fastapi-m8
+      - name: Lint the conformance harness
+        run: python -m ruff check scripts/conformance
+      - name: Run the local-package matrix + issuer/consumer parity harness
+        run: python -m scripts.conformance.run_conformance
+      - name: Run the conformance unit tests
+        run: python -m unittest discover -s scripts/conformance/tests -v

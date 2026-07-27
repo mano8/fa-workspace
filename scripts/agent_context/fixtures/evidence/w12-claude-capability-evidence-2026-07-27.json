@@ -1,0 +1,349 @@
+{
+  "schema_version": 1,
+  "step": "12.1",
+  "captured": "2026-07-27",
+  "agent": "claude",
+  "supersedes": {
+    "artifact": "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md",
+    "scope": "the two Claude rows only",
+    "codex_rows_unchanged": true,
+    "note": "The 2026-07-19 artifact keeps its own hash and remains the authority for the required Codex devcontainer non-interactive row."
+  },
+  "probe": {
+    "source": "scripts/agent_context/probe_claude_capabilities.py",
+    "source_sha256": "331df219ddd91ee682e2575f0e56ec9fb2a252ba727a2b2e759b709b206c37b8",
+    "command": "python3 scripts/agent_context/probe_claude_capabilities.py --output <path> --interactive",
+    "independent_runs": 2,
+    "model_input_capture": "loopback ANTHROPIC_BASE_URL recorder with a dummy ANTHROPIC_API_KEY; request bodies only, headers never stored",
+    "vendor_api_contacted": false,
+    "workspace_files_touched": 0
+  },
+  "client": {
+    "product": "Claude Code",
+    "version": "2.1.220",
+    "commit": "4073f59596e2",
+    "command_path": "/home/vscode/.local/bin/claude",
+    "resolved_path": "/home/vscode/.local/share/claude/versions/2.1.220",
+    "sha256": "674f61f20ff306f3100cf9200e4c36c4b70278b5bef2884549819b942a89c863",
+    "install_method": "native",
+    "auto_update": "enabled",
+    "observed_auto_update_during_probe": "2.1.215 -> 2.1.220",
+    "leftover_installation": "/usr/local/share/nvm/versions/node/v24.16.0/bin/claude",
+    "platform": "linux-x64",
+    "os_release": "Ubuntu 26.04 LTS",
+    "kernel": "5.15.167.4-microsoft-standard-WSL2",
+    "machine": "x86_64",
+    "node_version": "v24.16.0",
+    "devcontainer_bootstrap_lock_sha256": "4d6caca02cf82b993ac88ff5487f5ebe8196fb3468f39599c5a451abb6d42a6f"
+  },
+  "authentication": {
+    "logged_in": true,
+    "auth_method": "claude.ai",
+    "api_provider": "firstParty",
+    "subscription": "pro",
+    "note": "Authentication is a precondition, never delivery evidence. Account identifiers are intentionally omitted."
+  },
+  "hook_events_present_in_executable": [
+    "Notification",
+    "PostCompact",
+    "PostToolUse",
+    "PreCompact",
+    "PreToolUse",
+    "SessionEnd",
+    "SessionStart",
+    "SubagentStop",
+    "UserPromptSubmit"
+  ],
+  "hook_events_executed_by_probe": [
+    "SessionStart",
+    "UserPromptSubmit"
+  ],
+  "channels": {
+    "claude-hook-additional-context": {
+      "mechanism": "settings hook returning hookSpecificOutput.additionalContext",
+      "events_verified": [
+        "UserPromptSubmit",
+        "SessionStart"
+      ],
+      "max_exact_characters": 10000,
+      "min_rejected_characters": 10001,
+      "verified_channel_limit_bytes": 10000,
+      "byte_limit_rationale": "UTF-8 byte count is never below the character or UTF-16 unit count, so a payload of at most 10000 bytes stays inside the observed 10000-character boundary under any counting basis.",
+      "over_limit_behavior": "the client replaces the value with a <persisted-output> preview plus a temporary-file pointer, which the delivery contract never accepts as delivery",
+      "interactive_parity": true
+    },
+    "claude-cli-append-system-prompt": {
+      "mechanism": "--append-system-prompt supplied by the canonical wrapper immediately before client invocation",
+      "max_exact_bytes": 131000,
+      "verified_channel_limit_bytes": 65536,
+      "hard_boundary": "a single argument at or above the operating system MAX_ARG_STRLEN (131072 bytes here) never reaches the client: execve fails with E2BIG",
+      "interactive_parity": true
+    },
+    "claude-cli-stdin-prompt": {
+      "mechanism": "the serialized envelope is written to the client's stdin prompt in print mode",
+      "max_exact_bytes": 1048576,
+      "verified_channel_limit_bytes": 262144,
+      "hard_boundary": "none observed up to 1048576 bytes",
+      "interactive_parity": false
+    }
+  },
+  "native_load_inspection": {
+    "mechanism": "claude-loopback-model-input-capture",
+    "in_band_mechanism": "unavailable",
+    "description": "An out-of-band evidence run with identical client, project, settings, and channel configuration points ANTHROPIC_BASE_URL at a loopback recorder and compares the captured model input against the manifest sources.",
+    "project_memory_delivery": "the exact CLAUDE.md bytes, including the trailing newline, appear in the first user message under a '# claudeMd' heading labelled with the file's absolute path",
+    "verified_source_bytes": 99,
+    "verified_source_sha256": "1ba85bf593fd71859f37703449c516f2404829ea7bc17a83b910f8576a6b1a11",
+    "rejected_mechanisms": {
+      "claude -p -d api,hooks --debug-file": "logs [API REQUEST] lines only; the model-input body is never written",
+      "model self-report": "explicitly not evidence under the native-load evidence contract"
+    },
+    "limitation": "The capture run replaces the API endpoint, so it cannot run inside the canonical delivery launch itself; it is a separate identically configured run whose evidence any client, settings, trust, or channel change invalidates."
+  },
+  "trust": {
+    "non_interactive": "the trust dialog is skipped; project .claude/settings.json hooks executed with no trust record present, and invalid settings files are silently ignored",
+    "interactive": "an untrusted project blocks at the trust dialog before any model-input request is constructed; a further one-time onboarding dialog can also block startup",
+    "preflight_mechanism": "~/.claude.json projects[<absolute path>].hasTrustDialogAccepted",
+    "consequence": "the launcher must prove the trusted, hook-active state itself and must validate its own settings file; the client's own silence is never proof"
+  },
+  "lifecycle": {
+    "launcher_owned_identity_before_invocation": true,
+    "session_identity_flag": "--session-id <uuid>",
+    "start": "the requested session identity is honored in both print and interactive mode and is reported as session_id in --output-format json",
+    "resume": "-r/--resume <id> preserves the identity",
+    "clear": "a fresh invocation without --session-id or --resume creates a new identity",
+    "fork": "--fork-session creates a new identity from a resumed session",
+    "compaction": "unverified: PreCompact and PostCompact exist in the executable but no compaction transition was captured, so a launcher must fail closed rather than infer generation preservation"
+  },
+  "policy_hard_limit": 32768,
+  "preferred_budget": 24576,
+  "reserved_margin": 32768,
+  "client_context_allowance": 262144,
+  "rows": [
+    {
+      "row_id": "claude-devcontainer-non-interactive-hook-additional-context",
+      "capability_evidence_id": "6fb210e92e30f04006652e9a56fa860de168db868c3f3aa6a19919b8a8accce3",
+      "effective_hard_limit": 10000,
+      "effective_hard_limit_formula": "min(32768 policy, 10000 channel, 262144 allowance - 32768 margin) = 10000",
+      "byte_exact_fixtures": [
+        {
+          "bytes": 8192,
+          "characters": 8192,
+          "sha256": "09d252ab68def340ce8bcec0272cc5f3f57fb492a9a989675c00f6b620cab520",
+          "mode": "ascii"
+        },
+        {
+          "bytes": 10000,
+          "characters": 10000,
+          "sha256": "cf44380e62800165603c7fd7a79abee60b20542f5e3de0265272cb5f6f52e9c5",
+          "mode": "ascii"
+        }
+      ],
+      "notes": "Primary canonical channel. It carries the current 7160-byte fa-auth-m8 envelope with headroom, and any larger envelope must fall through to the full-content row.",
+      "capability_row": {
+        "agent": "claude",
+        "blocks_closeout": true,
+        "channel_id": "claude-hook-additional-context",
+        "clear_supported": true,
+        "client_context_allowance": 262144,
+        "client_session_identity_available": true,
+        "compact_supported": false,
+        "inspection_mechanism": "claude-loopback-model-input-capture",
+        "launcher_identity_available": true,
+        "mode": "non-interactive",
+        "platform": "devcontainer",
+        "reserved_margin": 32768,
+        "resume_supported": true,
+        "start_supported": true,
+        "status": "REQUIRED",
+        "verified_channel_limit": 10000
+      }
+    },
+    {
+      "row_id": "claude-devcontainer-non-interactive-append-system-prompt",
+      "capability_evidence_id": "271d67d6307df4cec85fb7dbb26566ae3a952035168fc8a19b76e6fc54647450",
+      "effective_hard_limit": 32768,
+      "effective_hard_limit_formula": "min(32768 policy, 65536 channel, 262144 allowance - 32768 margin) = 32768",
+      "byte_exact_fixtures": [
+        {
+          "bytes": 32768,
+          "characters": 30764,
+          "sha256": "797c41dae8f88a33e6c8a159794e910d3aae516ed4dfb43b28d1385450fe9cbc",
+          "mode": "mixed"
+        },
+        {
+          "bytes": 65536,
+          "characters": 61525,
+          "sha256": "90438b158cd5e4fca6aec6e70a88fe4f535366de3b164b3a334924c4808d0304",
+          "mode": "mixed"
+        }
+      ],
+      "notes": "Full-content fallback for an envelope above the hook boundary, up to the workspace policy hard limit. Its single-argument ceiling is an operating-system limit, not a client limit.",
+      "capability_row": {
+        "agent": "claude",
+        "blocks_closeout": true,
+        "channel_id": "claude-cli-append-system-prompt",
+        "clear_supported": true,
+        "client_context_allowance": 262144,
+        "client_session_identity_available": true,
+        "compact_supported": false,
+        "inspection_mechanism": "claude-loopback-model-input-capture",
+        "launcher_identity_available": true,
+        "mode": "non-interactive",
+        "platform": "devcontainer",
+        "reserved_margin": 32768,
+        "resume_supported": true,
+        "start_supported": true,
+        "status": "REQUIRED",
+        "verified_channel_limit": 65536
+      }
+    },
+    {
+      "row_id": "claude-devcontainer-non-interactive-stdin-prompt",
+      "capability_evidence_id": "baccb59224c6b587181f5d54a361606733b514d2900172009207373d347afbe0",
+      "effective_hard_limit": 32768,
+      "effective_hard_limit_formula": "min(32768 policy, 262144 channel, 262144 allowance - 32768 margin) = 32768",
+      "byte_exact_fixtures": [
+        {
+          "bytes": 262144,
+          "characters": 246097,
+          "sha256": "99606c0123d5317d21187fa04d0214e27816e8c759201fce2a0992a09ed61d7c",
+          "mode": "mixed"
+        }
+      ],
+      "notes": "Available headroom beyond the argument-vector ceiling; it places the envelope in the user turn rather than the system prompt and has no interactive counterpart, so it is not part of the minimum viable set.",
+      "capability_row": {
+        "agent": "claude",
+        "blocks_closeout": false,
+        "channel_id": "claude-cli-stdin-prompt",
+        "clear_supported": true,
+        "client_context_allowance": 262144,
+        "client_session_identity_available": true,
+        "compact_supported": false,
+        "inspection_mechanism": "claude-loopback-model-input-capture",
+        "launcher_identity_available": true,
+        "mode": "non-interactive",
+        "platform": "devcontainer",
+        "reserved_margin": 32768,
+        "resume_supported": true,
+        "start_supported": true,
+        "status": "OPTIONAL",
+        "verified_channel_limit": 262144
+      }
+    },
+    {
+      "row_id": "claude-devcontainer-interactive-hook-additional-context",
+      "capability_evidence_id": "e5759e1b0658d40895d8ce414d5fb0c328b83d205c180e8337d215bdf5711c03",
+      "effective_hard_limit": 10000,
+      "effective_hard_limit_formula": "min(32768 policy, 10000 channel, 262144 allowance - 32768 margin) = 10000",
+      "byte_exact_fixtures": [
+        {
+          "bytes": 10000,
+          "characters": 10000,
+          "sha256": "cf44380e62800165603c7fd7a79abee60b20542f5e3de0265272cb5f6f52e9c5",
+          "mode": "ascii"
+        }
+      ],
+      "notes": "Byte-exact parity with the non-interactive hook row, including the same 10001-character rejection. Canonical use additionally requires settled trust and onboarding dialogs and generation state, because UserPromptSubmit fires on every prompt.",
+      "capability_row": {
+        "agent": "claude",
+        "blocks_closeout": false,
+        "channel_id": "claude-hook-additional-context",
+        "clear_supported": true,
+        "client_context_allowance": 262144,
+        "client_session_identity_available": true,
+        "compact_supported": false,
+        "inspection_mechanism": "claude-loopback-model-input-capture",
+        "launcher_identity_available": true,
+        "mode": "interactive",
+        "platform": "devcontainer",
+        "reserved_margin": 32768,
+        "resume_supported": true,
+        "start_supported": true,
+        "status": "OPTIONAL",
+        "verified_channel_limit": 10000
+      }
+    },
+    {
+      "row_id": "claude-devcontainer-interactive-append-system-prompt",
+      "capability_evidence_id": "a312a1801e1ed05e27c7ab5999d58df8ece8722787653794becf2faa7dcc95c2",
+      "effective_hard_limit": 32768,
+      "effective_hard_limit_formula": "min(32768 policy, 32768 channel, 262144 allowance - 32768 margin) = 32768",
+      "byte_exact_fixtures": [
+        {
+          "bytes": 32768,
+          "characters": 30764,
+          "sha256": "797c41dae8f88a33e6c8a159794e910d3aae516ed4dfb43b28d1385450fe9cbc",
+          "mode": "mixed"
+        }
+      ],
+      "notes": "One startup injection per interactive launch, which matches exactly-once semantics per launcher-controlled generation.",
+      "capability_row": {
+        "agent": "claude",
+        "blocks_closeout": false,
+        "channel_id": "claude-cli-append-system-prompt",
+        "clear_supported": true,
+        "client_context_allowance": 262144,
+        "client_session_identity_available": true,
+        "compact_supported": false,
+        "inspection_mechanism": "claude-loopback-model-input-capture",
+        "launcher_identity_available": true,
+        "mode": "interactive",
+        "platform": "devcontainer",
+        "reserved_margin": 32768,
+        "resume_supported": true,
+        "start_supported": true,
+        "status": "OPTIONAL",
+        "verified_channel_limit": 32768
+      }
+    },
+    {
+      "row_id": "claude-outside-this-devcontainer",
+      "capability_evidence_id": "09763cf1a59ebc1e1546927f2d5ef27f729a5c184712087781d35ef8f659e400",
+      "effective_hard_limit": 0,
+      "effective_hard_limit_formula": "no verified channel",
+      "byte_exact_fixtures": [],
+      "notes": "Unavailable to this probe. No behavior is inferred from the devcontainer rows.",
+      "capability_row": {
+        "agent": "claude",
+        "blocks_closeout": false,
+        "channel_id": "none",
+        "clear_supported": false,
+        "client_context_allowance": 0,
+        "client_session_identity_available": false,
+        "compact_supported": false,
+        "inspection_mechanism": "unavailable",
+        "launcher_identity_available": false,
+        "mode": "any",
+        "platform": "windows-or-posix-outside-this-devcontainer",
+        "reserved_margin": 0,
+        "resume_supported": false,
+        "start_supported": false,
+        "status": "UNSUPPORTED",
+        "verified_channel_limit": 0
+      }
+    }
+  ],
+  "invalidation": [
+    "any Claude executable, version, or SHA-256 change, including an automatic update",
+    "any change to user, project, or launcher settings, hook registration, or trust state",
+    "any change to the selected channel, its limit, or the reserved margin",
+    "any change to the native-load inspection mechanism or its evidence run",
+    "any devcontainer bootstrap-lock or platform change"
+  ],
+  "measurement": {
+    "boundary": "model_visible_total = native_model_visible_bytes + serialized_injected_envelope_bytes + other_model_visible_bootstrap_bytes",
+    "worked_example": "fa-auth-m8 on 2026-07-27",
+    "native_model_visible_bytes": 3037,
+    "native_sources": [
+      "CLAUDE.md",
+      "fa-auth-m8/CLAUDE.md",
+      "fa-auth-m8/REPOSITORY_CONTEXT.md"
+    ],
+    "serialized_injected_envelope_bytes": 7160,
+    "model_visible_total": 10197,
+    "fits_hook_row": false,
+    "fits_full_content_row": true,
+    "consequence": "The hook row's 10000-byte ceiling is a total, not an envelope allowance: with the measured 3037-byte native Claude bootstrap only 6963 bytes remain, and the current 7160-byte fa-auth-m8 envelope exceeds that by 197 bytes. Canonical fa-auth-m8 delivery therefore selects the full-content row, and Step 12.4 must select by model_visible_total rather than envelope size alone."
+  }
+}

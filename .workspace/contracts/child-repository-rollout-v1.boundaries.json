@@ -5,11 +5,11 @@
   "source_evidence": [
     {
       "path": ".workspace/policy.index.json",
-      "sha256": "9b88858a809c28012539ca260109e8c534c36381661fadcd1b3b728312c5540e"
+      "sha256": "db8e572a3e200c2995786f7a460fe9ca61eb86ae101d7614483de35bbde95cc9"
     },
     {
       "path": ".workspace/policy.metadata.json",
-      "sha256": "6a8a03d2c7e85d34aae44b3f7f3a30e775b9b5974d99342890aa70be18fe0705"
+      "sha256": "0256fd1e105ba46f1759fcf96d389811381871a0ceb4ee35446274bbf2fbb1ac"
     },
     {
       "path": ".workspace/repo-types.json",

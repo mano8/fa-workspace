@@ -106,8 +106,8 @@ class W4FacetTests(unittest.TestCase):
 
     def test_representative_selections_preserve_scope_and_sdk_neutrality(self) -> None:
         expected = {
-            "auth-sdk-m8": {"always.security", "always.workspace", "facet.language.python"},
-            "fa-auth-m8": {"always.security", "always.workspace", "facet.language.python", "facet.kind.api-service"},
+            "auth-sdk-m8": {"always.security", "always.workspace", "facet.language.python", "facet.domain.auth-security"},
+            "fa-auth-m8": {"always.security", "always.workspace", "facet.language.python", "facet.kind.api-service", "facet.layer.service", "facet.framework.fastapi", "facet.domain.auth-security"},
             "astro-auth-m8": {"always.security", "always.workspace", "facet.language.typescript", "facet.layer.client", "facet.kind.astro-plugin", "facet.framework.astro", "facet.domain.auth-client"},
             "fa-ui-m8": {"always.security", "always.workspace", "facet.language.typescript", "facet.layer.client", "facet.framework.astro", "facet.domain.shared-ui"},
             "astro-ui-m8": {"always.security", "always.workspace", "facet.language.typescript", "facet.kind.ui-library", "facet.domain.shared-ui"},

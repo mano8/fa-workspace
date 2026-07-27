@@ -51,7 +51,7 @@ class WorkspaceValidatorTests(unittest.TestCase):
     def test_strict_root_validation_passes_without_any_child_clone(self) -> None:
         report = validate_workspace(self.root)
         self.assertEqual(report.repository_count, 16)
-        self.assertEqual(report.policy_count, 28)
+        self.assertEqual(report.policy_count, 31)
         self.assertEqual(len(report.child_diagnostics), 16)
         self.assertFalse(report.artifact_validated)
 

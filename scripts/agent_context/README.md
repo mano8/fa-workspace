@@ -50,8 +50,11 @@ authorization ID, issuer/key ID, payload/signature digests, issue/expiry, and
 redemption ID for future manifest/session/receipt linkage. Raw approval and
 signature bytes are never runtime artifacts. Canonical Codex launch is
 available only for the required devcontainer non-interactive row after the
-complete trust and capability preflight; Claude and unsupported rows remain
-fail-closed limited/unsupported modes.
+complete trust and capability preflight. Canonical Claude launch (Phase 12,
+below) is likewise available only for the two required devcontainer
+non-interactive rows after the same class of preflight, including the
+project's own recorded Claude trust decision; interactive Claude/Codex and
+unsupported rows remain fail-closed limited/optional/unsupported modes.
 
 ```bash
 "$M8_PYTHON" scripts/agent_context/resolve-context.py \
@@ -275,6 +278,21 @@ scripts/claude-repo.sh --repository fa-auth-m8 --project fa-auth-m8 \
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w12_claude_adapter -v
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w12_claude_hook_channel -v
 ```
+
+Step 12.6 reconciles the W2a contract mode table, the root/workspace
+documentation above, and the 2026-07-27 `fa-auth-m8` loaded-config snapshot
+against the frozen 12.1--12.5 evidence: only the two devcontainer
+non-interactive Claude rows flip to `REQUIRED`/canonical; interactive Claude
+stays the evidence-backed `OPTIONAL`, and outside this devcontainer stays
+`UNSUPPORTED`. No capability, native-evidence, or hook-channel artifact's
+tracked bytes changed — their hashes stay pinned by
+`claude_delivery_adapter.py` and re-verified by
+[`validate_workspace.py`](validate_workspace.py); this step only updates prose
+that referenced the pre-Phase-12 `LIMITED` status. A repository scope that has
+not itself recorded Claude project trust (`fa-auth-m8` as of this writing)
+still fails closed with `E_TRUST` regardless of this reconciliation; canonical
+delivery there requires a human to accept that project's own trust dialog
+first.
 
 The faceted resolver CLI in [`resolve-context.py`](resolve-context.py) remains
 an explicit inspection/fixture entry point. It requires a faceted v2

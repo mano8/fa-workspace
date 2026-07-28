@@ -1,20 +1,32 @@
 # Agent context W2a contract
 
-**Contract version:** `2.1.1`
+**Contract version:** `2.2.0`
 
-**Frozen:** 2026-07-21
+**Frozen:** 2026-07-21; Section 1 mode table and Claude capability references
+reconciled 2026-07-29 (Step 12.6)
 
 **Activation status:** `APPROVED_FOR_W2B`
 
 **Implementation status:** the Codex devcontainer non-interactive required row
 is implemented; the W9a remediation contract governs its signed authorization,
-trust, source, lifecycle, and receipt amendments
+trust, source, lifecycle, and receipt amendments. The two Claude devcontainer
+non-interactive required rows (Phase 12) are also implemented by
+`claude_delivery_adapter.py`/`claude_hook_gate.py`; a repository scope without
+its own recorded Claude project trust still fails closed with `E_TRUST`.
 
-**Capability evidence:**
+**Capability evidence (Codex):**
 `scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md`
 
-**Capability evidence SHA-256:**
+**Capability evidence SHA-256 (Codex):**
 `d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b`
+
+**Capability evidence (Claude):**
+`scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.json`,
+bound to the Step 12.2 native-load evidence
+(`w12-claude-native-load-evidence-2026-07-28.json`) and the Step 12.4 hook
+round-trip evidence (`w12-claude-hook-channel-evidence-2026-07-28.json`); all
+three hashes are pinned by `claude_delivery_adapter.py` and re-verified by
+`validate_workspace.py`.
 
 **Post-remediation precedence:** Sections 4, 6, 8, 9, 10, 12, and 13 below
 retain the frozen pre-remediation baseline. The tracked W9a contract explicitly
@@ -29,18 +41,21 @@ delivery, accounting, standalone, lifecycle, and exit behavior that later W2b
 implementation must follow. It does not claim a capability that the installed
 clients did not demonstrate.
 
-The current capability evidence yields this exact mode set:
+The current capability evidence yields this exact mode set (Claude rows
+reconciled 2026-07-29 against the Step 12.1--12.5 evidence; no row exceeds
+what that evidence demonstrated):
 
 | Agent | Platform | Mode | Status | Canonical channel | Blocks canonical activation |
 |---|---|---|---|---|---|
 | Codex | devcontainer | non-interactive | `REQUIRED` | `cli-config-developer-instructions`, 32,768 bytes | yes |
 | Codex | devcontainer | interactive | `LIMITED` | none frozen | no |
-| Claude | devcontainer | interactive | `LIMITED` | none frozen | no implementation obligation |
-| Claude | devcontainer | non-interactive | `LIMITED` | none frozen | no implementation obligation |
+| Claude | devcontainer | non-interactive | `REQUIRED` | `claude-hook-additional-context` (10,000-byte `model_visible_total`) or `claude-cli-append-system-prompt` (32,768-byte `model_visible_total`), selected by `model_visible_total`, never by envelope size alone | yes |
+| Claude | devcontainer | interactive | `OPTIONAL` | same two channels, byte-for-byte parity; startup can block on trust/onboarding dialogs a launcher cannot drive deterministically | no |
 | Codex and Claude | Windows / POSIX outside the devcontainer | interactive and non-interactive | `UNSUPPORTED` | none | no implementation obligation |
 
-The minimum viable `REQUIRED` set contains exactly Codex devcontainer
-non-interactive mode. For that row:
+The minimum viable `REQUIRED` set contains exactly the Codex devcontainer
+non-interactive mode plus the two Claude devcontainer non-interactive rows.
+For the Codex row:
 
 - `canonical_enabled` is true only after W2b1-W2b4 implement and pass this
   contract; W2a approval alone does not enable runtime behavior;
@@ -50,7 +65,31 @@ non-interactive mode. For that row:
 - CLI `developer_instructions` is the sole full-content handoff channel;
 - 32,768 bytes is the workspace-capped verified channel maximum and effective
   hard limit; and
-- interactive Codex and both Claude modes remain limited and noncanonical.
+- interactive Codex remains limited and noncanonical.
+
+For the two Claude rows (Phase 12, `claude_delivery_adapter.py`):
+
+- `canonical_enabled` is true only for a repository scope whose own project
+  trust the client has already recorded (`~/.claude.json`
+  `projects[<path>].hasTrustDialogAccepted`); a launcher never self-grants
+  trust, and an untrusted scope fails closed with `E_TRUST` regardless of
+  capability status;
+- `claude-loopback-model-input-capture` is the out-of-band native/model-input
+  inspection, because no in-band mechanism exists;
+- the hook channel's 10,000-byte effective limit and the full-content
+  channel's 32,768-byte effective limit are each a `model_visible_total`
+  (native bytes plus the serialized envelope), not an envelope-only allowance,
+  so channel selection recomputes that total rather than comparing envelope
+  size alone;
+- the hook row's injection authority is a launcher-owned, per-launch
+  `--settings` `UserPromptSubmit` registration that claims each generation by
+  atomic no-replace creation; any foreign `additionalContext` hook registered
+  in the project/local/user layer makes both Claude rows ineligible with
+  `E_CHANNEL`, because a `--settings` hook merges with those layers rather
+  than replacing them; and
+- interactive Claude remains `OPTIONAL` rather than `REQUIRED` because startup
+  can block on trust/onboarding dialogs a launcher cannot drive
+  deterministically; it is not limited for lack of evidence.
 
 The qualifying evidence for a `REQUIRED` row must include the installed client
 and configuration identities, project trust result, active native-source

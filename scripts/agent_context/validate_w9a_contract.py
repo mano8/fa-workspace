@@ -104,7 +104,7 @@ EXPECTED_SOURCES = {
     "w2a-contract": (
         "tracked-normative-input",
         ".workspace/contracts/agent-context-w2a.contract.md",
-        "acdfa4503da251548893e2fd824e21406c2663a24438de0a84be8aa37cb5b7fd",
+        "c5400f05255cb71f1b7de39cbb50d7d6578783d9f05fa153732651e00fa094e6",
         True,
     ),
 }

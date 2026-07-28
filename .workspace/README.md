@@ -57,8 +57,11 @@ evidence only.
 
 Capability evidence is per installed client, platform, and loading mode; it is
 not inferred from documentation or another platform. The tracked canonical
-artifact consumed by validation and preflight is
-[`capability-evidence-2026-07-19.md`](../scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md).
+artifacts consumed by validation and preflight are
+[`capability-evidence-2026-07-19.md`](../scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md)
+for Codex and
+[`w12-claude-capability-evidence-2026-07-27.md`](../scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.md)
+(plus its bound 12.2 native-load and 12.4 hook-channel artifacts) for Claude.
 Ignored `.workspace/status/` observations are historical only and cannot alter
 canonical authority:
 
@@ -66,16 +69,18 @@ canonical authority:
 |---|---|---|
 | Codex devcontainer non-interactive | `REQUIRED` | Supported canonical row; native inspection is `codex debug prompt-input`; full content uses the verified `developer_instructions` channel. |
 | Codex devcontainer interactive | `LIMITED` | Noncanonical; no frozen full-content or lifecycle evidence. |
-| Claude devcontainer interactive/non-interactive | `LIMITED` | Noncanonical; no verified native inspection or exact full-content channel. |
+| Claude devcontainer non-interactive | `REQUIRED` | Supported canonical row (Phase 12); native inspection is the out-of-band `claude-loopback-model-input-capture`; channel is the hook `additionalContext` row or the full-content `--append-system-prompt` row, selected by `model_visible_total`, never by envelope size alone. A repository scope must already carry the client's own recorded project trust or the launch fails closed with `E_TRUST`; a launcher never self-grants trust. |
+| Claude devcontainer interactive | `OPTIONAL` | Byte-for-byte parity with the non-interactive rows, but startup can block on trust/onboarding dialogs a launcher cannot drive deterministically, so it does not block closeout. |
 | Windows and host-POSIX rows | `UNSUPPORTED` | No behavior is inferred; these rows do not create implementation obligations. |
 
-The required row is the current canonical Codex launch mode after the Phase 10
-remediation. It is invalidated by a changed client or Node binary/version, project
-trust or configuration, capability evidence, native inspection mechanism,
-channel, lifecycle behavior, source hash, allowance, or safety margin. A new
-dated capability refresh is required before making or retaining a canonical
-claim. The Phase 9.5 rejection and parent-tree observations remain historical
-and do not describe this current tree.
+The required Codex row is the current canonical Codex launch mode after the
+Phase 10 remediation; the two required Claude rows are canonical after the
+Phase 12 remediation. Each is invalidated by a changed client or Node
+binary/version, project trust or configuration, capability evidence, native
+inspection mechanism, channel, lifecycle behavior, source hash, allowance, or
+safety margin. A new dated capability refresh is required before making or
+retaining a canonical claim. The Phase 9.5 rejection and parent-tree
+observations remain historical and do not describe this current tree.
 
 ## Resolution and delivery
 
@@ -95,8 +100,8 @@ delivery proof. The authoritative runtime journal records
 uncertain persistence terminal `EXECUTION_AMBIGUOUS`. Only a successful
 `COMPLETED` generation may resume. `--fresh SESSION_DIR` first invalidates that
 validated prior runtime, then starts generation zero with a new thread;
-client-native `clear` and `compact` are not claimed. Claude and
-unsupported client rows remain limited or unsupported and fail closed.
+client-native `clear` and `compact` are not claimed. Interactive Claude/Codex
+and unsupported client rows remain limited/unsupported and fail closed.
 
 For an authorized launch, first run `scripts/codex-repo.sh` with
 `--prepare-authorization-request`; this emits a metadata-only request and never
@@ -105,6 +110,21 @@ workspace-relative signed capability plus `--authorization-external-root`,
 `--authorization-trust-store`, and `--authorization-replay-store`. The launcher
 verifies and consumes the capability before it creates runtime state or invokes
 the adapter.
+
+The canonical Claude launcher (Phase 12) reuses the same resolver, kernel,
+authorization boundary, shared validator, and trust identity from
+`scripts/claude-repo.sh` / `claude_delivery_adapter.py`. It proves the
+devcontainer, the pinned 12.1/12.2/12.4 evidence, the installed client
+identity, the project's own recorded trust, and a real native-load capture
+before it classifies any source `inject`; it then selects the hook or
+full-content channel by `model_visible_total` and records the same
+`RESOLVED`/`PREPARED`/`SUBMISSION_STARTED`/`COMPLETED`/`EXECUTION_AMBIGUOUS`
+lifecycle. A repository scope without its own recorded trust decision (for
+example an unaccepted `hasTrustDialogAccepted` entry) fails closed with
+`E_TRUST` rather than being silently skipped or self-granted. See
+[`scripts/agent_context/README.md`](../scripts/agent_context/README.md) for the
+full boundary and [`agent-context-w2a.contract.md`](contracts/agent-context-w2a.contract.md)
+for the reconciled mode table.
 
 Parent-found mode may add reviewed workspace context. Parent-absent standalone
 mode uses only verified child-owned native instructions; workspace policies,

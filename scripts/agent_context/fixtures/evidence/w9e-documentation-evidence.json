@@ -1,5 +1,10 @@
 {
   "canonical_required_row": "codex-devcontainer-non-interactive",
+  "canonical_required_rows_2026_07_29": [
+    "codex-devcontainer-non-interactive",
+    "claude-devcontainer-non-interactive-hook-additional-context",
+    "claude-devcontainer-non-interactive-append-system-prompt"
+  ],
   "current_lifecycle": [
     "RESOLVED",
     "PREPARED",
@@ -16,17 +21,18 @@
     ".workspace/status/fa-workspace/agent-configuration-token-efficiency-w9-phase-9-5-provisional-sol-review-2026-07-20.md"
   ],
   "limited_rows": [
-    "codex-devcontainer-interactive",
-    "claude-devcontainer-interactive",
-    "claude-devcontainer-non-interactive"
+    "codex-devcontainer-interactive"
+  ],
+  "optional_rows_2026_07_29": [
+    "claude-devcontainer-interactive"
   ],
   "resumable_state": "COMPLETED",
   "schema_version": 1,
   "sha256": {
-    ".workspace/README.md": "b45eaf7fbcfbfbfacf1e8f585d32cb8fe84d730f3beaaabb22fcaf96aa6a825e",
+    ".workspace/README.md": "f4e0ec594f201429ce220822e3d98af473b662cbf66d5fb137c4a08fe9fee8c4",
     "AGENTS.md": "8b6b743d234696de8fa2b78285d12121cb6d6a747da286a692f037b74e2d07d1",
     "CLAUDE.md": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09",
-    "scripts/agent_context/README.md": "5400f7445bbee9a06b7afbed7a1951fc9675ff403da26e762a27c5affbe00e7f",
+    "scripts/agent_context/README.md": "4c97d8d175b67ce84c788cd453c6ab2760aa346e6f1111eb7354be650d784f28",
     "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md": "d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b"
   },
   "status": "CURRENT_POST_REMEDIATION",

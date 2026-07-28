@@ -168,6 +168,12 @@ before a canonical claim.
 This artifact freezes capability only. It activates no hook, writes no project
 configuration, and promotes no Claude row to canonical delivery; Steps 12.2
 through 12.6 own native-load classification, the adapter, the channel wiring,
-the fixtures, and the reconciled status. The current root and agent
-documentation continues to describe Claude evidence as limited until Step 12.6
-reconciles it against this freeze.
+the fixtures, and the reconciled status.
+
+**Step 12.6 reconciliation (2026-07-29):** the root and workspace
+documentation, the W2a contract mode table, and the 2026-07-27 `fa-auth-m8`
+loaded-config snapshot now describe the two `REQUIRED` rows above as
+canonical, gated on the per-scope trust check this artifact and Step 12.2
+already required. No field in this file or its bound 12.2/12.4 evidence
+artifacts changed; their tracked SHA-256 identities are exactly as recorded
+above and remain pinned by `claude_delivery_adapter.py`.

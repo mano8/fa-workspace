@@ -1,0 +1,705 @@
+{
+  "agent": "claude",
+  "captured": "2026-07-28",
+  "classification": [
+    {
+      "accounting": {
+        "effective_hard_limit": 10000,
+        "model_visible_total": 9065,
+        "native_model_visible_bytes": 1905,
+        "other_model_visible_bootstrap_bytes": 0,
+        "serialized_injected_envelope_bytes": 7160
+      },
+      "capability_evidence_id": "6fb210e92e30f04006652e9a56fa860de168db868c3f3aa6a19919b8a8accce3",
+      "channel_id": "claude-hook-additional-context",
+      "entries": [
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/always/security.md",
+          "source_bytes": 321
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/always/workspace.md",
+          "source_bytes": 573
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/language-python.md",
+          "source_bytes": 972
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/layer-service.md",
+          "source_bytes": 545
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/kind-api-service.md",
+          "source_bytes": 167
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/framework-fastapi.md",
+          "source_bytes": 750
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/domain-auth-security.md",
+          "source_bytes": 1260
+        },
+        {
+          "delivery": "native",
+          "native_evidence_id": "45ddd49d39baa9673efb30aaaaf9f0a6f53f5299dc5ae471701001c35c39aab1",
+          "path": "CLAUDE.md",
+          "source_bytes": 1905
+        }
+      ],
+      "envelope_sha256": "eb276fb66fe5acf8d4733400964d0b72b7db92348cf85fedd3d4ad53382fee92",
+      "injection_evidence_sources": 31,
+      "instruction_sources": [
+        {
+          "authority_tier": "workspace",
+          "path": "CLAUDE.md",
+          "policy_id": "instruction.root.claude",
+          "repository_id": "$workspace",
+          "scope_prefix": "."
+        }
+      ],
+      "manifest_id": "5b64a7132a5be8c561a61ee62268f433b4c1f8ca809ec5997faf19ad8f9ca67c",
+      "manifest_native_binding": [
+        "CLAUDE.md"
+      ],
+      "native_evidence_id": "45ddd49d39baa9673efb30aaaaf9f0a6f53f5299dc5ae471701001c35c39aab1",
+      "receipt_binding": {
+        "delivered_bytes": 7160,
+        "envelope_sha256": "eb276fb66fe5acf8d4733400964d0b72b7db92348cf85fedd3d4ad53382fee92",
+        "manifest_id": "5b64a7132a5be8c561a61ee62268f433b4c1f8ca809ec5997faf19ad8f9ca67c",
+        "native_evidence_ids": [
+          "45ddd49d39baa9673efb30aaaaf9f0a6f53f5299dc5ae471701001c35c39aab1"
+        ],
+        "state": "COMPLETED",
+        "transport": "kernel test seam (FakeTransportAdapter); no client was invoked"
+      },
+      "row_id": "claude-devcontainer-non-interactive-hook-additional-context",
+      "validation": "ACCEPTED",
+      "variant": "workspace-only"
+    },
+    {
+      "accounting": {
+        "effective_hard_limit": 32768,
+        "model_visible_total": 9065,
+        "native_model_visible_bytes": 1905,
+        "other_model_visible_bootstrap_bytes": 0,
+        "serialized_injected_envelope_bytes": 7160
+      },
+      "capability_evidence_id": "271d67d6307df4cec85fb7dbb26566ae3a952035168fc8a19b76e6fc54647450",
+      "channel_id": "claude-cli-append-system-prompt",
+      "entries": [
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/always/security.md",
+          "source_bytes": 321
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/always/workspace.md",
+          "source_bytes": 573
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/language-python.md",
+          "source_bytes": 972
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/layer-service.md",
+          "source_bytes": 545
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/kind-api-service.md",
+          "source_bytes": 167
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/framework-fastapi.md",
+          "source_bytes": 750
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/domain-auth-security.md",
+          "source_bytes": 1260
+        },
+        {
+          "delivery": "native",
+          "native_evidence_id": "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd",
+          "path": "CLAUDE.md",
+          "source_bytes": 1905
+        }
+      ],
+      "envelope_sha256": "524497a51a4e2636c45d3c971a3c6cb23a27f8549fc9d51a340284c32b4430fd",
+      "injection_evidence_sources": 31,
+      "instruction_sources": [
+        {
+          "authority_tier": "workspace",
+          "path": "CLAUDE.md",
+          "policy_id": "instruction.root.claude",
+          "repository_id": "$workspace",
+          "scope_prefix": "."
+        }
+      ],
+      "manifest_id": "93637201d38cf19e485a17d34007adc2dba79c3b0b52ae8b2acac6eb3d926e5a",
+      "manifest_native_binding": [
+        "CLAUDE.md"
+      ],
+      "native_evidence_id": "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd",
+      "receipt_binding": {
+        "delivered_bytes": 7160,
+        "envelope_sha256": "524497a51a4e2636c45d3c971a3c6cb23a27f8549fc9d51a340284c32b4430fd",
+        "manifest_id": "93637201d38cf19e485a17d34007adc2dba79c3b0b52ae8b2acac6eb3d926e5a",
+        "native_evidence_ids": [
+          "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd"
+        ],
+        "state": "COMPLETED",
+        "transport": "kernel test seam (FakeTransportAdapter); no client was invoked"
+      },
+      "row_id": "claude-devcontainer-non-interactive-append-system-prompt",
+      "validation": "ACCEPTED",
+      "variant": "workspace-only"
+    },
+    {
+      "accounting": {
+        "effective_hard_limit": 10000,
+        "model_visible_total": 10924,
+        "native_model_visible_bytes": 1905,
+        "other_model_visible_bootstrap_bytes": 0,
+        "serialized_injected_envelope_bytes": 9019
+      },
+      "capability_evidence_id": "6fb210e92e30f04006652e9a56fa860de168db868c3f3aa6a19919b8a8accce3",
+      "channel_id": "claude-hook-additional-context",
+      "entries": [
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/always/security.md",
+          "source_bytes": 321
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/always/workspace.md",
+          "source_bytes": 573
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/language-python.md",
+          "source_bytes": 972
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/layer-service.md",
+          "source_bytes": 545
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/kind-api-service.md",
+          "source_bytes": 167
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/framework-fastapi.md",
+          "source_bytes": 750
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/domain-auth-security.md",
+          "source_bytes": 1260
+        },
+        {
+          "delivery": "native",
+          "native_evidence_id": "45ddd49d39baa9673efb30aaaaf9f0a6f53f5299dc5ae471701001c35c39aab1",
+          "path": "CLAUDE.md",
+          "source_bytes": 1905
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": "fa-auth-m8/CLAUDE.md",
+          "source_bytes": 162
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": "fa-auth-m8/REPOSITORY_CONTEXT.md",
+          "source_bytes": 970
+        }
+      ],
+      "envelope_sha256": "974de1c7b31aa77452a95db13459870f44eaeeb1516aaabe953ace31ab1b4191",
+      "fail_closed": {
+        "code": "E_BUDGET",
+        "message": "model-visible context exceeds its effective hard limit"
+      },
+      "injection_evidence_sources": 33,
+      "instruction_sources": [
+        {
+          "authority_tier": "workspace",
+          "path": "CLAUDE.md",
+          "policy_id": "instruction.root.claude",
+          "repository_id": "$workspace",
+          "scope_prefix": "."
+        },
+        {
+          "authority_tier": "repository",
+          "path": "fa-auth-m8/CLAUDE.md",
+          "policy_id": "instruction.fa-auth-m8.claude",
+          "repository_id": "fa-auth-m8",
+          "scope_prefix": "fa-auth-m8"
+        },
+        {
+          "authority_tier": "repository",
+          "path": "fa-auth-m8/REPOSITORY_CONTEXT.md",
+          "policy_id": "instruction.fa-auth-m8.repository-context",
+          "repository_id": "fa-auth-m8",
+          "scope_prefix": "fa-auth-m8"
+        }
+      ],
+      "manifest_id": "dfc446fdbb02d52cf8ed8024b488ef9fe6de2e73dbaf083c53ca138bde603097",
+      "manifest_native_binding": [
+        "CLAUDE.md"
+      ],
+      "native_evidence_id": "45ddd49d39baa9673efb30aaaaf9f0a6f53f5299dc5ae471701001c35c39aab1",
+      "row_id": "claude-devcontainer-non-interactive-hook-additional-context",
+      "validation": "REJECTED",
+      "variant": "with-injected-child-instructions"
+    },
+    {
+      "accounting": {
+        "effective_hard_limit": 32768,
+        "model_visible_total": 10924,
+        "native_model_visible_bytes": 1905,
+        "other_model_visible_bootstrap_bytes": 0,
+        "serialized_injected_envelope_bytes": 9019
+      },
+      "capability_evidence_id": "271d67d6307df4cec85fb7dbb26566ae3a952035168fc8a19b76e6fc54647450",
+      "channel_id": "claude-cli-append-system-prompt",
+      "entries": [
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/always/security.md",
+          "source_bytes": 321
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/always/workspace.md",
+          "source_bytes": 573
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/language-python.md",
+          "source_bytes": 972
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/layer-service.md",
+          "source_bytes": 545
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/kind-api-service.md",
+          "source_bytes": 167
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/framework-fastapi.md",
+          "source_bytes": 750
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": ".workspace/policies/facets/domain-auth-security.md",
+          "source_bytes": 1260
+        },
+        {
+          "delivery": "native",
+          "native_evidence_id": "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd",
+          "path": "CLAUDE.md",
+          "source_bytes": 1905
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": "fa-auth-m8/CLAUDE.md",
+          "source_bytes": 162
+        },
+        {
+          "delivery": "inject",
+          "native_evidence_id": null,
+          "path": "fa-auth-m8/REPOSITORY_CONTEXT.md",
+          "source_bytes": 970
+        }
+      ],
+      "envelope_sha256": "133f51d989e7b6f414b0a1946dd6e32ad3acf17270d933b9c3a44e6d9b45a345",
+      "injection_evidence_sources": 33,
+      "instruction_sources": [
+        {
+          "authority_tier": "workspace",
+          "path": "CLAUDE.md",
+          "policy_id": "instruction.root.claude",
+          "repository_id": "$workspace",
+          "scope_prefix": "."
+        },
+        {
+          "authority_tier": "repository",
+          "path": "fa-auth-m8/CLAUDE.md",
+          "policy_id": "instruction.fa-auth-m8.claude",
+          "repository_id": "fa-auth-m8",
+          "scope_prefix": "fa-auth-m8"
+        },
+        {
+          "authority_tier": "repository",
+          "path": "fa-auth-m8/REPOSITORY_CONTEXT.md",
+          "policy_id": "instruction.fa-auth-m8.repository-context",
+          "repository_id": "fa-auth-m8",
+          "scope_prefix": "fa-auth-m8"
+        }
+      ],
+      "manifest_id": "c8322263666792dfcf3dcfe7ef03d14477f52c8f0b2feace7e71146f91705986",
+      "manifest_native_binding": [
+        "CLAUDE.md"
+      ],
+      "native_evidence_id": "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd",
+      "receipt_binding": {
+        "delivered_bytes": 9019,
+        "envelope_sha256": "133f51d989e7b6f414b0a1946dd6e32ad3acf17270d933b9c3a44e6d9b45a345",
+        "manifest_id": "c8322263666792dfcf3dcfe7ef03d14477f52c8f0b2feace7e71146f91705986",
+        "native_evidence_ids": [
+          "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd"
+        ],
+        "state": "COMPLETED",
+        "transport": "kernel test seam (FakeTransportAdapter); no client was invoked"
+      },
+      "row_id": "claude-devcontainer-non-interactive-append-system-prompt",
+      "validation": "ACCEPTED",
+      "variant": "with-injected-child-instructions"
+    }
+  ],
+  "client": {
+    "identity": "/home/vscode/.local/share/claude/versions/2.1.220",
+    "matches_capability_evidence": true,
+    "sha256": "674f61f20ff306f3100cf9200e4c36c4b70278b5bef2884549819b942a89c863",
+    "version": "2.1.220 (Claude Code)"
+  },
+  "configuration": {
+    "config_sha256": "62467e11f25d3b32e48dbe188a3a25220bc2329a8b769b3ff0dfce8d83418aca",
+    "project": {
+      ".claude/settings.json": "0285e6bec715b5d5f26949d42d2681a8fcebd0958801d0b409e1e29b6eed4974",
+      ".claude/settings.local.json": "d44d6585aacca06674962d973456a4e7bc249d4097eacdb6c1706cf94179ebea"
+    },
+    "registered_hook_events": [],
+    "user": "4a3179f9c823a946f261776791c3c04a72e483d9714d1a43ae43722f1a9f2b9d"
+  },
+  "depends_on": {
+    "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.json",
+    "note": "Step 12.1 froze the capability rows this evidence binds; a matrix change invalidates it.",
+    "sha256": "f3539f7f66135a6726253e97c5bab0b3858860e904b9148ec26d112d82c7c6f8"
+  },
+  "invalidation": [
+    "any Claude executable, version, or SHA-256 change, including an automatic update",
+    "any change to project or user settings, registered hook events, or the trust record",
+    "any change to a proven-active or proven-absent source's bytes",
+    "any change of launch directory, because the active project-memory set is scope-dependent",
+    "any change to the frozen 12.1 capability matrix or its selected channel"
+  ],
+  "mechanism": {
+    "description": "One separate, identically configured client launch whose ANTHROPIC_BASE_URL points at a loopback recorder started by the tool. The recorded request body is the exact model input the client built, so every active instruction source is enumerated from the client's own '# claudeMd' labels and proved byte-exact against the file on disk.",
+    "framing": "Contents of <absolute path> (project instructions, checked into the codebase): then one blank line then the file's exact bytes.",
+    "id": "claude-loopback-model-input-capture",
+    "in_band_mechanism": "unavailable",
+    "inject_classification": "Claude cannot disable its own project-memory discovery, so the contract's alternative is used: every injected source is proved absent from the same exact model input, and exactly-once handoff remains the kernel's launcher-controlled generation state.",
+    "limitation": "The capture replaces the API endpoint, so it cannot run inside the canonical launch itself. Any client, settings, hook, trust, project-scope, or channel change invalidates it and requires a rerun.",
+    "rejected_mechanisms": {
+      "claude -p -d api,hooks --debug-file": "logs [API REQUEST] lines only; never the model-input body",
+      "model self-report": "explicitly not evidence under the native-load evidence contract"
+    }
+  },
+  "native_evidence": [
+    {
+      "record": {
+        "agent": "claude",
+        "capability_evidence_id": "271d67d6307df4cec85fb7dbb26566ae3a952035168fc8a19b76e6fc54647450",
+        "captured_at": "2026-07-28T00:18:00Z",
+        "client_identity": "/home/vscode/.local/share/claude/versions/2.1.220",
+        "client_version": "2.1.220 (Claude Code)",
+        "config_sha256": "62467e11f25d3b32e48dbe188a3a25220bc2329a8b769b3ff0dfce8d83418aca",
+        "inspection_mechanism": "claude-loopback-model-input-capture",
+        "mode": "non-interactive",
+        "native_evidence_id": "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd",
+        "platform": "devcontainer",
+        "sources": [
+          {
+            "path": "CLAUDE.md",
+            "sha256": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09"
+          }
+        ],
+        "trust_state": "trusted"
+      },
+      "row_id": "claude-devcontainer-non-interactive-append-system-prompt"
+    },
+    {
+      "record": {
+        "agent": "claude",
+        "capability_evidence_id": "6fb210e92e30f04006652e9a56fa860de168db868c3f3aa6a19919b8a8accce3",
+        "captured_at": "2026-07-28T00:18:00Z",
+        "client_identity": "/home/vscode/.local/share/claude/versions/2.1.220",
+        "client_version": "2.1.220 (Claude Code)",
+        "config_sha256": "62467e11f25d3b32e48dbe188a3a25220bc2329a8b769b3ff0dfce8d83418aca",
+        "inspection_mechanism": "claude-loopback-model-input-capture",
+        "mode": "non-interactive",
+        "native_evidence_id": "45ddd49d39baa9673efb30aaaaf9f0a6f53f5299dc5ae471701001c35c39aab1",
+        "platform": "devcontainer",
+        "sources": [
+          {
+            "path": "CLAUDE.md",
+            "sha256": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09"
+          }
+        ],
+        "trust_state": "trusted"
+      },
+      "row_id": "claude-devcontainer-non-interactive-hook-additional-context"
+    }
+  ],
+  "open_items": [
+    "The selected-child scope is the Phase 12 canonical intent and its three active sources are proved byte-exact, but /workspace/fa-auth-m8 has hasTrustDialogAccepted=false. Trust is a recorded human action; the launcher must never self-grant it, so this scope stays BLOCKED_UNTRUSTED_PROJECT until a human accepts it.",
+    "Exactly-once injection across SessionStart and UserPromptSubmit is enforced here only as a configuration rejection; Step 12.4 owns the single injection authority itself."
+  ],
+  "proved_absent": [
+    {
+      "path": ".workspace/policies/always/security.md",
+      "sha256": "f73a5e520bc237bb70851569ef039a549db65c28a580b2cdb95f5b9db11525f2"
+    },
+    {
+      "path": ".workspace/policies/always/workspace.md",
+      "sha256": "23cbe65b8d93b8d6482c8a6f41a49bc6e7ac596b1435bb9d937775c0b4d5cea3"
+    },
+    {
+      "path": ".workspace/policies/facets/domain-auth-client.md",
+      "sha256": "ac6aea67db70da6f4b299f93754d569851432e47af1fd9ac0f3aec131e88d5c4"
+    },
+    {
+      "path": ".workspace/policies/facets/domain-auth-security.md",
+      "sha256": "4050d95f3d58a00cb73856be2a0ce5bab51d5a197ffd7464490bccd8620a65d0"
+    },
+    {
+      "path": ".workspace/policies/facets/domain-media-client.md",
+      "sha256": "4102f1fe7e1fff02eb055891974aa9186dc40fa3f63f553a39c670d9669f7607"
+    },
+    {
+      "path": ".workspace/policies/facets/domain-prompt-client.md",
+      "sha256": "9c8c85e3f90f4debd9406c2330e8e7f043fee32039b657ea63f888cb8c180001"
+    },
+    {
+      "path": ".workspace/policies/facets/domain-shared-ui.md",
+      "sha256": "51ac83ceafadc0ebbc62a94d980b60c8943830d0e8b65ee29d589bbfd29db0ea"
+    },
+    {
+      "path": ".workspace/policies/facets/domain-teaching-assignment-client.md",
+      "sha256": "5ed52e34dbfed86f4184bd9fbf1a83a69d6c4433b4531ca1f6a2af3e15bb4dba"
+    },
+    {
+      "path": ".workspace/policies/facets/framework-astro.md",
+      "sha256": "e54aa3f2111ed23812ea6c685d688549569fa830306bd7878a058f532fe0632b"
+    },
+    {
+      "path": ".workspace/policies/facets/framework-fastapi.md",
+      "sha256": "d00e0c3212746a7fd919febca2697743d40f254609f2a012e4b826c82e470f94"
+    },
+    {
+      "path": ".workspace/policies/facets/kind-api-service.md",
+      "sha256": "2c4805abd0fcf0665feadb76996af18ca6e8fdd5d073ffdcc82348d2231647aa"
+    },
+    {
+      "path": ".workspace/policies/facets/kind-astro-plugin.md",
+      "sha256": "00757620e36a3f676506a230fa5a760c50905e7251555743585093ac5683e9e9"
+    },
+    {
+      "path": ".workspace/policies/facets/kind-ui-library.md",
+      "sha256": "dd23ca4393004800d7937dbc3a3cb9c738390d10078302444f44415a104836af"
+    },
+    {
+      "path": ".workspace/policies/facets/language-python.md",
+      "sha256": "a1364f6478f3e185e1eabe1c5b4f32898cba9458addaca52a9e702bca0384302"
+    },
+    {
+      "path": ".workspace/policies/facets/language-typescript.md",
+      "sha256": "6d2ba0659e3bc51c28abc35030b138d396cdec2173b68d1384690f855b837aae"
+    },
+    {
+      "path": ".workspace/policies/facets/layer-client.md",
+      "sha256": "9d1f5afc46470c75e03ae8a563a66a58819ad4e7d0c574f798ed35f9a4be10c0"
+    },
+    {
+      "path": ".workspace/policies/facets/layer-service.md",
+      "sha256": "fedb7ff3627bd1d842b4d71756126c7b055572bafdead78ffd3f1a26d2387aa6"
+    },
+    {
+      "path": ".workspace/policies/tasks/astro-auth-adapter.md",
+      "sha256": "5732dbcc9a8e4fadc77fe1ae4b327258a50d1b958fdf67da5d470db340ace16d"
+    },
+    {
+      "path": ".workspace/policies/tasks/astro-host.md",
+      "sha256": "f6ade782e91f1c4009c3a27a8797de4b05f0368956f336751db427e91371222c"
+    },
+    {
+      "path": ".workspace/policies/tasks/astro-plugin-testing.md",
+      "sha256": "bb69021623169355bf1f0514baa276a914a71fbca3e36d68b8c9b7129ab0ebf2"
+    },
+    {
+      "path": ".workspace/policies/tasks/astro-registry-scaffolding.md",
+      "sha256": "6550a6785d93095f45dd34b2e525f155a7e00e17f08a596e85477a2602afc177"
+    },
+    {
+      "path": ".workspace/policies/tasks/cross-repository.md",
+      "sha256": "72f0efbc46f787cf35294ca1c58b6fc762728fcb13d2438002412ed7d64cb416"
+    },
+    {
+      "path": ".workspace/policies/tasks/environment.md",
+      "sha256": "e1988d5d38c72a48a0955bc6c84f3010c8631d36e76ff33aaaf872a4f8a7bad2"
+    },
+    {
+      "path": ".workspace/policies/tasks/git-branch.md",
+      "sha256": "053235024f88073cc526ee58bb7f1203737c85fd9e41d0e913b103616935195d"
+    },
+    {
+      "path": ".workspace/policies/tasks/git-commit.md",
+      "sha256": "291d6384736a4c41dc9e5d9d818e841b074a2bec209faee2bb40de0eab2a6e58"
+    },
+    {
+      "path": ".workspace/policies/tasks/git-pull-request.md",
+      "sha256": "513a919083aacae59b227a8557a7327b050c0ef7d6fe5778b9e32bd514d9a10e"
+    },
+    {
+      "path": ".workspace/policies/tasks/git-push.md",
+      "sha256": "ea84422055af67ec2975b0dedc3d4bb46e363def36367e7992a6bca484ce966a"
+    },
+    {
+      "path": ".workspace/policies/tasks/headroom-wrapper.md",
+      "sha256": "221da711cd5c6aff294915fa81b54c03890991a816c27c4f4a49c27846ca2893"
+    },
+    {
+      "path": ".workspace/policies/tasks/headroom.md",
+      "sha256": "c0fe0460f8eb5ead9b8dcc397e66037625194ff312978f59dce99d9282d64f44"
+    },
+    {
+      "path": ".workspace/policies/tasks/release.md",
+      "sha256": "73d763b8f437db6843023adc0c726e6e92788bd34e0d310676535b35935f552a"
+    },
+    {
+      "path": ".workspace/policies/tasks/testing.md",
+      "sha256": "7a48359c11c056d9930d649a264a9c2239405605530ab260306625479751ec1c"
+    },
+    {
+      "path": "fa-auth-m8/CLAUDE.md",
+      "sha256": "76703ed2afa57fbcac79d9a243e9b29e4faf4d50184c48aeaf155b2d5a7e033f"
+    },
+    {
+      "path": "fa-auth-m8/REPOSITORY_CONTEXT.md",
+      "sha256": "6b1bafd2c7e9a8983231f1682db45e8dc4ac38d5e06a6e02e16b8a933c4f65da"
+    }
+  ],
+  "schema_version": 1,
+  "scopes": [
+    {
+      "captured_at": "2026-07-28T00:18:00Z",
+      "external_labels": [],
+      "launch_directory": ".",
+      "model_input_bytes": 18578,
+      "model_input_sha256": "2f2a5853fde14af352107e664b49fd9d9dd6e3cfa0456b5e6e161ede18afed58",
+      "native_model_visible_bytes": 1905,
+      "native_sources": [
+        {
+          "label": "project instructions, checked into the codebase",
+          "path": "CLAUDE.md",
+          "source_bytes": 1905,
+          "source_sha256": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09"
+        }
+      ],
+      "request_count": 2,
+      "scope_id": "workspace-root",
+      "status": "CANONICAL",
+      "trust_record": "~/.claude.json projects[<absolute path>].hasTrustDialogAccepted",
+      "trust_state": "trusted"
+    },
+    {
+      "captured_at": "2026-07-28T00:18:07Z",
+      "external_labels": [],
+      "fail_closed": {
+        "code": "E_TRUST",
+        "message": "the inspected Claude project is untrusted, not trusted"
+      },
+      "launch_directory": "fa-auth-m8",
+      "model_input_bytes": 33489,
+      "model_input_sha256": "771f1c7c1fab50198134d495081ad2b85c20a814a295678e0b878945a6195a57",
+      "native_model_visible_bytes": 3037,
+      "native_sources": [
+        {
+          "label": "project instructions, checked into the codebase",
+          "path": "CLAUDE.md",
+          "source_bytes": 1905,
+          "source_sha256": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09"
+        },
+        {
+          "label": "project instructions, checked into the codebase",
+          "path": "fa-auth-m8/CLAUDE.md",
+          "source_bytes": 162,
+          "source_sha256": "76703ed2afa57fbcac79d9a243e9b29e4faf4d50184c48aeaf155b2d5a7e033f"
+        },
+        {
+          "label": "project instructions, checked into the codebase",
+          "path": "fa-auth-m8/REPOSITORY_CONTEXT.md",
+          "source_bytes": 970,
+          "source_sha256": "6b1bafd2c7e9a8983231f1682db45e8dc4ac38d5e06a6e02e16b8a933c4f65da"
+        }
+      ],
+      "request_count": 2,
+      "scope_id": "selected-child",
+      "status": "BLOCKED_UNTRUSTED_PROJECT",
+      "trust_record": "~/.claude.json projects[<absolute path>].hasTrustDialogAccepted",
+      "trust_state": "untrusted"
+    }
+  ],
+  "step": "12.2",
+  "tool": {
+    "command": "python3 scripts/agent_context/claude_native_evidence.py --workspace-root . --project <launch directory> --output <path>",
+    "model_input_retention": "request bodies are held in a temporary directory removed before the tool returns",
+    "source": "scripts/agent_context/claude_native_evidence.py",
+    "source_sha256": "01041ef6d293f615397bdd670fa945f8f4fe9279bab1d142e602062f287911d5",
+    "vendor_api_contacted": false,
+    "workspace_files_written": 0
+  }
+}

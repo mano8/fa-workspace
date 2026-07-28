@@ -72,6 +72,17 @@ INJECTION_EVIDENCE_FIELDS = {
     "sources",
 }
 TIER_ORDER = {"security": 0, "workspace": 1, "task": 2, "repository": 3}
+# The native instruction file names each client actually discovers.  Codex reads
+# the AGENTS.md hierarchy; Claude reads the CLAUDE.md hierarchy plus the neutral
+# repository-owned context file a child CLAUDE.md imports with ``@``.  Nothing
+# else may enter a manifest as an instruction source.
+NATIVE_INSTRUCTION_FILES: dict[str, dict[str, tuple[str, ...]]] = {
+    "codex": {"$workspace": ("AGENTS.md",), "repository": ("AGENTS.md",)},
+    "claude": {
+        "$workspace": ("CLAUDE.md",),
+        "repository": ("CLAUDE.md", "REPOSITORY_CONTEXT.md"),
+    },
+}
 
 
 @dataclass(frozen=True)
@@ -739,10 +750,15 @@ def _instruction_source_specs(
             _fail(error.message, "E_NATIVE_EVIDENCE")
         if item["authority_tier"] not in TIER_ORDER:
             _fail("instruction source authority tier is invalid", "E_NATIVE_EVIDENCE")
+        names = NATIVE_INSTRUCTION_FILES.get(request.agent)
+        if names is None:
+            _fail("instruction sources are undefined for this agent", "E_NATIVE_EVIDENCE")
         if repository_id == "$workspace":
-            valid = item["path"] == "AGENTS.md" and item["scope_prefix"] == "."
+            valid = item["path"] in names["$workspace"] and item["scope_prefix"] == "."
         else:
-            valid = item["scope_prefix"] != "." and item["path"] == f"{item['scope_prefix']}/AGENTS.md"
+            valid = item["scope_prefix"] != "." and item["path"] in {
+                f"{item['scope_prefix']}/{name}" for name in names["repository"]
+            }
         if not valid:
             _fail("instruction source does not match its canonical repository scope", "E_NATIVE_EVIDENCE")
         paths.add(item["path"])

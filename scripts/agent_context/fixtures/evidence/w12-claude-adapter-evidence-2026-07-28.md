@@ -55,11 +55,22 @@ Windows wrapper because no row outside this devcontainer is evidenced.
 
 The hook row is not disabled by opinion: `HOOK_ROUND_TRIP_EVIDENCE` is `None`
 because Step 12.4 owns that fixture and the single injection authority. The
-tests prove the seam works in both directions — with the evidence supplied and a
-single `UserPromptSubmit` hook registered, a fitting generation selects the hook
-row, and the same generation falls back when its total grows. While a hook is
-registered, the wrapper channel is refused: bypassing the hook would inject a
-second copy.
+tests prove the seam works in both directions — with the evidence supplied, a
+fitting generation selects the hook row, and the same generation falls back when
+its total grows. While a hook is registered, the wrapper channel is refused:
+bypassing the hook would inject a second copy.
+
+> **Superseded by Step 12.4** — see
+> [`w12-claude-hook-channel-evidence-2026-07-28.md`](w12-claude-hook-channel-evidence-2026-07-28.md).
+> That step froze the byte-exact round trip, so the hook row is now `WIRED` and
+> selected whenever `model_visible_total` fits it. The injection authority is a
+> launcher-owned `--settings` `UserPromptSubmit` gate written into the runtime
+> session, and because such a registration *merges* with the project layer, a
+> settings-registered `additionalContext` hook the launcher does not own now
+> makes **both** rows ineligible rather than only the wrapper row. The tables in
+> this report describe the state at Step 12.3 and are preserved as written; only
+> the tooling identities were recomputed for the tree that carries the wired
+> channel.
 
 ## The driven run
 

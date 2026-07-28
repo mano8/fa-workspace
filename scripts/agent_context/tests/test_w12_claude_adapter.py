@@ -29,6 +29,7 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agent_context import claude_delivery_adapter as adapter
+from agent_context import claude_hook_gate as hook_gate
 from agent_context import claude_native_evidence as native
 from agent_context import claude_repo_launcher, w2b1
 from agent_context.codex_adapter import CommandResult
@@ -41,6 +42,7 @@ NATIVE_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-native-load-evidence-2026-07
 CAPABILITY = ROOT / EVIDENCE_DIR / "w12-claude-capability-evidence-2026-07-27.json"
 ADAPTER_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-adapter-evidence-2026-07-28.json"
 ADAPTER_REPORT = ROOT / EVIDENCE_DIR / "w12-claude-adapter-evidence-2026-07-28.md"
+HOOK_CHANNEL = ROOT / EVIDENCE_DIR / "w12-claude-hook-channel-evidence-2026-07-28.json"
 HOOK_ROW = "claude-devcontainer-non-interactive-hook-additional-context"
 FULL_ROW = "claude-devcontainer-non-interactive-append-system-prompt"
 SECTION_PREAMBLE = (
@@ -104,9 +106,16 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
         (self.child / ".git").mkdir(parents=True)
         (self.child / "CLAUDE.md").write_text("# child memory\n", encoding="utf-8")
         (self.child / "REPOSITORY_CONTEXT.md").write_text("# neutral child context\n", encoding="utf-8")
+        # The launcher registers the reviewed gate by absolute path and the
+        # client runs it as its own process, so the fixture workspace carries
+        # the real package rather than a stand-in.
+        shutil.copytree(
+            ROOT / "scripts" / "agent_context", self.root / "scripts" / "agent_context",
+            ignore=shutil.ignore_patterns("tests", "fixtures", "__pycache__"),
+        )
         evidence = self.root / EVIDENCE_DIR
         evidence.mkdir(parents=True)
-        for source in (CAPABILITY, NATIVE_EVIDENCE):
+        for source in (CAPABILITY, NATIVE_EVIDENCE, HOOK_CHANNEL):
             shutil.copy2(source, evidence / source.name)
         self.artifact = json.loads(CAPABILITY.read_text(encoding="utf-8"))
         self.client = self.artifact["client"]
@@ -114,6 +123,12 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
         self.commands: list[tuple[str, ...]] = []
         self.session_id: str | None = None
         self.returncode = 0
+        # The offline client model runs the registered gate unless a fixture
+        # deliberately models a client that ignored it.
+        self.run_registered_hook = True
+        self.hook_output: dict[str, object] | None = None
+        self.hook_returncode: int | None = None
+        self.registered_events: list[str] = []
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -176,11 +191,44 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
         )
 
     def _runner(self, command: tuple[str, ...] | list[str], cwd: Path) -> CommandResult:
-        del cwd
-        self.commands.append(tuple(command))
-        index = list(command).index("--session-id" if "--session-id" in command else "--resume")
-        session = self.session_id or command[index + 1]
+        """Model the client offline: record the invocation and run its hook.
+
+        A client launched with ``--settings`` runs the registered pre-task hook
+        before it builds any model input, so the fixture runs the reviewed gate
+        itself.  Nothing here invokes a client or contacts a vendor API; the
+        byte-exactness of the hook channel is proved by the frozen Step 12.4
+        round trip, not by this seam.
+        """
+        items = list(command)
+        self.commands.append(tuple(items))
+        index = items.index("--session-id" if "--session-id" in items else "--resume")
+        session = self.session_id or items[index + 1]
+        if "--settings" in items and self.run_registered_hook:
+            self.hook_output = self._run_registered_hook(
+                Path(items[items.index("--settings") + 1]), items[index + 1], cwd,
+            )
         return CommandResult(self.returncode, json.dumps({"session_id": session}).encode("utf-8"))
+
+    def _run_registered_hook(
+        self, settings: Path, session: str, cwd: Path,
+    ) -> dict[str, object] | None:
+        """Invoke exactly the command the launcher's own settings registered."""
+        registration = json.loads(settings.read_text(encoding="utf-8"))
+        events = registration["hooks"]
+        self.registered_events = sorted(events)
+        entry = events[hook_gate.HOOK_EVENT][0]["hooks"][0]
+        payload = json.dumps({
+            "hook_event_name": hook_gate.HOOK_EVENT, "session_id": session,
+            "cwd": str(cwd), "prompt": "fixture prompt",
+        })
+        result = subprocess.run(
+            entry["command"], shell=True, input=payload.encode("utf-8"),
+            capture_output=True, check=False,
+        )
+        self.hook_returncode = result.returncode
+        if result.returncode != 0:
+            return None
+        return json.loads(result.stdout.decode("utf-8"))
 
     def _inspector(self, **kwargs: object) -> native.ClaudeNativeLoad:
         project = Path(str(kwargs["project"]))
@@ -383,38 +431,69 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
 
     # -------------------------------------------------------- channel selection
 
-    def test_the_hook_row_is_rejected_until_step_12_4_freezes_its_round_trip(self) -> None:
+    def test_the_hook_row_carries_its_frozen_round_trip_or_is_not_selected(self) -> None:
         resolution, _ = self._resolve()
-        self.assertEqual(resolution.capability.row_id, FULL_ROW)
-        self.assertEqual(resolution.channel_id, adapter.FULL_CONTENT_CHANNEL_ID)
-        self.assertEqual([item["row_id"] for item in resolution.rejected_rows], [HOOK_ROW])
-        self.assertIn("round-trip evidence", resolution.rejected_rows[0]["reason"])
-        self.assertIsNone(adapter.HOOK_ROUND_TRIP_EVIDENCE)
+        self.assertEqual(resolution.capability.row_id, HOOK_ROW)
+        self.assertEqual(resolution.channel_id, adapter.HOOK_CHANNEL_ID)
+        self.assertEqual(resolution.rejected_rows, ())
+        self.assertEqual(resolution.round_trip_evidence_id, adapter.HOOK_ROUND_TRIP_EVIDENCE)
+        # Without frozen evidence the same generation falls back exactly as it
+        # did throughout Step 12.3, with the reason recorded rather than implied.
+        with mock.patch.object(adapter, "HOOK_ROUND_TRIP_EVIDENCE", None):
+            unwired, _ = self._resolve()
+        self.assertEqual(unwired.capability.row_id, FULL_ROW)
+        self.assertIsNone(unwired.round_trip_evidence_id)
+        self.assertEqual([item["row_id"] for item in unwired.rejected_rows], [HOOK_ROW])
+        self.assertIn("round-trip evidence", unwired.rejected_rows[0]["reason"])
 
     def test_a_wired_hook_row_is_selected_only_while_the_total_fits(self) -> None:
-        self._register_hooks("UserPromptSubmit")
-        with mock.patch.object(adapter, "HOOK_ROUND_TRIP_EVIDENCE", "e" * 64):
-            resolution, _ = self._resolve()
-            self.assertEqual(resolution.capability.row_id, HOOK_ROW)
-            self.assertEqual(resolution.channel_id, adapter.HOOK_CHANNEL_ID)
-            accounting = resolution.resolved.manifest["accounting"]
-            self.assertLessEqual(accounting["model_visible_total"], accounting["effective_hard_limit"])
-            # Once the total no longer fits, a still-registered hook cannot be
-            # bypassed by the wrapper channel: that would inject twice.
-            (self.root / ".workspace" / "policies" / "python.md").write_text(
-                "python facet policy\n" + "x" * 10000, encoding="utf-8"
-            )
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._resolve()
-            self.assertEqual(failure.exception.code, "E_CHANNEL")
-            self.assertIn("second copy", failure.exception.message)
-            # With no hook registered the same oversize generation falls through
-            # to the separately tested full-content channel, as Step 12.2 froze.
-            (self.root / ".claude" / "settings.local.json").unlink()
-            oversized, _ = self._resolve()
+        resolution, _ = self._resolve()
+        self.assertEqual(resolution.capability.row_id, HOOK_ROW)
+        accounting = resolution.resolved.manifest["accounting"]
+        self.assertLessEqual(accounting["model_visible_total"], accounting["effective_hard_limit"])
+        # Once the total no longer fits the hook row, the same generation falls
+        # through to the separately tested full-content channel.
+        (self.root / ".workspace" / "policies" / "python.md").write_text(
+            "python facet policy\n" + "x" * 10000, encoding="utf-8"
+        )
+        oversized, _ = self._resolve()
         self.assertEqual(oversized.capability.row_id, FULL_ROW)
         self.assertEqual([item["row_id"] for item in oversized.rejected_rows], [HOOK_ROW])
         self.assertIn("E_BUDGET", oversized.rejected_rows[0]["reason"])
+
+    def test_a_foreign_additional_context_hook_makes_every_row_ineligible(self) -> None:
+        """A ``--settings`` hook merges, so an unowned one is a second authority."""
+        self._register_hooks(adapter.INJECTION_AUTHORITY_EVENT)
+        with self.assertRaises(w2b1.AgentContextError) as failure:
+            self._resolve()
+        self.assertEqual(failure.exception.code, "E_CHANNEL")
+        self.assertIn("second", failure.exception.message)
+        self.assertEqual(self.commands, [])
+        # Removing the foreign authority restores the launcher-owned hook row.
+        (self.root / ".claude" / "settings.local.json").unlink()
+        resolution, _ = self._resolve()
+        self.assertEqual(resolution.capability.row_id, HOOK_ROW)
+
+    def test_a_changed_hook_gate_or_identity_makes_the_hook_row_ineligible(self) -> None:
+        for mutate, fragment in (
+            (lambda: (self.root / adapter.GATE_MODULE_PATH).write_text("# edited\n", encoding="utf-8"),
+             "gate changed"),
+            (lambda: (self.root / adapter.GATE_MODULE_PATH).unlink(), "gate changed"),
+        ):
+            with self.subTest(fragment=fragment):
+                self.tearDown()
+                self.setUp()
+                mutate()
+                with self.assertRaises(w2b1.AgentContextError) as failure:
+                    self._resolve()
+                self.assertEqual(failure.exception.code, "E_CHANNEL")
+        self.tearDown()
+        self.setUp()
+        with mock.patch.object(adapter, "HOOK_ROUND_TRIP_EVIDENCE", "e" * 64):
+            with self.assertRaises(w2b1.AgentContextError) as failure:
+                self._resolve()
+        self.assertEqual(failure.exception.code, "E_CHANNEL")
+        self.assertIn("differs from the adapter", failure.exception.message)
 
     def test_no_fitting_channel_fails_closed_before_any_client_invocation(self) -> None:
         (self.root / ".workspace" / "policies" / "python.md").write_text(
@@ -441,19 +520,101 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
             )
         self.assertEqual(result.receipt["state"], "COMPLETED")
         self.assertEqual(result.receipt["previous_state"], "SUBMISSION_STARTED")
-        self.assertEqual(result.receipt["channel_id"], adapter.FULL_CONTENT_CHANNEL_ID)
+        self.assertEqual(result.receipt["channel_id"], adapter.HOOK_CHANNEL_ID)
         self.assertEqual(result.session["state"], "COMPLETED")
         self.assertEqual(len(self.commands), 1)
         command = self.commands[0]
         self.assertEqual(command[0], "fixture-claude")
-        self.assertIn("--append-system-prompt", command)
-        envelope = command[command.index("--append-system-prompt") + 1].encode("utf-8")
+        # The hook row never passes the envelope as an argument; the launcher's
+        # own one-launch registration is the sole injection authority.
+        self.assertNotIn("--append-system-prompt", command)
+        self.assertIn("--settings", command)
+        self.assertEqual(self.registered_events, [adapter.INJECTION_AUTHORITY_EVENT])
+        settings = Path(command[command.index("--settings") + 1])
+        self.assertEqual(settings.parent, result.runtime_dir)
+        envelope = (result.runtime_dir / hook_gate.CHANNEL_ENVELOPE_ARTIFACT).read_bytes()
         self.assertEqual(hashlib.sha256(envelope).hexdigest(), result.receipt["envelope_sha256"])
         self.assertEqual(len(envelope), result.receipt["delivered_bytes"])
+        # The gate returned exactly those bytes, once, and claimed the generation.
+        self.assertEqual(
+            self.hook_output["hookSpecificOutput"]["additionalContext"].encode("utf-8"), envelope
+        )
+        claim = json.loads(
+            (result.runtime_dir / hook_gate.claim_artifact(0)).read_text(encoding="utf-8")
+        )
+        self.assertEqual(claim["envelope_sha256"], result.receipt["envelope_sha256"])
+        self.assertEqual(claim["delivered_bytes"], result.receipt["delivered_bytes"])
+        self.assertEqual(claim["round_trip_evidence_id"], adapter.HOOK_ROUND_TRIP_EVIDENCE)
         self.assertEqual(command[command.index("--session-id") + 1], result.receipt["client_session_id"])
         self.assertEqual(command[-1], "inspect the repository")
         # A receipt is metadata only; no policy content may reach runtime state.
         self.assertNotIn(b"always policy", (result.runtime_dir / "receipt.json").read_bytes())
+
+    def test_the_full_content_row_delivers_the_same_entries_as_one_argument(self) -> None:
+        """Both wired rows carry the same resolved entries, byte for byte.
+
+        The two envelopes differ only in the manifest identity each capability
+        row produces; every injected source entry is identical, and each row
+        delivers its own resolver output exactly.
+        """
+        with self._patches(), self._client_patch(), self._environment():
+            hooked = self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), prompt="first",
+            )
+        armed = json.loads(
+            (hooked.runtime_dir / hook_gate.CHANNEL_ENVELOPE_ARTIFACT).read_text(encoding="utf-8")
+        )
+        with mock.patch.object(adapter, "HOOK_ROUND_TRIP_EVIDENCE", None):
+            with self._patches(), self._client_patch(), self._environment():
+                resolution, _ = self._adapter().resolve_repositories(
+                    workspace_root=self.root, repository_ids=("repo-a",),
+                )
+                result = self._adapter().prepare_and_handoff_repositories(
+                    workspace_root=self.root, repository_ids=("repo-a",), prompt="second",
+                )
+        self.assertEqual(result.receipt["channel_id"], adapter.FULL_CONTENT_CHANNEL_ID)
+        command = self.commands[1]
+        self.assertIn("--append-system-prompt", command)
+        self.assertNotIn("--settings", command)
+        envelope = command[command.index("--append-system-prompt") + 1].encode("utf-8")
+        self.assertEqual(envelope, resolution.resolved.envelope_bytes)
+        self.assertEqual(json.loads(envelope.decode("utf-8"))["entries"], armed["entries"])
+        self.assertEqual(hashlib.sha256(envelope).hexdigest(), result.receipt["envelope_sha256"])
+
+    def test_a_client_that_never_ran_the_gate_can_never_claim_delivery(self) -> None:
+        self.run_registered_hook = False
+        with self._patches(), self._client_patch(), self._environment():
+            with self.assertRaises(w2b1.AgentContextError) as failure:
+                self._adapter().prepare_and_handoff_repositories(
+                    workspace_root=self.root, repository_ids=("repo-a",), prompt="must not complete",
+                )
+        self.assertEqual(failure.exception.code, "E_CHANNEL")
+        self.assertIn("injection authority did not deliver", failure.exception.message)
+        sessions = sorted((self.root / ".workspace/.runtime").iterdir())
+        receipt = json.loads((sessions[-1] / "receipt.json").read_text(encoding="utf-8"))
+        self.assertEqual(receipt["state"], "EXECUTION_AMBIGUOUS")
+
+    def test_runtime_cleanup_removes_the_armed_channel_artifacts_safely(self) -> None:
+        with self._patches(), self._client_patch(), self._environment():
+            first = self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), prompt="first launch",
+            )
+            armed = sorted(
+                child.name for child in first.runtime_dir.iterdir()
+                if child.name.startswith("channel-")
+            )
+            for name in armed:
+                self.assertEqual((first.runtime_dir / name).stat().st_mode & 0o077, 0)
+            second = self._adapter().fresh_and_handoff_repositories(
+                workspace_root=self.root, prior_runtime_dir=first.runtime_dir,
+                repository_ids=("repo-a",), prompt="fresh launch",
+            )
+        self.assertEqual(armed, [
+            "channel-claim-000000.json", "channel-envelope.bin",
+            "channel-settings.json", "channel-state.json",
+        ])
+        self.assertFalse(first.runtime_dir.exists())
+        self.assertEqual(second.receipt["generation"], 0)
 
     def test_a_failing_client_records_execution_ambiguous_and_blocks_the_task(self) -> None:
         self.returncode = 1
@@ -507,13 +668,14 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
         self.assertEqual(self.commands, [])
 
     def test_the_transport_refuses_any_channel_step_12_4_has_not_wired(self) -> None:
+        """Only the two measured rows may reach a client invocation."""
         with self._patches(), self._client_patch(), self._environment():
             launcher = self._adapter()
             resolution, preflight = launcher.resolve_repositories(
                 workspace_root=self.root, repository_ids=("repo-a",),
             )
             transport = launcher._transport(preflight, resolution, "must not run", "s" * 8, None)
-            for channel in (adapter.HOOK_CHANNEL_ID, "claude-cli-stdin-prompt"):
+            for channel in ("claude-cli-stdin-prompt", "claude-hook-session-start"):
                 with self.subTest(channel=channel):
                     with self.assertRaises(w2b1.AgentContextError) as failure:
                         transport.deliver(
@@ -522,6 +684,16 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
                             channel_id=channel,
                         )
                     self.assertEqual(failure.exception.code, "E_CHANNEL")
+            # The wired hook channel still refuses to arm without a prepared
+            # runtime generation, so no client can be invoked without one.
+            with self.assertRaises(w2b1.AgentContextError) as failure:
+                transport.deliver(
+                    payload=resolution.resolved.envelope_bytes,
+                    envelope_sha256=resolution.resolved.envelope_sha256,
+                    channel_id=adapter.HOOK_CHANNEL_ID,
+                )
+            self.assertEqual(failure.exception.code, "E_CHANNEL")
+            self.assertIn("prepared runtime generation", failure.exception.message)
         self.assertEqual(self.commands, [])
 
     def test_resume_continues_one_completed_generation_with_the_same_identity(self) -> None:
@@ -755,8 +927,20 @@ class W12ClaudeAdapterEvidenceTests(unittest.TestCase):
     def test_the_recorded_channel_policy_matches_the_adapter(self) -> None:
         policy = self.artifact["channel_policy"]
         self.assertEqual(tuple(policy["order"]), adapter.REQUIRED_ROW_IDS)
+        # The 12.3 record is historical: it froze the hook row as ineligible
+        # until its round trip existed.  Step 12.4 supplied that round trip, and
+        # the supersession — not the historical record — must match the adapter.
         self.assertIsNone(policy["hook_round_trip_evidence"])
         self.assertEqual(policy["hook_row_status"], "INELIGIBLE_UNTIL_12_4")
+        superseded = self.artifact["superseded_by"]
+        self.assertEqual(superseded["step"], "12.4")
+        self.assertEqual(superseded["hook_row_status"], "WIRED")
+        self.assertEqual(
+            superseded["hook_round_trip_evidence"], adapter.HOOK_ROUND_TRIP_EVIDENCE
+        )
+        self.assertEqual(
+            superseded["artifact"], adapter.HOOK_CHANNEL_EVIDENCE_PATH
+        )
         self.assertEqual(
             self.artifact["lifecycle"]["states"],
             ["RESOLVED", "PREPARED", "SUBMISSION_STARTED", "COMPLETED", "EXECUTION_AMBIGUOUS", "FAILED"],
@@ -823,9 +1007,14 @@ class W12ClaudeTrackedSourceTests(unittest.TestCase):
         self.assertTrue(os.access(ROOT / "scripts/claude-repo.sh", os.X_OK))
 
     def test_step_12_3_registers_no_hook_and_promotes_no_project_configuration(self) -> None:
+        """The wired hook stays launcher-owned: no workspace file registers it."""
         settings = json.loads((ROOT / ".claude/settings.json").read_text(encoding="utf-8"))
         self.assertNotIn("hooks", settings)
-        self.assertIsNone(adapter.HOOK_ROUND_TRIP_EVIDENCE)
+        self.assertIsNotNone(adapter.HOOK_ROUND_TRIP_EVIDENCE)
+        for relative in ("scripts/agent_context/claude_delivery_adapter.py", "scripts/claude-repo.sh"):
+            self.assertNotIn(
+                ".claude/settings", (ROOT / relative).read_text(encoding="utf-8"), relative
+            )
         self.assertEqual(
             subprocess.run(
                 ["git", "-C", str(ROOT), "check-ignore", "-q", ".workspace/.runtime"], check=False

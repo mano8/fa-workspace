@@ -329,7 +329,7 @@
     ]
   },
   "open_items": [
-    "Step 12.4 must freeze the byte-exact hook round trip and register exactly one injection authority; until then the hook row is rejected and selection falls through to the full-content channel.",
+    "Step 12.4 froze the byte-exact hook round trip and the single injection authority; see superseded_by. CLOSED.",
     "Step 12.5 owns interactive/non-interactive parity, duplicate-injection, and runtime-security fixtures against a real client invocation.",
     "The intended child-scope topology still needs a human to accept the /workspace/fa-auth-m8 trust dialog; the adapter fails closed with E_TRUST until then."
   ],
@@ -356,11 +356,21 @@
   "schema_version": 1,
   "step": "12.3",
   "summary": "The canonical Claude launcher-adapter runs preflight, resolution, native/inject classification, channel selection by model_visible_total, delivery, and the shared kernel lifecycle. Every stage fails closed and blocks the user task.",
+  "superseded_by": {
+    "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-07-28.json",
+    "hook_round_trip_evidence": "c9fe9601915491ca1b6085373f6c32ba76506b75985579a3a288be4f7135b922",
+    "hook_row_status": "WIRED",
+    "hook_row_status_at_12_3": "INELIGIBLE_UNTIL_12_4",
+    "injection_authority": "one launcher-owned --settings UserPromptSubmit gate per launcher-controlled generation; a settings-registered additionalContext hook the launcher does not own makes both rows ineligible",
+    "note": "Step 12.4 froze the byte-exact hook round trip this step deliberately left open and wired the channel, so the hook row is no longer INELIGIBLE_UNTIL_12_4. The records below describe the state at Step 12.3 and are preserved; the tooling identities were recomputed for the tree that carries the wired channel.",
+    "step": "12.4",
+    "wrapper_row_guard_at_12_3": "a registered additionalContext hook makes the wrapper channel ineligible"
+  },
   "tooling": [
     {
       "path": "scripts/agent_context/claude_delivery_adapter.py",
       "role": "preflight, classification, channel selection, transport",
-      "sha256": "afb41c6a933a9a7a09498d1f974f21961c00bfc61abdff02073bd6e1613e15b9"
+      "sha256": "ab73447215bacaa23287ea27ee8ab5e8825ae756d6da6c6f9be4e9fa986a4d09"
     },
     {
       "path": "scripts/agent_context/claude_repo_launcher.py",
@@ -375,7 +385,7 @@
     {
       "path": "scripts/agent_context/tests/test_w12_claude_adapter.py",
       "role": "offline fail-closed, selection, lifecycle, and reproduction coverage",
-      "sha256": "f63be31ed6f29c0ad4239a65d3328f040eb063d48209af522aeb1c690169f680"
+      "sha256": "2a387630851b99ccfa412878ee19032a972fa882e6f57d8268cad028d908e271"
     }
   ]
 }

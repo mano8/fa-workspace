@@ -46,6 +46,7 @@ CRITICAL_PATHS = (
     ".workspace/contracts",
     "scripts/agent_context/authorization.py",
     "scripts/agent_context/claude_delivery_adapter.py",
+    "scripts/agent_context/claude_hook_gate.py",
     "scripts/agent_context/claude_native_evidence.py",
     "scripts/agent_context/claude_repo_launcher.py",
     "scripts/agent_context/codex_adapter.py",

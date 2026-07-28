@@ -223,11 +223,12 @@ scripts/codex-repo.sh --repository auth-sdk-m8 \
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w6_codex_adapter -v
 ```
 
-Phase 12 Steps 12.1--12.3 add the parallel Claude boundary. Step 12.1 froze the
-installed-client capability matrix and Step 12.2 the out-of-band
-`claude-loopback-model-input-capture` native-load mechanism; both are tracked
-under [`fixtures/evidence`](fixtures/evidence) and pinned by the adapter and by
-root workspace validation.
+Phase 12 Steps 12.1--12.4 add the parallel Claude boundary. Step 12.1 froze the
+installed-client capability matrix, Step 12.2 the out-of-band
+`claude-loopback-model-input-capture` native-load mechanism, and Step 12.4 the
+byte-exact hook round trip; all three are tracked under
+[`fixtures/evidence`](fixtures/evidence) and pinned by the adapter and by root
+workspace validation.
 [`claude_delivery_adapter.py`](claude_delivery_adapter.py) and
 [`claude-repo.sh`](../claude-repo.sh) reuse the same resolver, kernel,
 authorization boundary, shared validator, and trust identity as the Codex path.
@@ -246,10 +247,24 @@ Channel selection is by `model_visible_total`, never by envelope size: the
 shared validator is the budget oracle, the hook row's 10,000-byte ceiling is a
 total rather than an envelope allowance, and an over-budget generation falls
 through to the verified `--append-system-prompt` full-content channel or fails
-closed. Until Step 12.4 freezes the byte-exact hook round trip and registers
-exactly one injection authority, the hook row is rejected with a recorded reason
-and no hook is configured; while any `additionalContext` hook is registered the
-wrapper channel is refused, because bypassing the hook would inject twice.
+closed.
+
+Step 12.4 wired the hook row. Its injection authority is launcher-owned and
+lives for exactly one launch: the transport writes the exact envelope, a closed
+armed state, and a one-event `--settings` registration naming
+[`claude_hook_gate.py`](claude_hook_gate.py) into the kernel's owner-only
+runtime session, and passes only `--settings` to the client. The gate returns
+the envelope as `additionalContext`, claims each launcher-controlled generation
+through atomic no-replace creation, and answers a repeated prompt in that
+generation with no second copy; the launcher then verifies that claim after the
+run, so a client that never ran the gate can never claim delivery. No workspace,
+project, or user settings file is ever written, and the reviewed project
+settings layer still forbids `hooks`. Because a `--settings` hook *merges* with
+those layers rather than replacing them, an `additionalContext` hook registered
+there is a second authority the launcher does not own and makes **both** rows
+ineligible with `E_CHANNEL`. The byte-exact round trip, the exactly-once
+evidence, and the 10,000/10,001 boundary are frozen in
+[`w12-claude-hook-channel-evidence-2026-07-28.md`](fixtures/evidence/w12-claude-hook-channel-evidence-2026-07-28.md).
 
 ```bash
 scripts/claude-repo.sh --repository fa-auth-m8 "inspect the repository"
@@ -258,6 +273,7 @@ scripts/claude-repo.sh --repository fa-auth-m8 "inspect the repository"
 scripts/claude-repo.sh --repository fa-auth-m8 --project fa-auth-m8 \
   "inspect the repository"
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w12_claude_adapter -v
+"$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w12_claude_hook_channel -v
 ```
 
 The faceted resolver CLI in [`resolve-context.py`](resolve-context.py) remains

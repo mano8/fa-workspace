@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import secrets
 import stat
 import tempfile
@@ -30,6 +31,12 @@ from agent_context.resolve_context import ResolvedContext
 
 ZERO_SHA256 = "0" * 64
 RUNTIME_DIRECTORY = ".workspace/.runtime"
+# A channel whose injection authority is a separate process needs the exact
+# payload on disk rather than in this process's memory.  Those artifacts stay
+# inside the same owner-only session directory as the session, receipt, and
+# journal, so containment, ownership, and cleanup are one policy instead of two.
+CHANNEL_ARTIFACT_PREFIX = "channel-"
+CHANNEL_ARTIFACT_NAME = re.compile(r"^channel-[a-z0-9]+(?:[.-][a-z0-9]+)*$")
 
 
 class ExitCode(IntEnum):
@@ -302,7 +309,7 @@ class DeliveryKernel:
                 for entry in entries:
                     if entry.name not in permitted and not (
                         entry.name.startswith("journal-") and entry.name.endswith(".json")
-                    ):
+                    ) and not CHANNEL_ARTIFACT_NAME.match(entry.name):
                         _fail("E_RUNTIME", "runtime cleanup found an unexpected entry")
                     info = entry.lstat()
                     if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
@@ -688,6 +695,46 @@ class DeliveryKernel:
             if info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) & 0o077:
                 _fail("E_RUNTIME", "runtime directory is not owner-only")
 
+    @staticmethod
+    def _channel_name(name: str) -> str:
+        """Reject any artifact name that is not one flat channel file."""
+        if not isinstance(name, str) or not CHANNEL_ARTIFACT_NAME.match(name):
+            _fail("E_RUNTIME", "runtime channel artifact name is invalid")
+        return name
+
+    def write_channel_artifact(
+        self, runtime_dir: Path, name: str, raw: bytes, *, replace: bool = False,
+    ) -> Path:
+        """Persist one owner-only channel artifact beside its generation state.
+
+        A channel whose delivery runs in a separate process cannot receive the
+        payload in memory.  Writing it here keeps the same containment,
+        ownership, atomicity, and cleanup rules as every other runtime file, and
+        ``replace=False`` is the atomic no-replace creation an exactly-once
+        claim depends on.
+        """
+        self._validate_dir(runtime_dir, runtime_dir.parent, allow_root=False)
+        if not isinstance(raw, (bytes, bytearray)):
+            _fail("E_RUNTIME", "runtime channel artifact must be raw bytes")
+        self._write_bytes(runtime_dir, self._channel_name(name), bytes(raw), replace=replace)
+        return runtime_dir / name
+
+    def read_channel_artifact(self, runtime_dir: Path, name: str) -> bytes:
+        """Read one owner-only channel artifact without following any path."""
+        self._validate_dir(runtime_dir, runtime_dir.parent, allow_root=False)
+        path = runtime_dir / self._channel_name(name)
+        try:
+            info = path.lstat()
+            if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
+                _fail("E_RUNTIME", "runtime channel artifact is unsafe")
+            if os.name == "posix" and (
+                info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) & 0o077
+            ):
+                _fail("E_RUNTIME", "runtime channel artifact is not owner-only")
+            return path.read_bytes()
+        except OSError as error:
+            _fail("E_RUNTIME", f"runtime channel artifact cannot be read: {error}")
+
     def _read_json(self, directory: Path, name: str, validator: Callable[[Any], None]) -> dict[str, Any]:
         self._validate_dir(directory, directory.parent, allow_root=False)
         path = directory / name
@@ -705,10 +752,12 @@ class DeliveryKernel:
 
     def _write_json(self, directory: Path, name: str, value: Mapping[str, Any], *, replace: bool) -> None:
         self._validate_dir(directory, directory.parent, allow_root=False)
+        self._write_bytes(directory, name, w2b1.canonical_bytes(dict(value)), replace=replace)
+
+    def _write_bytes(self, directory: Path, name: str, raw: bytes, *, replace: bool) -> None:
         destination = directory / name
         if not replace and destination.exists():
             _fail("E_CONCURRENCY", "runtime state already exists")
-        raw = w2b1.canonical_bytes(dict(value))
         fd, temporary_name = tempfile.mkstemp(prefix=f".{name}.", dir=directory)
         temporary = Path(temporary_name)
         try:

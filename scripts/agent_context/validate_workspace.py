@@ -38,6 +38,7 @@ from agent_context.validate_root_claude import validate_root_claude
 
 CAPABILITY_EVIDENCE = Path(codex_adapter.CAPABILITY_EVIDENCE_PATH)
 CLAUDE_CAPABILITY_EVIDENCE = Path(claude_delivery_adapter.CAPABILITY_EVIDENCE_PATH)
+CLAUDE_HOOK_CHANNEL_EVIDENCE = Path(claude_delivery_adapter.HOOK_CHANNEL_EVIDENCE_PATH)
 ROOT_INPUTS = (
     Path(".m8-workspace-root"), Path("AGENTS.md"), Path("CLAUDE.md"),
     Path(".claude/settings.json"), Path(".codex/config.toml"),
@@ -48,7 +49,8 @@ ROOT_INPUTS = (
     Path(".workspace/contracts/child-repository-rollout-v1.boundaries.json"),
     Path("scripts/codex-repo.sh"), Path("scripts/codex-repo.ps1"),
     Path("scripts/claude-repo.sh"),
-    CAPABILITY_EVIDENCE, CLAUDE_CAPABILITY_EVIDENCE,
+    Path(claude_delivery_adapter.GATE_MODULE_PATH),
+    CAPABILITY_EVIDENCE, CLAUDE_CAPABILITY_EVIDENCE, CLAUDE_HOOK_CHANNEL_EVIDENCE,
 )
 
 
@@ -159,6 +161,20 @@ def _validate_claude_capability_evidence(workspace: Path) -> None:
         claude_delivery_adapter.HOOK_CHANNEL_ID, claude_delivery_adapter.FULL_CONTENT_CHANNEL_ID
     }:
         _fail("frozen Claude rows no longer carry both verified delivery channels")
+    hook_channel = _read_normalized(
+        workspace / CLAUDE_HOOK_CHANNEL_EVIDENCE, "Claude hook round-trip evidence"
+    )
+    if (
+        hashlib.sha256(hook_channel).hexdigest()
+        != claude_delivery_adapter.HOOK_CHANNEL_EVIDENCE_SHA256
+    ):
+        _fail("tracked Claude hook round-trip-evidence hash does not match the adapter identity")
+    # The wired hook row may claim canonical delivery only while its frozen
+    # round trip still describes this gate, this client, and this row.
+    try:
+        claude_delivery_adapter._hook_channel_evidence(workspace, rows)
+    except w2b1.AgentContextError as error:
+        _fail(f"Claude hook round-trip evidence is invalid: {error}")
 
 
 def _validate_policy_sources(

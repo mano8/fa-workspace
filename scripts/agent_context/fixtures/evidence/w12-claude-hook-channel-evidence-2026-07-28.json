@@ -1,0 +1,367 @@
+{
+  "agent": "claude",
+  "capability_evidence_id": "6fb210e92e30f04006652e9a56fa860de168db868c3f3aa6a19919b8a8accce3",
+  "captured": "2026-07-28",
+  "client": {
+    "identity": "/home/vscode/.local/share/claude/versions/2.1.220",
+    "sha256": "674f61f20ff306f3100cf9200e4c36c4b70278b5bef2884549819b942a89c863",
+    "version": "2.1.220 (Claude Code)"
+  },
+  "depends_on": [
+    {
+      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.json",
+      "note": "the hook row, its 10000-byte verified channel limit, and the frozen client identity",
+      "sha256": "f3539f7f66135a6726253e97c5bab0b3858860e904b9148ec26d112d82c7c6f8",
+      "step": "12.1"
+    },
+    {
+      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-07-28.json",
+      "note": "the native-load mechanism whose identically configured launch this round trip preserves",
+      "sha256": "705d1b9d30a8b617d2c4b683b12d57d85e76ab29d206447951434201a0825634",
+      "step": "12.2"
+    },
+    {
+      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-adapter-evidence-2026-07-28.json",
+      "note": "the fail-closed adapter whose hook row this step makes eligible. Its hash is deliberately not pinned here: that artifact pins the adapter, the adapter pins this artifact, and a hash in both directions cannot converge. The 12.3 record carries a superseded_by pointer to this step instead.",
+      "sha256": null,
+      "step": "12.3"
+    }
+  ],
+  "driven_run": {
+    "accounting": {
+      "client_context_allowance": 262144,
+      "effective_hard_limit": 10000,
+      "estimated_tokens": 1663,
+      "excluded_external_layers": [],
+      "model_visible_total": 6651,
+      "native_model_visible_bytes": 1905,
+      "other_model_visible_bootstrap_bytes": 0,
+      "policy_hard_limit": 32768,
+      "raw_injected_source_bytes": 2863,
+      "reserved_margin": 32768,
+      "serialization_overhead_bytes": 1883,
+      "serialized_injected_envelope_bytes": 4746,
+      "verified_channel_limit": 10000
+    },
+    "armed_envelope_matches_receipt": true,
+    "channel_id": "claude-hook-additional-context",
+    "claim": {
+      "channel_id": "claude-hook-additional-context",
+      "claimed_at": "2026-07-28T15:27:46Z",
+      "client_session_id": "5cb5354c-d80a-45c7-a25c-0da1b234321d",
+      "delivered_bytes": 4746,
+      "envelope_sha256": "f8d379b9744ff072c25b113093067b4b2aba36de322faaab73949a798e20770c",
+      "generation": 0,
+      "launch_id": "launch-08c0783d450b49fda1f9cf5ab1b2603e",
+      "manifest_id": "bdd4d2a5248ce4462d70a3d21c7c944c696000a559832e2159837b30b57b208a",
+      "round_trip_evidence_id": "c9fe9601915491ca1b6085373f6c32ba76506b75985579a3a288be4f7135b922",
+      "schema_version": 1
+    },
+    "command": [
+      "claude",
+      "-p",
+      "--output-format",
+      "json",
+      "--session-id",
+      "5cb5354c-d80a-45c7-a25c-0da1b234321d",
+      "--settings",
+      "/workspace/.workspace/.runtime/session-62b6097163b31543927a6df5335f2f295f8f15f5641ae825/channel-settings.json",
+      "Reply with exactly: W12-4 DRIVEN RUN"
+    ],
+    "description": "One live root-scope launch through the wired hook row: the real installed client was invoked against a loopback recorder, so the vendor API was never contacted.",
+    "entries": [
+      {
+        "delivery": "inject",
+        "path": ".workspace/policies/always/security.md",
+        "source_bytes": 321
+      },
+      {
+        "delivery": "inject",
+        "path": ".workspace/policies/always/workspace.md",
+        "source_bytes": 573
+      },
+      {
+        "delivery": "inject",
+        "path": ".workspace/policies/facets/language-python.md",
+        "source_bytes": 972
+      },
+      {
+        "delivery": "native",
+        "path": "CLAUDE.md",
+        "source_bytes": 1905
+      },
+      {
+        "delivery": "inject",
+        "path": "imgtools_m8/CLAUDE.md",
+        "source_bytes": 222
+      },
+      {
+        "delivery": "inject",
+        "path": "imgtools_m8/REPOSITORY_CONTEXT.md",
+        "source_bytes": 775
+      }
+    ],
+    "envelope_bytes": 4746,
+    "envelope_model_visible_occurrences": 1,
+    "envelope_sha256": "f751ca1a27509c5e2bd07f0d27efd69f3a54ab781e06b748518ed6989a703bf1",
+    "launch_scope": ".",
+    "manifest_id": "ce95933fbab21b7fb0e6fe62f3f713c8c889ecbe91df381d439aeda27bbd089d",
+    "native_sources": [
+      {
+        "path": "CLAUDE.md",
+        "sha256": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09"
+      }
+    ],
+    "receipt": {
+      "channel_id": "claude-hook-additional-context",
+      "delivered_bytes": 4746,
+      "envelope_sha256": "f8d379b9744ff072c25b113093067b4b2aba36de322faaab73949a798e20770c",
+      "generation": 0,
+      "native_evidence_ids": [
+        "b9379ecc1c88e17e5f2a808f5426458a273b55105b7972aa2acf5e1a0ca10922"
+      ],
+      "previous_state": "SUBMISSION_STARTED",
+      "state": "COMPLETED"
+    },
+    "registered_hook_events": [],
+    "rejected_rows": [],
+    "repository": "imgtools_m8",
+    "round_trip_evidence_id": "c9fe9601915491ca1b6085373f6c32ba76506b75985579a3a288be4f7135b922",
+    "runtime_artifacts_are_owner_only": true,
+    "selected_row": "claude-devcontainer-non-interactive-hook-additional-context",
+    "trust_state": "trusted"
+  },
+  "findings": [
+    {
+      "finding": "The complete 4211-byte serialized JCS envelope reaches the model input byte-exactly and exactly once through the gate.",
+      "id": "F-1"
+    },
+    {
+      "finding": "A resumed session replays its own transcript, so the envelope stays visible once; the gate writes no second claim and injects no second copy.",
+      "id": "F-2"
+    },
+    {
+      "finding": "A --settings hook merges with the project settings layer instead of replacing it, so any additionalContext event already registered there is a second injection authority the launcher does not own.",
+      "id": "F-3"
+    },
+    {
+      "finding": "A refused gate produced zero model-input requests: the unowned session, the oversize payload, and the drifted envelope each blocked the prompt before any model input existed, so no user task ran without its context.",
+      "id": "F-4"
+    },
+    {
+      "finding": "Registering this gate on SessionStart delivers nothing and claims nothing, so even a misconfigured launcher cannot turn it into a second authority.",
+      "id": "F-5"
+    },
+    {
+      "finding": "Narrowing --setting-sources to user suppresses the project memory the Step 12.2 native evidence enumerated, so the canonical launch keeps the default sources and adds only its own hook.",
+      "id": "F-6"
+    },
+    {
+      "finding": "The client's 10000/10001 boundary holds through this registration path; at 10001 it substitutes a <persisted-output> preview plus a temporary-file pointer, which is never delivery.",
+      "id": "F-7"
+    }
+  ],
+  "gate": {
+    "blocking_exit_code": 2,
+    "event": "UserPromptSubmit",
+    "exactly_once": "atomic no-replace creation of the per-generation claim; a repeated prompt in the same generation is answered with no additionalContext",
+    "failure_behavior": "no claim is written, so the launcher's own post-run claim check fails closed independently of the client's exit status",
+    "registration": "one launcher-owned --settings file written into the kernel's owner-only runtime session; no workspace, project, or user settings file is ever modified",
+    "runtime_artifacts": [
+      "channel-state.json",
+      "channel-envelope.bin",
+      "channel-settings.json",
+      "channel-claim-<generation>.json"
+    ],
+    "source": "scripts/agent_context/claude_hook_gate.py",
+    "source_sha256": "f52c2e195caed7a0fcd540b7ba65fa47948ee123d56a3312a5fab854ba7b6196"
+  },
+  "injection_authority": {
+    "compaction": "unsupported and fail-closed; the frozen rows record compact_supported false",
+    "foreign_authority": "any SessionStart or UserPromptSubmit hook registered in the project, local, or user settings layer makes both rows ineligible with E_CHANNEL",
+    "full_content_row": "--append-system-prompt; the launcher registers no hook at all",
+    "hook_row": "the launcher's own --settings UserPromptSubmit gate; no --append-system-prompt argument is passed",
+    "resume": "validates and continues one generation; the claim prevents a second copy",
+    "rule": "exactly one pre-task injection authority per launcher-controlled generation",
+    "session_start": "never registered by the launcher and refused by the gate"
+  },
+  "invalidation": [
+    "any Claude executable, version, or SHA-256 change, including an automatic update",
+    "any change to scripts/agent_context/claude_hook_gate.py",
+    "any change to the hook row, its verified channel limit, or its capability evidence",
+    "any change to the registered hook event or the launcher's own registration mechanism",
+    "any change to the native-load evidence mechanism or its identically configured launch"
+  ],
+  "never_delivery": [
+    "a truncated value",
+    "a temporary-file pointer",
+    "a <persisted-output> preview",
+    "a payload above the verified channel limit",
+    "an armed envelope whose hash or byte count drifted"
+  ],
+  "observations": {
+    "boundary": [
+      {
+        "client_exit_code": 0,
+        "exact_model_input": true,
+        "fixture_bytes": 10000,
+        "fixture_sha256": "cf44380e62800165603c7fd7a79abee60b20542f5e3de0265272cb5f6f52e9c5",
+        "persisted_output_substituted": false
+      },
+      {
+        "client_exit_code": 0,
+        "exact_model_input": false,
+        "fixture_bytes": 10001,
+        "fixture_sha256": "d168ef55dab1e27f3a4ac3448d3bab2a8a1d2da8b20eb5f6d50560e9efa24d5f",
+        "persisted_output_substituted": true
+      }
+    ],
+    "foreign_authority": {
+      "client_exit_code": 0,
+      "foreign_marker_occurrences": 1,
+      "launcher_envelope_delivered": true,
+      "settings_hooks_merge": true
+    },
+    "gate_refusals": [
+      {
+        "case": "unowned-session",
+        "claims": [],
+        "client_exit_code": 0,
+        "client_stderr_excerpt": "\u26a0 claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login \u00b7 Unset it to load your organization's connectors",
+        "delivered": false,
+        "expected_code": "E_LIFECYCLE",
+        "model_input_requests": 0
+      },
+      {
+        "case": "oversize-payload",
+        "claims": [],
+        "client_exit_code": 0,
+        "client_stderr_excerpt": "\u26a0 claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login \u00b7 Unset it to load your organization's connectors",
+        "delivered": false,
+        "expected_code": "E_CHANNEL",
+        "model_input_requests": 0
+      },
+      {
+        "case": "drifted-envelope",
+        "claims": [],
+        "client_exit_code": 0,
+        "client_stderr_excerpt": "\u26a0 claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login \u00b7 Unset it to load your organization's connectors",
+        "delivered": false,
+        "expected_code": "E_CHANNEL",
+        "model_input_requests": 0
+      },
+      {
+        "case": "session-start-event",
+        "claims": [],
+        "client_exit_code": 0,
+        "client_stderr_excerpt": "\u26a0 claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login \u00b7 Unset it to load your organization's connectors",
+        "delivered": false,
+        "expected_code": "E_CHANNEL",
+        "model_input_requests": 1
+      }
+    ],
+    "round_trip": {
+      "claim": {
+        "channel_id": "claude-hook-additional-context",
+        "claimed_at": "2026-07-28T15:26:40Z",
+        "client_session_id": "6e1d5354-4079-4260-b918-e2fedde6c7e3",
+        "delivered_bytes": 4211,
+        "envelope_sha256": "04fefde60c0843681a007afce96b9aa3d0a5425ed4201557f9d91352da08bb84",
+        "generation": 0,
+        "launch_id": "launch-00000000000000000000000000000000",
+        "manifest_id": "b7e04b9d72c2e278cd05c18027346af9797b5c82b7c7f26313d55b5e896b2123",
+        "round_trip_evidence_id": "f7938eddeace3681353a87fca9571ea4c65b4e3d3518cf8b3b446e7dcca591ae",
+        "schema_version": 1
+      },
+      "claim_recorded": true,
+      "claims_after_second_prompt": [
+        "channel-claim-000000.json"
+      ],
+      "client_exit_code": 0,
+      "envelope_bytes": 4211,
+      "envelope_is_jcs": true,
+      "envelope_sha256": "04fefde60c0843681a007afce96b9aa3d0a5425ed4201557f9d91352da08bb84",
+      "exact_model_input": true,
+      "model_visible_occurrences": 1,
+      "second_prompt_exit_code": 0,
+      "second_prompt_model_visible_occurrences": 1
+    },
+    "setting_sources": {
+      "default": {
+        "client_exit_code": 0,
+        "envelope_delivered": true,
+        "native_project_memory_present": true
+      },
+      "user-only": {
+        "client_exit_code": 0,
+        "envelope_delivered": true,
+        "native_project_memory_present": false
+      }
+    }
+  },
+  "probe": {
+    "command": "python3 scripts/agent_context/probe_claude_hook_channel.py --output <path>",
+    "independent_runs": 2,
+    "model_input_capture": "loopback ANTHROPIC_BASE_URL recorder with a dummy ANTHROPIC_API_KEY; request bodies only, headers never stored",
+    "runs_agree_apart_from": [
+      "per-run client session identifiers",
+      "per-run UTC timestamps"
+    ],
+    "source": "scripts/agent_context/probe_claude_hook_channel.py",
+    "source_sha256": "be209c9d87efdd7163bb6308d9ab9229416d4789fc5d2e694c32822c586d2937",
+    "vendor_api_contacted": false,
+    "workspace_files_read": [
+      "scripts/agent_context/claude_hook_gate.py"
+    ],
+    "workspace_files_written": 0
+  },
+  "round_trip": {
+    "capability_evidence_id": "6fb210e92e30f04006652e9a56fa860de168db868c3f3aa6a19919b8a8accce3",
+    "captured_at": "2026-07-28T15:27:06Z",
+    "channel_id": "claude-hook-additional-context",
+    "claim_recorded": true,
+    "claims_after_second_prompt": 1,
+    "client_identity": "/home/vscode/.local/share/claude/versions/2.1.220",
+    "client_sha256": "674f61f20ff306f3100cf9200e4c36c4b70278b5bef2884549819b942a89c863",
+    "client_version": "2.1.220 (Claude Code)",
+    "delivery_mechanism": "launcher-owned --settings UserPromptSubmit gate",
+    "envelope_bytes": 4211,
+    "envelope_sha256": "04fefde60c0843681a007afce96b9aa3d0a5425ed4201557f9d91352da08bb84",
+    "exact_model_input": true,
+    "gate_source_sha256": "f52c2e195caed7a0fcd540b7ba65fa47948ee123d56a3312a5fab854ba7b6196",
+    "hook_event": "UserPromptSubmit",
+    "mechanism": "claude-loopback-model-input-capture",
+    "model_visible_occurrences": 1,
+    "round_trip_evidence_id": "c9fe9601915491ca1b6085373f6c32ba76506b75985579a3a288be4f7135b922",
+    "second_prompt_model_visible_occurrences": 1,
+    "verified_channel_limit": 10000
+  },
+  "row_fit_survey": {
+    "description": "model_visible_total for every registered repository at root scope on this tree, with the 1905-byte native Claude bootstrap",
+    "falls_through_to_full_content": [
+      "astro-auth-m8",
+      "astro-media-m8",
+      "astro-prompt-m8",
+      "reparto-docente-m8",
+      "fa-auth-m8",
+      "astro-reparto-m8"
+    ],
+    "hook_row_fits": [
+      "imgtools_m8",
+      "security-tests-m8",
+      "media-worker-m8",
+      "auth-sdk-m8",
+      "media-sdk-m8",
+      "astro-ui-m8",
+      "prompt-engine-m8",
+      "media-service-m8",
+      "fa-ui-m8",
+      "fastapi-m8"
+    ]
+  },
+  "row_id": "claude-devcontainer-non-interactive-hook-additional-context",
+  "schema_version": 1,
+  "step": "12.4",
+  "summary": "The launcher-owned UserPromptSubmit gate delivers the complete serialized JCS envelope byte-exactly into the model input, exactly once per launcher-controlled generation, and refuses every unverified state with no claim and no delivery.",
+  "verified_channel_limit": 10000
+}

@@ -27,10 +27,15 @@ Nothing here is optimistic.  Every stage has one fail-closed answer:
 
 The resolver, kernel, authorization boundary, shared validator, and trust
 identity are reused unchanged; this module adds only the Claude-specific
-preflight, classification, and transport.  Step 12.4 owns the byte-exact hook
-round trip and the single injection authority, so the hook row is deliberately
-ineligible here and selection falls through to the separately tested
-full-content channel.
+preflight, classification, and transport.
+
+Step 12.4 wired the second channel.  The hook row is now eligible, bound to the
+frozen byte-exact round-trip artifact, and delivered by the launcher's own
+``--settings`` registration of exactly one ``UserPromptSubmit`` gate per
+launcher-controlled generation.  Because a settings-registered
+``additionalContext`` hook merges with the launcher's own, any such event
+already registered in the project, local, or user layer is a second injection
+authority this launcher does not own and makes *both* rows ineligible.
 """
 
 from __future__ import annotations
@@ -38,13 +43,16 @@ from __future__ import annotations
 import hashlib
 import json
 import secrets
+import shlex
 import stat
+import sys
 import uuid
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, NoReturn
 
+from agent_context import claude_hook_gate as gate
 from agent_context import claude_native_evidence as native
 from agent_context import w2b1
 
@@ -87,6 +95,10 @@ NATIVE_LOAD_EVIDENCE_PATH = (
     "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-07-28.json"
 )
 NATIVE_LOAD_EVIDENCE_SHA256 = "705d1b9d30a8b617d2c4b683b12d57d85e76ab29d206447951434201a0825634"
+HOOK_CHANNEL_EVIDENCE_PATH = (
+    "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-07-28.json"
+)
+HOOK_CHANNEL_EVIDENCE_SHA256 = "db329b43cd2205838e619037e1a8051ce2c53e943d5e2ec19baefacb00463d5e"
 
 HOOK_CHANNEL_ID = "claude-hook-additional-context"
 FULL_CONTENT_CHANNEL_ID = "claude-cli-append-system-prompt"
@@ -95,11 +107,14 @@ REQUIRED_ROW_IDS = (
     "claude-devcontainer-non-interactive-hook-additional-context",
     "claude-devcontainer-non-interactive-append-system-prompt",
 )
-INJECTION_AUTHORITY_EVENT = "UserPromptSubmit"
-# Step 12.4 must freeze the byte-exact hook round trip and register exactly one
-# injection authority before the hook row can carry an envelope.  Until then a
-# fitting hook row is rejected here instead of being trusted at delivery.
-HOOK_ROUND_TRIP_EVIDENCE: str | None = None
+INJECTION_AUTHORITY_EVENT = gate.HOOK_EVENT
+GATE_MODULE_PATH = "scripts/agent_context/claude_hook_gate.py"
+# Step 12.4's frozen byte-exact round trip.  It is the identity of the tracked
+# hook-channel artifact and is bound into every armed generation; the hook row
+# stays ineligible whenever it is absent.
+HOOK_ROUND_TRIP_EVIDENCE: str | None = (
+    "c9fe9601915491ca1b6085373f6c32ba76506b75985579a3a288be4f7135b922"
+)
 REPOSITORY_INSTRUCTION_FILES = ("CLAUDE.md", "REPOSITORY_CONTEXT.md")
 # The client frames native memory itself and that framing is client-owned, not
 # workspace-controlled.  Every workspace-owned native byte is already counted
@@ -181,6 +196,8 @@ class ClaudeResolution:
     injection_evidence: Mapping[str, Any]
     # Metadata-only selection trace: why each earlier row could not deliver.
     rejected_rows: tuple[Mapping[str, str], ...]
+    # The frozen Step 12.4 round trip, present only when the hook row delivers.
+    round_trip_evidence_id: str | None = None
 
 
 def _capability_artifact(root: Path) -> dict[str, Any]:
@@ -191,6 +208,9 @@ def _capability_artifact(root: Path) -> dict[str, Any]:
     evidence = root.joinpath(*NATIVE_LOAD_EVIDENCE_PATH.split("/"))
     if _sha256(evidence, code="E_NATIVE_EVIDENCE") != NATIVE_LOAD_EVIDENCE_SHA256:
         _fail("E_NATIVE_EVIDENCE", "Claude native-load evidence changed and must be refrozen")
+    hook_channel = root.joinpath(*HOOK_CHANNEL_EVIDENCE_PATH.split("/"))
+    if _sha256(hook_channel, code="E_CHANNEL") != HOOK_CHANNEL_EVIDENCE_SHA256:
+        _fail("E_CHANNEL", "Claude hook round-trip evidence changed and must be refrozen")
     try:
         artifact = w2b1.parse_strict_json(path.read_bytes())
     except (OSError, w2b1.AgentContextError) as error:
@@ -198,6 +218,52 @@ def _capability_artifact(root: Path) -> dict[str, Any]:
     if not isinstance(artifact, dict) or not isinstance(artifact.get("rows"), list):
         _fail("E_CAPABILITY", "Claude capability evidence has no frozen row list")
     return artifact
+
+
+def _hook_channel_evidence(root: Path, rows: Mapping[str, ClaudeCapabilityRow]) -> Mapping[str, Any]:
+    """Load the frozen Step 12.4 round trip and prove it still describes this row.
+
+    A round trip is evidence only while it names the same client, the same hook
+    event, the same channel, and the same verified limit as the capability row
+    it unlocks; any drift makes the hook row ineligible rather than optimistic.
+    """
+    path = root.joinpath(*HOOK_CHANNEL_EVIDENCE_PATH.split("/"))
+    try:
+        artifact = w2b1.parse_strict_json(path.read_bytes())
+    except (OSError, w2b1.AgentContextError) as error:
+        _fail("E_CHANNEL", f"Claude hook round-trip evidence is invalid: {error}")
+    record = artifact.get("round_trip") if isinstance(artifact, dict) else None
+    if not isinstance(record, dict):
+        _fail("E_CHANNEL", "Claude hook round-trip evidence has no frozen record")
+    identity = record.get("round_trip_evidence_id")
+    if w2b1.canonical_sha256(
+        {key: value for key, value in record.items() if key != "round_trip_evidence_id"}
+    ) != identity:
+        _fail("E_CHANNEL", "the frozen hook round-trip identity does not recompute")
+    if identity != HOOK_ROUND_TRIP_EVIDENCE:
+        _fail("E_CHANNEL", "the frozen hook round-trip identity differs from the adapter")
+    row = rows[REQUIRED_ROW_IDS[0]]
+    if (
+        record.get("channel_id") != HOOK_CHANNEL_ID
+        or record.get("hook_event") != INJECTION_AUTHORITY_EVENT
+        or record.get("capability_evidence_id") != row.capability_evidence_id
+        or record.get("verified_channel_limit") != row.row["verified_channel_limit"]
+    ):
+        _fail("E_CHANNEL", "the frozen hook round trip does not describe the required hook row")
+    if record.get("exact_model_input") is not True or record.get("delivery_mechanism") != (
+        "launcher-owned --settings UserPromptSubmit gate"
+    ):
+        _fail("E_CHANNEL", "the frozen hook round trip does not prove exact model-visible delivery")
+    if record.get("model_visible_occurrences") != 1 or record.get("claims_after_second_prompt") != 1:
+        _fail("E_CHANNEL", "the frozen hook round trip does not prove exactly-once delivery")
+    # The gate is the injection authority the round trip measured; a changed
+    # gate is unmeasured wiring, so the row becomes ineligible rather than
+    # inheriting another file's evidence.
+    if _sha256(
+        root.joinpath(*GATE_MODULE_PATH.split("/")), code="E_CHANNEL"
+    ) != record.get("gate_source_sha256"):
+        _fail("E_CHANNEL", "the Claude hook gate changed since its round-trip evidence")
+    return record
 
 
 def _capability_rows(artifact: Mapping[str, Any]) -> dict[str, ClaudeCapabilityRow]:
@@ -405,6 +471,9 @@ class ClaudeLauncherAdapter:
             )
         root = preflight.workspace_root
         rows = _capability_rows(_capability_artifact(root))
+        round_trip = (
+            _hook_channel_evidence(root, rows) if HOOK_ROUND_TRIP_EVIDENCE is not None else None
+        )
         metadata = _load_json(root / ".workspace" / "policy.metadata.json")
         instruction_sources, injected_instructions = self._classified_instructions(preflight)
         injection_evidence = native.build_injection_evidence(
@@ -439,10 +508,15 @@ class ClaudeLauncherAdapter:
                 _fail("E_CAPABILITY", f"resolved effective limit differs from frozen evidence: {row_id}")
             reasons = self._ineligible_reasons(capability, preflight, resolved)
             if not reasons:
+                channel = capability.row["channel_id"]
                 return ClaudeResolution(
-                    capability=capability, channel_id=capability.row["channel_id"],
+                    capability=capability, channel_id=channel,
                     resolved=resolved, native_evidence=native_evidence,
                     injection_evidence=injection_evidence, rejected_rows=tuple(rejected),
+                    round_trip_evidence_id=(
+                        round_trip["round_trip_evidence_id"]
+                        if channel == HOOK_CHANNEL_ID and round_trip is not None else None
+                    ),
                 ), preflight
             rejected.append({"row_id": row_id, "reason": "; ".join(reasons)})
         # Every row over budget is a budget failure; a row that fits but is not
@@ -494,10 +568,17 @@ class ClaudeLauncherAdapter:
         The shared validator is the budget oracle, so ``model_visible_total`` —
         not envelope size — decides whether a row fits, exactly as Step 12.1's
         correction and Step 12.2's refinement require.
+
+        Step 12.4 makes the injection authority launcher-owned: the hook is
+        registered for one launch through the launcher's own ``--settings``
+        file, never in the workspace.  A ``--settings`` hook *merges* with the
+        project, local, and user layers rather than replacing them, so any
+        ``additionalContext`` event already registered there is a foreign
+        second authority and makes every row ineligible.
         """
         registered = set(preflight.settings.get("registered_hook_events") or ())
-        duplicate = registered.intersection(native.DUPLICATE_INJECTION_EVENTS)
-        if len(duplicate) > 1:
+        foreign = registered.intersection(native.DUPLICATE_INJECTION_EVENTS)
+        if len(foreign) > 1:
             # Step 12.1 measured that SessionStart carries additionalContext
             # exactly as UserPromptSubmit does; both would deliver two copies.
             _fail("E_CHANNEL", "SessionStart and UserPromptSubmit would both inject additionalContext")
@@ -517,10 +598,13 @@ class ClaudeLauncherAdapter:
         if channel == HOOK_CHANNEL_ID:
             if HOOK_ROUND_TRIP_EVIDENCE is None:
                 reasons.append("E_CHANNEL: no byte-exact hook round-trip evidence is frozen (Step 12.4)")
-            elif duplicate != {INJECTION_AUTHORITY_EVENT}:
-                reasons.append("E_CHANNEL: the single UserPromptSubmit injection authority is not registered")
+            elif foreign:
+                reasons.append(
+                    "E_CHANNEL: a settings-registered additionalContext hook is a second "
+                    "injection authority this launcher does not own"
+                )
         elif channel == FULL_CONTENT_CHANNEL_ID:
-            if duplicate:
+            if foreign:
                 reasons.append("E_CHANNEL: a registered additionalContext hook would inject a second copy")
         else:
             _fail("E_CHANNEL", f"frozen row has no implemented Claude channel: {capability.row_id}")
@@ -560,10 +644,12 @@ class ClaudeLauncherAdapter:
             if fresh_runtime_dir is not None
             else delivery_kernel.prepare(request)
         )
-        return delivery_kernel.handoff(
-            prepared,
-            self._transport(preflight, resolution, prompt, client_session_id, authorization_trust_store),
+        transport = self._transport(
+            preflight, resolution, prompt, client_session_id, authorization_trust_store,
+            kernel=delivery_kernel, runtime_dir=prepared.runtime_dir,
+            launch_id=prepared.session["launch_id"],
         )
+        return delivery_kernel.handoff(prepared, transport)
 
     def fresh_and_handoff_repositories(
         self, *, workspace_root: Path, prior_runtime_dir: Path, repository_ids: Sequence[str],
@@ -603,13 +689,12 @@ class ClaudeLauncherAdapter:
             authorization_trust_store=authorization_trust_store,
         )
         prepared = delivery_kernel.resume(runtime_dir, request)
-        return delivery_kernel.handoff(
-            prepared,
-            self._transport(
-                preflight, resolution, prompt, prior["client_session_id"],
-                authorization_trust_store, resume=True,
-            ),
+        transport = self._transport(
+            preflight, resolution, prompt, prior["client_session_id"],
+            authorization_trust_store, resume=True, kernel=delivery_kernel,
+            runtime_dir=prepared.runtime_dir, launch_id=prepared.session["launch_id"],
         )
+        return delivery_kernel.handoff(prepared, transport)
 
     def _delivery_request(
         self, preflight: ClaudePreflight, resolution: ClaudeResolution, *, client_session_id: str,
@@ -633,7 +718,10 @@ class ClaudeLauncherAdapter:
     def _transport(
         self, preflight: ClaudePreflight, resolution: ClaudeResolution, prompt: str,
         client_session_id: str, authorization_trust_store: Path | None, *, resume: bool = False,
+        kernel: DeliveryKernel | None = None, runtime_dir: Path | None = None,
+        launch_id: str | None = None,
     ) -> ClaudeCliTransport:
+        accounting = resolution.resolved.manifest["accounting"]
         return ClaudeCliTransport(
             runner=self.runner, client_command=self.client_command,
             workspace_root=preflight.workspace_root, launch_scope=preflight.launch_scope,
@@ -644,6 +732,16 @@ class ClaudeLauncherAdapter:
                 preflight, authorization_trust_store=authorization_trust_store,
             ),
             resume=resume,
+            # The hook channel arms a separate process, so it needs the runtime
+            # session the kernel owns and the exact generation identity.
+            kernel=kernel, runtime_dir=runtime_dir, launch_id=launch_id,
+            generation=resolution.resolved.envelope["generation"],
+            manifest_id=resolution.resolved.manifest["manifest_id"],
+            capability_evidence_id=resolution.capability.capability_evidence_id,
+            verified_channel_limit=resolution.capability.row["verified_channel_limit"],
+            effective_hard_limit=accounting["effective_hard_limit"],
+            model_visible_total=accounting["model_visible_total"],
+            round_trip_evidence_id=resolution.round_trip_evidence_id,
         )
 
     def _verify_live_integration(
@@ -694,7 +792,14 @@ class ClaudeLauncherAdapter:
 
 @dataclass
 class ClaudeCliTransport(TransportAdapter):
-    """Run one real Claude pre-task gate and return metadata-only confirmation."""
+    """Run one real Claude pre-task gate and return metadata-only confirmation.
+
+    Both wired channels deliver the identical serialized envelope and differ
+    only in transport: the full-content row passes it as one
+    ``--append-system-prompt`` argument, and the hook row arms the launcher's
+    own ``UserPromptSubmit`` gate, which returns it as ``additionalContext``
+    exactly once per launcher-controlled generation.
+    """
 
     runner: CommandRunner
     client_command: str
@@ -707,11 +812,22 @@ class ClaudeCliTransport(TransportAdapter):
     integrity_check: Callable[[], None]
     resume: bool = False
     output: bytes = b""
+    # Hook-channel state; the full-content channel needs none of it.
+    kernel: DeliveryKernel | None = None
+    runtime_dir: Path | None = None
+    launch_id: str | None = None
+    generation: int = 0
+    manifest_id: str = ""
+    capability_evidence_id: str = ""
+    verified_channel_limit: int = 0
+    effective_hard_limit: int = 0
+    model_visible_total: int = 0
+    round_trip_evidence_id: str | None = None
 
     def deliver(self, *, payload: bytes, envelope_sha256: str, channel_id: str) -> TransportConfirmation:
-        if channel_id != FULL_CONTENT_CHANNEL_ID:
-            # The hook channel is wired and round-trip proved by Step 12.4; no
-            # other identifier may reach a client invocation.
+        if channel_id not in (FULL_CONTENT_CHANNEL_ID, HOOK_CHANNEL_ID):
+            # Only the two rows Step 12.1 measured and Steps 12.3/12.4 wired may
+            # ever reach a client invocation.
             _fail("E_CHANNEL", "Claude transport received an unwired or unverified channel")
         try:
             content = payload.decode("utf-8")
@@ -724,18 +840,126 @@ class ClaudeCliTransport(TransportAdapter):
         session_argument = ("--resume", self.client_session_id) if self.resume else (
             "--session-id", self.client_session_id
         )
-        command = (
-            self.client_command, "-p", "--output-format", "json",
-            *session_argument, "--append-system-prompt", content, self.prompt,
-        )
+        if channel_id == HOOK_CHANNEL_ID:
+            settings = self._arm_hook_channel(payload, envelope_sha256)
+            command = (
+                self.client_command, "-p", "--output-format", "json",
+                *session_argument, "--settings", str(settings), self.prompt,
+            )
+        else:
+            command = (
+                self.client_command, "-p", "--output-format", "json",
+                *session_argument, "--append-system-prompt", content, self.prompt,
+            )
         result = self.runner(command, self.launch_scope)
         self.output = result.stdout
         if result.returncode != 0:
             _fail("E_CHANNEL", "Claude execution did not confirm the pre-task handoff")
+        if channel_id == HOOK_CHANNEL_ID:
+            self._verify_injection_claim(envelope_sha256, len(payload))
         session_id = _reported_session_id(result.stdout)
         if session_id != self.client_session_id:
             _fail("E_LIFECYCLE", "Claude reported a different session identity than the launcher owned")
         return TransportConfirmation(envelope_sha256, len(payload), session_id)
+
+    # ------------------------------------------------------------- hook channel
+
+    def _hook_runtime(self) -> tuple[DeliveryKernel, Path]:
+        if self.kernel is None or self.runtime_dir is None or self.launch_id is None:
+            _fail("E_CHANNEL", "the Claude hook channel requires a prepared runtime generation")
+        return self.kernel, self.runtime_dir
+
+    def _gate_command(self, runtime_dir: Path) -> str:
+        """Build the one shell command the launcher's own settings registers."""
+        gate = self.workspace_root / GATE_MODULE_PATH
+        try:
+            info = gate.lstat()
+            gate.resolve(strict=True).relative_to(self.workspace_root)
+        except (OSError, ValueError) as error:
+            _fail("E_CHANNEL", f"the reviewed Claude hook gate is unavailable: {error}")
+        if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
+            _fail("E_CHANNEL", "the reviewed Claude hook gate is not a regular file")
+        return " ".join(
+            shlex.quote(item)
+            for item in (sys.executable, str(gate), "--runtime-dir", str(runtime_dir))
+        )
+
+    def _arm_hook_channel(self, payload: bytes, envelope_sha256: str) -> Path:
+        """Persist the exact envelope and the one-launch hook registration.
+
+        The gate runs as a separate process, so the payload cannot be handed to
+        it in memory.  Both artifacts are created no-replace inside the kernel's
+        owner-only runtime session, which keeps containment, permissions, and
+        cleanup under a single policy.
+        """
+        kernel, runtime_dir = self._hook_runtime()
+        if self.round_trip_evidence_id is None:
+            _fail("E_CHANNEL", "the Claude hook channel requires frozen round-trip evidence")
+        if len(payload) > self.verified_channel_limit:
+            # The client silently substitutes a preview plus a file pointer
+            # above the measured boundary, which is never delivery.
+            _fail("E_CHANNEL", "the envelope exceeds the verified hook channel limit")
+        state = {
+            "schema_version": 1,
+            "channel_id": HOOK_CHANNEL_ID,
+            "launch_id": self.launch_id,
+            "client_session_id": self.client_session_id,
+            "generation": self.generation,
+            "manifest_id": self.manifest_id,
+            "envelope_sha256": envelope_sha256,
+            "envelope_bytes": len(payload),
+            "verified_channel_limit": self.verified_channel_limit,
+            "effective_hard_limit": self.effective_hard_limit,
+            "model_visible_total": self.model_visible_total,
+            "round_trip_evidence_id": self.round_trip_evidence_id,
+            "capability_evidence_id": self.capability_evidence_id,
+            "launch_scope": str(self.launch_scope),
+        }
+        settings = {
+            "hooks": {
+                gate.HOOK_EVENT: [
+                    {"hooks": [{"type": "command", "command": self._gate_command(runtime_dir)}]}
+                ]
+            }
+        }
+        # A resumed session arms its next generation in the same session
+        # directory, so the armed payload is replaced while the per-generation
+        # claim — the exactly-once authority — stays no-replace.
+        kernel.write_channel_artifact(
+            runtime_dir, gate.CHANNEL_ENVELOPE_ARTIFACT, payload, replace=True,
+        )
+        kernel.write_channel_artifact(
+            runtime_dir, gate.CHANNEL_STATE_ARTIFACT, w2b1.canonical_bytes(state), replace=True,
+        )
+        return kernel.write_channel_artifact(
+            runtime_dir, gate.CHANNEL_SETTINGS_ARTIFACT, w2b1.canonical_bytes(settings),
+            replace=True,
+        )
+
+    def _verify_injection_claim(self, envelope_sha256: str, delivered_bytes: int) -> None:
+        """Prove the launcher's own gate delivered this generation exactly once."""
+        kernel, runtime_dir = self._hook_runtime()
+        try:
+            raw = kernel.read_channel_artifact(
+                runtime_dir, gate.claim_artifact(self.generation)
+            )
+            claim = w2b1.parse_strict_json(raw)
+        except w2b1.AgentContextError as error:
+            _fail(
+                "E_CHANNEL",
+                f"the pre-task injection authority did not deliver this generation: {error.message}",
+            )
+        expected = {
+            "schema_version": 1, "channel_id": HOOK_CHANNEL_ID, "launch_id": self.launch_id,
+            "client_session_id": self.client_session_id, "generation": self.generation,
+            "manifest_id": self.manifest_id, "envelope_sha256": envelope_sha256,
+            "delivered_bytes": delivered_bytes,
+            "round_trip_evidence_id": self.round_trip_evidence_id,
+        }
+        if not isinstance(claim, dict) or set(claim) != set(expected) | {"claimed_at"}:
+            _fail("E_CHANNEL", "the injection claim does not have its closed shape")
+        if any(claim[key] != value for key, value in expected.items()):
+            _fail("E_CHANNEL", "the injection claim does not match the armed generation exactly")
 
 
 def _reported_session_id(raw: bytes) -> str:
@@ -755,6 +979,12 @@ def _reported_session_id(raw: bytes) -> str:
 __all__ = [
     "CAPABILITY_EVIDENCE_PATH",
     "CAPABILITY_EVIDENCE_SHA256",
+    "FULL_CONTENT_CHANNEL_ID",
+    "GATE_MODULE_PATH",
+    "HOOK_CHANNEL_EVIDENCE_PATH",
+    "HOOK_CHANNEL_EVIDENCE_SHA256",
+    "HOOK_CHANNEL_ID",
+    "HOOK_ROUND_TRIP_EVIDENCE",
     "REQUIRED_ROW_IDS",
     "ClaudeCapabilityRow",
     "ClaudeCliTransport",

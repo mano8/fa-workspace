@@ -41,11 +41,18 @@ class WorkspaceValidatorTests(unittest.TestCase):
             "capability-evidence-2026-07-19.md",
             "w12-claude-capability-evidence-2026-07-27.json",
             "w12-claude-native-load-evidence-2026-07-28.json",
+            "w12-claude-hook-channel-evidence-2026-07-28.json",
         ):
             shutil.copy2(
                 WORKSPACE / "scripts" / "agent_context" / "fixtures" / "evidence" / name,
                 evidence / name,
             )
+        # The frozen hook round trip binds the exact gate that produced it, so
+        # root validation needs the reviewed gate present and tracked.
+        shutil.copy2(
+            WORKSPACE / "scripts" / "agent_context" / "claude_hook_gate.py",
+            self.root / "scripts" / "agent_context" / "claude_hook_gate.py",
+        )
         subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
         subprocess.run(["git", "add", "."], cwd=self.root, check=True)
 

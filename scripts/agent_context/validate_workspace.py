@@ -24,6 +24,7 @@ if __package__ in {None, ""}:
 
 from agent_context import w2b1
 from agent_context import child_rollout
+from agent_context import claude_delivery_adapter
 from agent_context import codex_adapter
 from agent_context import resolve_context
 from agent_context.shared_validation import validate_persisted
@@ -36,6 +37,7 @@ from agent_context.validate_root_claude import validate_root_claude
 
 
 CAPABILITY_EVIDENCE = Path(codex_adapter.CAPABILITY_EVIDENCE_PATH)
+CLAUDE_CAPABILITY_EVIDENCE = Path(claude_delivery_adapter.CAPABILITY_EVIDENCE_PATH)
 ROOT_INPUTS = (
     Path(".m8-workspace-root"), Path("AGENTS.md"), Path("CLAUDE.md"),
     Path(".claude/settings.json"), Path(".codex/config.toml"),
@@ -45,7 +47,8 @@ ROOT_INPUTS = (
     Path(".workspace/contracts/child-repository-rollout-v1.contract.md"),
     Path(".workspace/contracts/child-repository-rollout-v1.boundaries.json"),
     Path("scripts/codex-repo.sh"), Path("scripts/codex-repo.ps1"),
-    CAPABILITY_EVIDENCE,
+    Path("scripts/claude-repo.sh"),
+    CAPABILITY_EVIDENCE, CLAUDE_CAPABILITY_EVIDENCE,
 )
 
 
@@ -110,6 +113,7 @@ def _validate_capability_evidence(workspace: Path) -> None:
     )
     if codex_adapter.CAPABILITY_EVIDENCE_SHA256.encode() not in contract:
         _fail("agent-context contract does not link the current capability-evidence hash")
+    _validate_claude_capability_evidence(workspace)
     row = codex_adapter.CURRENT_CODEX_CAPABILITY
     expected = {
         "agent": "codex", "platform": "devcontainer", "mode": "non-interactive",
@@ -122,6 +126,39 @@ def _validate_capability_evidence(workspace: Path) -> None:
     }
     if row != expected:
         _fail("Codex capability row drifted from the frozen required capability evidence")
+
+
+def _validate_claude_capability_evidence(workspace: Path) -> None:
+    """Keep the Claude adapter bound to the exact tracked Step 12.1/12.2 freeze.
+
+    Only the two required rows are checked here.  Their canonical status is
+    still owned by the capability artifact, not by this validator, and the W2a
+    contract's own mode table is reconciled separately in Step 12.6.
+    """
+    evidence = _read_normalized(
+        workspace / CLAUDE_CAPABILITY_EVIDENCE, "Claude capability evidence"
+    )
+    if hashlib.sha256(evidence).hexdigest() != claude_delivery_adapter.CAPABILITY_EVIDENCE_SHA256:
+        _fail("tracked Claude capability-evidence hash does not match the adapter identity")
+    native_evidence = _read_normalized(
+        workspace / claude_delivery_adapter.NATIVE_LOAD_EVIDENCE_PATH,
+        "Claude native-load evidence",
+    )
+    if (
+        hashlib.sha256(native_evidence).hexdigest()
+        != claude_delivery_adapter.NATIVE_LOAD_EVIDENCE_SHA256
+    ):
+        _fail("tracked Claude native-load-evidence hash does not match the adapter identity")
+    try:
+        rows = claude_delivery_adapter._capability_rows(
+            w2b1.parse_strict_json(evidence)
+        )
+    except w2b1.AgentContextError as error:
+        _fail(f"Claude capability evidence is invalid: {error}")
+    if {row.row.get("channel_id") for row in rows.values()} != {
+        claude_delivery_adapter.HOOK_CHANNEL_ID, claude_delivery_adapter.FULL_CONTENT_CHANNEL_ID
+    }:
+        _fail("frozen Claude rows no longer carry both verified delivery channels")
 
 
 def _validate_policy_sources(

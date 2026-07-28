@@ -402,3 +402,86 @@ def verify_and_redeem(
         identity=identity, provenance=provenance,
     )
     return VerifiedAuthorization(request=request, provenance=provenance)
+
+
+def load_capability(root: Path, value: str) -> dict[str, Any]:
+    """Load one signed carrier without permitting a pointer outside the workspace."""
+    try:
+        w2b1._canonical_path(value, "authorization path")
+        candidate = root.joinpath(*value.split("/"))
+        info = candidate.lstat()
+        resolved = candidate.resolve(strict=True)
+        resolved.relative_to(root)
+    except (OSError, ValueError, w2b1.AgentContextError) as error:
+        raise w2b1.AgentContextError(
+            "E_SCOPE_UNAVAILABLE", f"authorization capability path is unsafe: {error}"
+        ) from error
+    if candidate != resolved or not info or candidate.is_symlink() or not candidate.is_file():
+        raise w2b1.AgentContextError(
+            "E_SCOPE_UNAVAILABLE", "authorization capability must be a regular workspace-relative file"
+        )
+    try:
+        parsed = w2b1.parse_strict_json(candidate.read_bytes())
+    except (OSError, UnicodeDecodeError, w2b1.AgentContextError) as error:
+        _fail(f"authorization capability is invalid: {error}")
+    if not isinstance(parsed, dict):
+        _fail("authorization capability must be a JSON object")
+    return parsed
+
+
+def verify_authorizations(
+    *, root: Path, capabilities: Sequence[Mapping[str, Any]], repositories: Sequence[str],
+    tasks: Sequence[str], operations: Sequence[str], prompt: str,
+    external_root: Path | None, trust_store: Path | None, replay_store: Path | None,
+) -> tuple[tuple[dict[str, Any], ...], tuple[dict[str, str], ...], str | None, Path | None]:
+    """Authenticate and consume every signed capability before adapter preflight.
+
+    Both canonical launchers call this one boundary, so no client-specific path
+    can redeem a capability differently or reach a transport without it.
+    """
+    external_values = (external_root, trust_store, replay_store)
+    if not capabilities:
+        if any(value is not None for value in external_values):
+            raise w2b1.AgentContextError(
+                "E_USAGE", "external authorization paths require a signed capability"
+            )
+        return (), (), None, None
+    if any(value is None for value in external_values):
+        _fail("signed capabilities require external root, trust store, and replay store")
+    assert external_root is not None and trust_store is not None and replay_store is not None
+    resolved_trust_store = trust_store if trust_store.is_absolute() else external_root / trust_store
+    resolved_replay_store = replay_store if replay_store.is_absolute() else external_root / replay_store
+    records: list[dict[str, Any]] = []
+    provenance: list[dict[str, str]] = []
+    launch_ids: set[str] = set()
+    for capability in capabilities:
+        request = request_from_capability(
+            capability, repositories=repositories, tasks=tasks,
+            operations=operations, user_task=prompt,
+        )
+        verified = verify_and_redeem(
+            capability, request=request, workspace_root=root, external_root=external_root,
+            trust_store=resolved_trust_store, replay_store=resolved_replay_store,
+        )
+        item = verified.provenance.as_dict()
+        launch_ids.add(request.launch_id)
+        provenance.append(item)
+        records.append({
+            "authorization_id": item["authorization_id"],
+            "kind": "named-owner-decision",
+            "authorized_by": item["issuer"],
+            "source_ref": f"ed25519:{item['key_id']}:{item['redemption_id']}",
+            "source_sha256": item["signed_payload_sha256"],
+            "repositories": list(request.repositories),
+            "operations": list(request.operations),
+            "issued_at": item["issued_at"],
+        })
+    if len(launch_ids) != 1:
+        _fail("all signed capabilities must bind the same launch_id")
+    ordered = sorted(zip(records, provenance, strict=True), key=lambda pair: pair[0]["authorization_id"])
+    return (
+        tuple(pair[0] for pair in ordered),
+        tuple(pair[1] for pair in ordered),
+        next(iter(launch_ids)),
+        resolved_trust_store,
+    )

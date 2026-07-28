@@ -1,8 +1,9 @@
-# Agent-context resolver and canonical Codex delivery
+# Agent-context resolver and canonical Codex and Claude delivery
 
 This package contains the active root-owned faceted resolver, signed external
-authorization boundary, reviewed trust identity, delivery kernel, canonical
-Codex devcontainer non-interactive adapter, and root-only validators. It
+authorization boundary, reviewed trust identity, delivery kernel, the canonical
+Codex and Claude devcontainer non-interactive adapters, and root-only
+validators. It
 validates the v2 registry/index, policy units, manifests, journals, sessions,
 receipts, and RFC 8785 JCS UTF-8 injected envelopes. Other client/platform rows
 remain limited or unsupported as recorded by capability evidence.
@@ -105,6 +106,9 @@ without truncation:
 ```bash
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w5_claude_adapter -v
 ```
+
+That Phase 5 seam is unchanged. Canonical Claude delivery is a separate module
+added by Phase 12 below; this one still activates nothing.
 
 Phase 6 Step 6.1 keeps the tracked Codex project configuration portable and
 least-privilege: it uses on-request approval, workspace-write sandboxing,
@@ -219,6 +223,43 @@ scripts/codex-repo.sh --repository auth-sdk-m8 \
 "$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w6_codex_adapter -v
 ```
 
+Phase 12 Steps 12.1--12.3 add the parallel Claude boundary. Step 12.1 froze the
+installed-client capability matrix and Step 12.2 the out-of-band
+`claude-loopback-model-input-capture` native-load mechanism; both are tracked
+under [`fixtures/evidence`](fixtures/evidence) and pinned by the adapter and by
+root workspace validation.
+[`claude_delivery_adapter.py`](claude_delivery_adapter.py) and
+[`claude-repo.sh`](../claude-repo.sh) reuse the same resolver, kernel,
+authorization boundary, shared validator, and trust identity as the Codex path.
+The launcher proves the devcontainer, the exact marker root, the pinned
+evidence, the installed client identity, the reviewed project settings layer,
+the client's own recorded project trust, and each selected direct child with its
+`.git` and `CLAUDE.md`; it then enumerates the active instruction sources from a
+real capture, proves every injected source absent from that same capture, and
+compares the manifest with that evidence in both directions before omitting an
+injected entry. There is no Windows wrapper because no row outside this
+devcontainer is evidenced. A child launch scope requires that project's own
+recorded trust and otherwise fails with `E_TRUST`; a launcher never grants its
+own trust.
+
+Channel selection is by `model_visible_total`, never by envelope size: the
+shared validator is the budget oracle, the hook row's 10,000-byte ceiling is a
+total rather than an envelope allowance, and an over-budget generation falls
+through to the verified `--append-system-prompt` full-content channel or fails
+closed. Until Step 12.4 freezes the byte-exact hook round trip and registers
+exactly one injection authority, the hook row is rejected with a recorded reason
+and no hook is configured; while any `additionalContext` hook is registered the
+wrapper channel is refused, because bypassing the hook would inject twice.
+
+```bash
+scripts/claude-repo.sh --repository fa-auth-m8 "inspect the repository"
+# --project selects the launch directory; it must be a selected repository and
+# must already be trusted by a recorded human decision.
+scripts/claude-repo.sh --repository fa-auth-m8 --project fa-auth-m8 \
+  "inspect the repository"
+"$M8_PYTHON" -m unittest scripts.agent_context.tests.test_w12_claude_adapter -v
+```
+
 The faceted resolver CLI in [`resolve-context.py`](resolve-context.py) remains
 an explicit inspection/fixture entry point. It requires a faceted v2
 registry/index and policy metadata fixture, then accepts repeatable
@@ -230,17 +271,19 @@ disabled and an exact-once handoff is proven for the requested generation;
 runtime enforcement is provided by the active client-neutral kernel in
 [`delivery_kernel.py`](delivery_kernel.py). It owns only isolated runtime
 state, source-drift rehashing, receipt transitions, stable exit mapping, and a
-fake exact-payload adapter seam; the Codex adapter is the only currently
-capability-supported real transport and Claude remains fail-closed.
+fake exact-payload adapter seam; the Codex and Phase 12 Claude adapters are the
+only capability-supported real transports, and every other client/platform row
+remains fail-closed.
 
 W2b4 keeps that boundary client-neutral. Its deterministic fixtures exercise
 strict faceted-schema failures, scoped multi-repository authorization and authority failures, native
 evidence drift, exact accounting, delimiter/JSON/Unicode/CRLF/BOM/NUL framing,
 exact channel limits, lifecycle/receipt terminality, source drift, concurrent fake
 adapter handoff, runtime collisions/substitution/permissions, and safe interrupted
-cleanup/retention. The only capability-supported canonical row is Codex
-non-interactive in the devcontainer; Windows and host-POSIX client rows remain
-explicitly unsupported rather than being inferred from these kernel fixtures.
+cleanup/retention. Those fixtures were written for the Codex non-interactive
+devcontainer row and Phase 12 adds the Claude devcontainer rows on their own
+evidence; Windows and host-POSIX client rows remain explicitly unsupported
+rather than being inferred from these kernel fixtures.
 
 Phase 4.6 measures active workspace-controlled context without activating a
 client transport. It separately accounts for current verified Codex-native root

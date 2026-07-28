@@ -33,15 +33,19 @@ class WorkspaceValidatorTests(unittest.TestCase):
         shutil.copy2(WORKSPACE / ".codex" / "config.toml", self.root / ".codex" / "config.toml")
         shutil.copytree(WORKSPACE / ".githooks", self.root / ".githooks")
         (self.root / "scripts").mkdir()
-        for name in ("codex-repo.sh", "codex-repo.ps1"):
+        for name in ("codex-repo.sh", "codex-repo.ps1", "claude-repo.sh"):
             shutil.copy2(WORKSPACE / "scripts" / name, self.root / "scripts" / name)
         evidence = self.root / "scripts" / "agent_context" / "fixtures" / "evidence"
         evidence.mkdir(parents=True)
-        shutil.copy2(
-            WORKSPACE / "scripts" / "agent_context" / "fixtures" / "evidence"
-            / "capability-evidence-2026-07-19.md",
-            evidence / "capability-evidence-2026-07-19.md",
-        )
+        for name in (
+            "capability-evidence-2026-07-19.md",
+            "w12-claude-capability-evidence-2026-07-27.json",
+            "w12-claude-native-load-evidence-2026-07-28.json",
+        ):
+            shutil.copy2(
+                WORKSPACE / "scripts" / "agent_context" / "fixtures" / "evidence" / name,
+                evidence / name,
+            )
         subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
         subprocess.run(["git", "add", "."], cwd=self.root, check=True)
 

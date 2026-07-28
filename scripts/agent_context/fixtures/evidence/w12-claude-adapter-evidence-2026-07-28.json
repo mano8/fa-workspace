@@ -1,0 +1,381 @@
+{
+  "agent": "claude",
+  "boundary": [
+    "no hook is registered and no project configuration was changed",
+    "no child repository file was written",
+    "the W2a contract mode table and the Step 5.6 wording stay unchanged; Step 12.6 reconciles them",
+    "claude_adapter.py keeps its Phase 5 LIMITED seam untouched",
+    "the Codex required row, its adapter, and its bound evidence hash are untouched"
+  ],
+  "captured": "2026-07-28",
+  "channel_policy": {
+    "budget_oracle": "shared_validation.validate_resolved",
+    "hook_round_trip_evidence": null,
+    "hook_row_reason": "no byte-exact hook round-trip evidence is frozen (Step 12.4)",
+    "hook_row_status": "INELIGIBLE_UNTIL_12_4",
+    "never_delivery": [
+      "a truncated value",
+      "a temporary-file pointer",
+      "a <persisted-output> preview"
+    ],
+    "order": [
+      "claude-devcontainer-non-interactive-hook-additional-context",
+      "claude-devcontainer-non-interactive-append-system-prompt"
+    ],
+    "selection": "the first frozen REQUIRED row whose model_visible_total fits and whose channel is wired",
+    "wrapper_row_guard": "a registered additionalContext hook makes the wrapper channel ineligible"
+  },
+  "depends_on": [
+    {
+      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.json",
+      "note": "the two REQUIRED rows, their channels, limits, and the frozen client identity",
+      "sha256": "f3539f7f66135a6726253e97c5bab0b3858860e904b9148ec26d112d82c7c6f8",
+      "step": "12.1"
+    },
+    {
+      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-07-28.json",
+      "note": "the claude-loopback-model-input-capture mechanism and its classification",
+      "sha256": "705d1b9d30a8b617d2c4b683b12d57d85e76ab29d206447951434201a0825634",
+      "step": "12.2"
+    }
+  ],
+  "driven_run": {
+    "delivery": {
+      "channel_id": "claude-cli-append-system-prompt",
+      "command_shape": [
+        "claude",
+        "-p",
+        "--output-format",
+        "json",
+        "--session-id",
+        "63c29e94-b525-4d87-adf3-1761cb1d3364",
+        "--append-system-prompt",
+        "<serialized JCS envelope>"
+      ],
+      "delivered_bytes": 9019,
+      "envelope_sha256": "ea6915181f3a127a889643e36e053e518f23b0e56ae844897cea3d39e209270e",
+      "manifest_id": "d97f0a9697c3c31d92946d19479aaffb6582f4caa81f0716d50fe5af3927b158",
+      "native_evidence_ids": [
+        "84b72a45f19c90af1e94cb0b3f5513a4755f175e8976cb8546484ec6d0eb4c75"
+      ],
+      "previous_state": "SUBMISSION_STARTED",
+      "runtime_dir_is_ignored": true,
+      "session_identity_matches": true,
+      "state": "COMPLETED",
+      "transport_envelope_bytes": 9019,
+      "transport_envelope_sha256": "ea6915181f3a127a889643e36e053e518f23b0e56ae844897cea3d39e209270e"
+    },
+    "note": "One complete live run on the workspace root scope with fa-auth-m8 selected. The native-load capture was a real client launch against the loopback recorder; the transport ran through a recording seam, so no client was invoked for delivery and no vendor API was contacted.",
+    "preflight": {
+      "client_identity": "/home/vscode/.local/share/claude/versions/2.1.220",
+      "client_sha256": "674f61f20ff306f3100cf9200e4c36c4b70278b5bef2884549819b942a89c863",
+      "client_version": "2.1.220 (Claude Code)",
+      "config_sha256": "62467e11f25d3b32e48dbe188a3a25220bc2329a8b769b3ff0dfce8d83418aca",
+      "native_sources": [
+        {
+          "path": "CLAUDE.md",
+          "source_bytes": 1905,
+          "source_sha256": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09"
+        }
+      ],
+      "project": ".",
+      "registered_hook_events": [],
+      "trust_state": "trusted",
+      "workspace_root": "/workspace"
+    },
+    "reviewed_tree": "live HEAD tree; the manifest and envelope identities below are that run's observation, not a tree-independent constant",
+    "selection": {
+      "accounting": {
+        "client_context_allowance": 262144,
+        "effective_hard_limit": 32768,
+        "estimated_tokens": 2731,
+        "excluded_external_layers": [],
+        "model_visible_total": 10924,
+        "native_model_visible_bytes": 1905,
+        "other_model_visible_bootstrap_bytes": 0,
+        "policy_hard_limit": 32768,
+        "raw_injected_source_bytes": 5720,
+        "reserved_margin": 32768,
+        "serialization_overhead_bytes": 3299,
+        "serialized_injected_envelope_bytes": 9019,
+        "verified_channel_limit": 65536
+      },
+      "channel_id": "claude-cli-append-system-prompt",
+      "effective_hard_limit": 32768,
+      "entries": [
+        {
+          "delivery": "inject",
+          "path": ".workspace/policies/always/security.md",
+          "source_bytes": 321
+        },
+        {
+          "delivery": "inject",
+          "path": ".workspace/policies/always/workspace.md",
+          "source_bytes": 573
+        },
+        {
+          "delivery": "inject",
+          "path": ".workspace/policies/facets/language-python.md",
+          "source_bytes": 972
+        },
+        {
+          "delivery": "inject",
+          "path": ".workspace/policies/facets/layer-service.md",
+          "source_bytes": 545
+        },
+        {
+          "delivery": "inject",
+          "path": ".workspace/policies/facets/kind-api-service.md",
+          "source_bytes": 167
+        },
+        {
+          "delivery": "inject",
+          "path": ".workspace/policies/facets/framework-fastapi.md",
+          "source_bytes": 750
+        },
+        {
+          "delivery": "inject",
+          "path": ".workspace/policies/facets/domain-auth-security.md",
+          "source_bytes": 1260
+        },
+        {
+          "delivery": "native",
+          "path": "CLAUDE.md",
+          "source_bytes": 1905
+        },
+        {
+          "delivery": "inject",
+          "path": "fa-auth-m8/CLAUDE.md",
+          "source_bytes": 162
+        },
+        {
+          "delivery": "inject",
+          "path": "fa-auth-m8/REPOSITORY_CONTEXT.md",
+          "source_bytes": 970
+        }
+      ],
+      "injected_absence_proofs": 33,
+      "native_evidence_id": "07435312b8f3f64b96f2a54312c8bde468c88a002332ab97d995dd2284e72076",
+      "rejected_rows": [
+        {
+          "reason": "E_BUDGET: model-visible context exceeds its effective hard limit; E_CHANNEL: no byte-exact hook round-trip evidence is frozen (Step 12.4)",
+          "row_id": "claude-devcontainer-non-interactive-hook-additional-context"
+        }
+      ],
+      "row_id": "claude-devcontainer-non-interactive-append-system-prompt"
+    }
+  },
+  "fail_closed_matrix": [
+    {
+      "code": "E_UNSUPPORTED_MODE",
+      "condition": "not the evidenced devcontainer",
+      "stage": "platform",
+      "test": "test_every_preflight_stage_fails_closed_with_its_own_code"
+    },
+    {
+      "code": "E_SCOPE_UNAVAILABLE",
+      "condition": "no exact .m8-workspace-root marker",
+      "stage": "workspace-discovery",
+      "test": "test_every_preflight_stage_fails_closed_with_its_own_code"
+    },
+    {
+      "code": "E_CAPABILITY",
+      "condition": "the tracked 12.1 matrix changed",
+      "stage": "capability-artifact",
+      "test": "test_every_preflight_stage_fails_closed_with_its_own_code"
+    },
+    {
+      "code": "E_NATIVE_EVIDENCE",
+      "condition": "the tracked 12.2 freeze changed",
+      "stage": "native-load-artifact",
+      "test": "test_every_preflight_stage_fails_closed_with_its_own_code"
+    },
+    {
+      "code": "E_CAPABILITY",
+      "condition": "installed client path, version, or SHA-256 differs",
+      "stage": "client-identity",
+      "test": "test_a_changed_installed_client_can_never_reach_resolution"
+    },
+    {
+      "code": "E_TRUST",
+      "condition": "the project settings layer is not the reviewed one",
+      "stage": "project-settings",
+      "test": "test_every_preflight_stage_fails_closed_with_its_own_code"
+    },
+    {
+      "code": "E_TRUST",
+      "condition": "the launch scope is untrusted or unrecorded",
+      "stage": "project-trust",
+      "test": "test_an_untrusted_child_launch_scope_blocks_the_task"
+    },
+    {
+      "code": "E_TRUST",
+      "condition": "the settings layer changed during inspection",
+      "stage": "settings-drift",
+      "test": "test_a_settings_change_during_inspection_invalidates_the_capture"
+    },
+    {
+      "code": "E_SCOPE_UNAVAILABLE",
+      "condition": "the target is not a registered direct child with .git and CLAUDE.md",
+      "stage": "repository-scope",
+      "test": "test_every_preflight_stage_fails_closed_with_its_own_code"
+    },
+    {
+      "code": "E_SCOPE_UNAVAILABLE",
+      "condition": "the launch directory is not a selected repository",
+      "stage": "launch-scope",
+      "test": "test_an_unselected_launch_scope_is_out_of_scope"
+    },
+    {
+      "code": "E_NATIVE_EVIDENCE",
+      "condition": "the manifest shadows or omits a proven-active source",
+      "stage": "native-binding",
+      "test": "test_a_manifest_that_shadows_proven_native_load_fails_closed"
+    },
+    {
+      "code": "E_CHANNEL",
+      "condition": "SessionStart and UserPromptSubmit are both registered",
+      "stage": "injection-authority",
+      "test": "test_two_registered_additional_context_events_are_rejected_not_deduplicated"
+    },
+    {
+      "code": "E_CHANNEL",
+      "condition": "no verified channel can carry the generation",
+      "stage": "channel-eligibility",
+      "test": "test_a_wired_hook_row_is_selected_only_while_the_total_fits"
+    },
+    {
+      "code": "E_BUDGET",
+      "condition": "model_visible_total exceeds every effective hard limit",
+      "stage": "budget",
+      "test": "test_no_fitting_channel_fails_closed_before_any_client_invocation"
+    },
+    {
+      "code": "E_AUTHORIZATION",
+      "condition": "a mutating or cross-repository task lacks verified provenance",
+      "stage": "authorization",
+      "test": "test_a_mutating_task_cannot_be_selected_without_human_authorization"
+    },
+    {
+      "code": "E_USAGE",
+      "condition": "a non-canonical or duplicated identifier argument",
+      "stage": "usage",
+      "test": "test_adversarial_arguments_fail_before_any_evidence_is_read"
+    },
+    {
+      "code": "E_SOURCE",
+      "condition": "a manifest source changed after resolution",
+      "stage": "source-drift",
+      "test": "test_source_drift_after_resolution_blocks_both_the_kernel_and_transport"
+    },
+    {
+      "code": "E_NATIVE_EVIDENCE",
+      "condition": "a proven native source changed before transport",
+      "stage": "transport-native-drift",
+      "test": "test_source_drift_after_resolution_blocks_both_the_kernel_and_transport"
+    },
+    {
+      "code": "E_CHANNEL",
+      "condition": "an unwired channel reaches the transport",
+      "stage": "transport-channel",
+      "test": "test_the_transport_refuses_any_channel_step_12_4_has_not_wired"
+    },
+    {
+      "code": "E_LIFECYCLE",
+      "condition": "the client reports another session identity",
+      "stage": "session-identity",
+      "test": "test_a_different_reported_session_identity_never_claims_delivery"
+    },
+    {
+      "code": "E_CHANNEL",
+      "condition": "the client fails after SUBMISSION_STARTED",
+      "stage": "submission",
+      "terminal_state": "EXECUTION_AMBIGUOUS",
+      "test": "test_a_failing_client_records_execution_ambiguous_and_blocks_the_task"
+    },
+    {
+      "code": "E_TRUST",
+      "condition": "reviewed tree, client, settings, or recorded trust drifted",
+      "stage": "trust-identity",
+      "test": "test_claude_client_settings_instruction_or_trust_drift_fails"
+    }
+  ],
+  "frozen_reproduction": {
+    "envelope_sha256": "133f51d989e7b6f414b0a1946dd6e32ad3acf17270d933b9c3a44e6d9b45a345",
+    "manifest_id": "c8322263666792dfcf3dcfe7ef03d14477f52c8f0b2feace7e71146f91705986",
+    "native_evidence_id": "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd",
+    "reviewed_tree": {
+      "algorithm": "git-sha1",
+      "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "row_id": "claude-devcontainer-non-interactive-append-system-prompt",
+    "source": "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-07-28.json",
+    "test": "test_the_selected_row_and_identities_match_the_frozen_record",
+    "variant": "with-injected-child-instructions"
+  },
+  "lifecycle": {
+    "compaction": "unsupported and fail-closed; the frozen rows record compact_supported = false",
+    "fresh": "a named prior runtime is validated and removed before generation zero",
+    "launcher_identity": "--session-id is honored before invocation, so the launcher owns the session identity and the transport only confirms it",
+    "owner": "scripts/agent_context/delivery_kernel.py",
+    "resume": "--resume continues one COMPLETED generation with the same launch and client-session identity",
+    "states": [
+      "RESOLVED",
+      "PREPARED",
+      "SUBMISSION_STARTED",
+      "COMPLETED",
+      "EXECUTION_AMBIGUOUS",
+      "FAILED"
+    ]
+  },
+  "open_items": [
+    "Step 12.4 must freeze the byte-exact hook round trip and register exactly one injection authority; until then the hook row is rejected and selection falls through to the full-content channel.",
+    "Step 12.5 owns interactive/non-interactive parity, duplicate-injection, and runtime-security fixtures against a real client invocation.",
+    "The intended child-scope topology still needs a human to accept the /workspace/fa-auth-m8 trust dialog; the adapter fails closed with E_TRUST until then."
+  ],
+  "reused_extended": [
+    {
+      "change": "the capability loader and redemption boundary moved here from the Codex launcher so both canonical launchers share exactly one path; the Codex names remain as aliases and no verification logic changed",
+      "path": "scripts/agent_context/authorization.py"
+    },
+    {
+      "change": "one builder now serves both agents: the Claude parameters are additive and a Codex identity keeps exactly its previous members, so its digests are unaffected",
+      "path": "scripts/agent_context/trust_identity.py"
+    },
+    {
+      "change": "the tracked Claude capability and native-load artifacts are pinned in root validation",
+      "path": "scripts/agent_context/validate_workspace.py"
+    }
+  ],
+  "reused_unchanged": [
+    "scripts/agent_context/resolve_context.py",
+    "scripts/agent_context/delivery_kernel.py",
+    "scripts/agent_context/shared_validation.py",
+    "scripts/agent_context/claude_native_evidence.py"
+  ],
+  "schema_version": 1,
+  "step": "12.3",
+  "summary": "The canonical Claude launcher-adapter runs preflight, resolution, native/inject classification, channel selection by model_visible_total, delivery, and the shared kernel lifecycle. Every stage fails closed and blocks the user task.",
+  "tooling": [
+    {
+      "path": "scripts/agent_context/claude_delivery_adapter.py",
+      "role": "preflight, classification, channel selection, transport",
+      "sha256": "afb41c6a933a9a7a09498d1f974f21961c00bfc61abdff02073bd6e1613e15b9"
+    },
+    {
+      "path": "scripts/agent_context/claude_repo_launcher.py",
+      "role": "CLI: authorization redemption, lifecycle arguments, stable exit codes",
+      "sha256": "45ee16e7a34f9501e85a82d76f2c5286fd7a28208797831c30f9033093f162da"
+    },
+    {
+      "path": "scripts/claude-repo.sh",
+      "role": "POSIX devcontainer wrapper; no Windows counterpart is evidenced",
+      "sha256": "00986177c82cdadaf32a2193ca3c7bae4472e46c7638878855d91717664ab577"
+    },
+    {
+      "path": "scripts/agent_context/tests/test_w12_claude_adapter.py",
+      "role": "offline fail-closed, selection, lifecycle, and reproduction coverage",
+      "sha256": "f63be31ed6f29c0ad4239a65d3328f040eb063d48209af522aeb1c690169f680"
+    }
+  ]
+}

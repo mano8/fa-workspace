@@ -1,14 +1,19 @@
-"""Content-bound reviewed-tree identity for the required Codex launch mode.
+"""Content-bound reviewed-tree identity for the required canonical launch modes.
 
 The identity is deliberately assembled from exact bytes and command output, not
 from a working-directory name or a receipt.  It is transient until a launcher
 places its digest in a session/receipt; it never contains configuration content
 or secrets.
+
+Both canonical launchers use this one builder.  The Codex identity is unchanged
+byte-for-byte: the Claude parameters are additive, and only a Claude launch adds
+the agent, client, configuration, and project-trust members that differ.
 """
 
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import platform
 import shutil
@@ -23,6 +28,9 @@ from agent_context import w2b1
 
 
 ZERO_SHA256 = "0" * 64
+# Each client discovers a different native instruction file, so a child's
+# identity binds the instruction that client actually loads.
+AGENT_INSTRUCTION_FILES = {"codex": "AGENTS.md", "claude": "CLAUDE.md"}
 
 # These are the root-owned executable/configuration inputs that can change the
 # canonical Codex result.  A directory glob is used only for the workspace
@@ -37,6 +45,9 @@ CRITICAL_PATHS = (
     ".workspace/policy.metadata.json",
     ".workspace/contracts",
     "scripts/agent_context/authorization.py",
+    "scripts/agent_context/claude_delivery_adapter.py",
+    "scripts/agent_context/claude_native_evidence.py",
+    "scripts/agent_context/claude_repo_launcher.py",
     "scripts/agent_context/codex_adapter.py",
     "scripts/agent_context/codex_repo_launcher.py",
     "scripts/agent_context/delivery_kernel.py",
@@ -48,6 +59,7 @@ CRITICAL_PATHS = (
     "scripts/agent_context/review_bundle.py",
     "scripts/agent_context/validate_supply_chain.py",
     "scripts/agent_context/generate_root_sbom.py",
+    "scripts/claude-repo.sh",
     "scripts/codex-repo.sh",
     "scripts/codex-repo.ps1",
     ".devcontainer/devcontainer.json",
@@ -170,6 +182,56 @@ def _config_inventory(root: Path, codex_home: Path) -> list[dict[str, str | None
     return values
 
 
+def _claude_config_inventory(root: Path, home: Path) -> list[dict[str, str | None]]:
+    """Inventory the settings layer that changes Claude's canonical result.
+
+    The client's own ``~/.claude.json`` is deliberately excluded: it is live
+    session state that the running client rewrites, so hashing it would make a
+    launch fail for reasons unrelated to reviewed configuration.  The single
+    decision that record carries — project trust — is bound separately.
+    """
+    paths = (
+        ("project", root / ".claude" / "settings.json"),
+        ("project-local", root / ".claude" / "settings.local.json"),
+        ("user", home / ".claude" / "settings.json"),
+    )
+    values: list[dict[str, str | None]] = []
+    for kind, path in paths:
+        try:
+            info = path.lstat()
+        except FileNotFoundError:
+            values.append({"kind": kind, "path": f"{kind}:settings.json", "sha256": None})
+            continue
+        except OSError as error:
+            _fail("E_TRUST", f"cannot inspect {kind} Claude configuration: {error}")
+        if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
+            _fail("E_TRUST", f"{kind} Claude configuration is not a regular file")
+        values.append({"kind": kind, "path": f"{kind}:settings.json", "sha256": _sha256(path)})
+    return values
+
+
+def _project_trust(root: Path, scope: Path, home: Path) -> dict[str, str]:
+    """Bind the launch scope's recorded trust decision, never grant it."""
+    record = home / ".claude.json"
+    try:
+        projects = json.loads(record.read_text(encoding="utf-8")).get("projects")
+    except (OSError, UnicodeDecodeError, ValueError) as error:
+        _fail("E_TRUST", f"the Claude trust record cannot be inspected: {error}")
+    if not isinstance(projects, dict):
+        _fail("E_TRUST", "the Claude trust record has no project table")
+    try:
+        resolved = scope.resolve(strict=True)
+        relative = resolved.relative_to(root).as_posix()
+    except (OSError, ValueError) as error:
+        _fail("E_TRUST", f"the Claude launch scope is outside the workspace: {error}")
+    entry = projects.get(str(resolved))
+    if not isinstance(entry, dict):
+        state = "unrecorded"
+    else:
+        state = "trusted" if entry.get("hasTrustDialogAccepted") is True else "untrusted"
+    return {"scope": "." if resolved == root else relative, "state": state}
+
+
 def _binary_identity(path: Path, version: str) -> dict[str, str]:
     return {"path": str(path), "sha256": _sha256(path), "version": version}
 
@@ -209,18 +271,29 @@ def build_trust_identity(
     workspace_root: Path,
     selected_repositories: Sequence[Path],
     capability_path: str,
-    codex_binary: Path,
-    codex_version: str,
+    codex_binary: Path | None = None,
+    codex_version: str | None = None,
     node_binary: Path | None = None,
     node_version: str | None = None,
     authorization_trust_store: Path | None = None,
+    agent: str = "codex",
+    claude_binary: Path | None = None,
+    claude_version: str | None = None,
+    project_trust_scope: Path | None = None,
+    home: Path | None = None,
 ) -> dict[str, Any]:
     """Return a JCS-addressed identity after fail-closed trust preflight.
 
     The caller must provide repository paths discovered from the central
     registry.  Each is independently Git-bound, so a parent receipt/tree
     cannot stand in for a child repository's identity.
+
+    ``agent`` selects which client, native instruction file, and configuration
+    layer the identity binds.  A Codex identity keeps exactly the members it had
+    before Claude existed, so its digests are unaffected.
     """
+    if agent not in AGENT_INSTRUCTION_FILES:
+        _fail("E_TRUST", f"trust identity has no instruction contract for agent: {agent}")
     try:
         root = workspace_root.resolve(strict=True)
     except OSError as error:
@@ -233,30 +306,46 @@ def build_trust_identity(
             candidate.relative_to(root)
         except (OSError, ValueError) as error:
             _fail("E_TRUST", f"selected child is outside the workspace: {error}")
-        instruction = candidate / "AGENTS.md"
+        instruction = candidate / AGENT_INSTRUCTION_FILES[agent]
         children.append({
             "path": candidate.relative_to(root).as_posix(),
             "git": _git_identity(candidate),
             "instruction_sha256": _sha256(instruction),
         })
-    codex_home = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+    user_home = home or Path.home()
     python_path = Path(sys.executable).resolve()
     trust_store_hash = None
     if authorization_trust_store is not None:
         trust_store_hash = _sha256(authorization_trust_store)
+    if agent == "codex":
+        if codex_binary is None or codex_version is None:
+            _fail("E_TRUST", "a Codex trust identity requires its client binary and version")
+        client = {"codex": _binary_identity(codex_binary, codex_version)}
+        configuration = _config_inventory(
+            root, Path(os.environ.get("CODEX_HOME", user_home / ".codex"))
+        )
+    else:
+        if claude_binary is None or claude_version is None or project_trust_scope is None:
+            _fail("E_TRUST", "a Claude trust identity requires its client binary, version, and scope")
+        client = {
+            "agent": agent,
+            "claude": _binary_identity(claude_binary, claude_version),
+            "project_trust": _project_trust(root, project_trust_scope, user_home),
+        }
+        configuration = _claude_config_inventory(root, user_home)
     identity: dict[str, Any] = {
         "schema_version": 1,
         "root": root_git,
         "children": children,
         "critical_files": _critical_hashes(root, capability_path),
-        "codex": _binary_identity(codex_binary, codex_version),
+        **client,
         "node": _node_identity(node_binary, node_version),
         "python": _binary_identity(python_path, platform.python_version()),
         "platform": {
             "system": platform.system(), "release": platform.release(),
             "machine": platform.machine(), "python_implementation": platform.python_implementation(),
         },
-        "configuration": _config_inventory(root, codex_home),
+        "configuration": configuration,
         "authorization_trust_store_sha256": trust_store_hash,
         "trust_identity_sha256": ZERO_SHA256,
     }

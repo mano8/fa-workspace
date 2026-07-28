@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import subprocess
 import shutil
 import sys
@@ -211,6 +213,123 @@ class W9d2TrustIdentityTests(unittest.TestCase):
         )
         with self.assertRaises(w2b1.AgentContextError):
             self._verify(identity)
+
+
+class W12ClaudeTrustIdentityTests(unittest.TestCase):
+    """Step 12.3 reuses one builder; only the Claude members differ."""
+
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name) / "workspace"
+        self.root.mkdir()
+        for relative in CRITICAL_PATHS:
+            path = self.root / relative
+            if relative == ".workspace/contracts":
+                path.mkdir(parents=True)
+                (path / "contract.md").write_text("contract\n", encoding="utf-8")
+            else:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(f"{relative}\n", encoding="utf-8")
+        self.capability = ".workspace/capability.json"
+        (self.root / self.capability).write_text("{}\n", encoding="utf-8")
+        (self.root / ".claude").mkdir(exist_ok=True)
+        self.settings = self.root / ".claude" / "settings.json"
+        self.settings.write_text('{"autoMemoryEnabled": false}\n', encoding="utf-8")
+        self.child = self.root / "child"
+        self.child.mkdir()
+        (self.child / "AGENTS.md").write_text("child agents\n", encoding="utf-8")
+        (self.child / "CLAUDE.md").write_text("child memory\n", encoding="utf-8")
+        W9d2TrustIdentityTests._commit(self.child)
+        W9d2TrustIdentityTests._commit(self.root)
+        self.home = Path(self.temporary.name) / "claude-home"
+        (self.home / ".claude").mkdir(parents=True)
+        (self.home / ".claude" / "settings.json").write_text("{}\n", encoding="utf-8")
+        self.trust_record = self.home / ".claude.json"
+        self._write_trust(True)
+        self.binary = Path(self.temporary.name) / "claude-fixture"
+        shutil.copyfile(Path(sys.executable).resolve(), self.binary)
+        self.node = Path(self.temporary.name) / "node-fixture"
+        shutil.copyfile(Path(sys.executable).resolve(), self.node)
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    def _write_trust(self, trusted: bool) -> None:
+        self.trust_record.write_text(
+            json.dumps({"projects": {str(self.root): {"hasTrustDialogAccepted": trusted}}}),
+            encoding="utf-8",
+        )
+
+    def _kwargs(self) -> dict[str, object]:
+        return {
+            "workspace_root": self.root, "selected_repositories": (self.child,),
+            "capability_path": self.capability, "agent": "claude",
+            "claude_binary": self.binary, "claude_version": "2.1.220 (fixture)",
+            "project_trust_scope": self.root, "node_binary": self.node,
+            "node_version": "fixture-node", "home": self.home,
+        }
+
+    def test_a_claude_identity_binds_its_client_settings_and_recorded_trust(self) -> None:
+        identity = build_trust_identity(**self._kwargs())
+        self.assertEqual(identity["agent"], "claude")
+        self.assertEqual(identity["project_trust"], {"scope": ".", "state": "trusted"})
+        self.assertEqual(identity["claude"]["version"], "2.1.220 (fixture)")
+        self.assertEqual(
+            [item["kind"] for item in identity["configuration"]],
+            ["project", "project-local", "user"],
+        )
+        # The volatile client state file is never hashed into the identity.
+        self.assertNotIn(".claude.json", json.dumps(identity))
+        self.assertEqual(
+            identity["children"][0]["instruction_sha256"],
+            hashlib.sha256((self.child / "CLAUDE.md").read_bytes()).hexdigest(),
+        )
+        verify_trust_identity(identity, **self._kwargs())
+
+    def test_claude_client_settings_instruction_or_trust_drift_fails(self) -> None:
+        identity = build_trust_identity(**self._kwargs())
+        for name, mutate in (
+            ("client", lambda: self.binary.write_bytes(self.binary.read_bytes() + b"drift")),
+            ("settings", lambda: self.settings.write_text("{}\n", encoding="utf-8")),
+            ("user-settings", lambda: (self.home / ".claude" / "settings.json").write_text(
+                '{"drift": true}\n', encoding="utf-8"
+            )),
+            ("trust", lambda: self._write_trust(False)),
+        ):
+            with self.subTest(input=name):
+                self.setUp()
+                identity = build_trust_identity(**self._kwargs())
+                mutate()
+                with self.assertRaises(w2b1.AgentContextError) as failure:
+                    verify_trust_identity(identity, **self._kwargs())
+                self.assertEqual(failure.exception.code, "E_TRUST")
+
+    def test_an_incomplete_or_unknown_agent_identity_is_refused(self) -> None:
+        for overrides, fragment in (
+            ({"claude_binary": None}, "client binary"),
+            ({"project_trust_scope": None}, "client binary"),
+            ({"agent": "other"}, "instruction contract"),
+        ):
+            with self.subTest(overrides=sorted(overrides)):
+                with self.assertRaises(w2b1.AgentContextError) as failure:
+                    build_trust_identity(**{**self._kwargs(), **overrides})
+                self.assertEqual(failure.exception.code, "E_TRUST")
+                self.assertIn(fragment, failure.exception.message)
+
+    def test_the_codex_identity_keeps_exactly_its_previous_members(self) -> None:
+        identity = build_trust_identity(
+            workspace_root=self.root, selected_repositories=(self.child,),
+            capability_path=self.capability, codex_binary=self.binary, codex_version="fixture",
+            node_binary=self.node, node_version="fixture-node", home=self.home,
+        )
+        self.assertEqual(set(identity), {
+            "schema_version", "root", "children", "critical_files", "codex", "node", "python",
+            "platform", "configuration", "authorization_trust_store_sha256", "trust_identity_sha256",
+        })
+        self.assertEqual(
+            identity["children"][0]["instruction_sha256"],
+            hashlib.sha256((self.child / "AGENTS.md").read_bytes()).hexdigest(),
+        )
 
 
 if __name__ == "__main__":

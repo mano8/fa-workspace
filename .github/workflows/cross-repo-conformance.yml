@@ -75,8 +75,10 @@ jobs:
           python -m pip install --disable-pip-version-check --upgrade pip
           python -m pip install "ruff==${RUFF_VERSION}"
           # SDK first so fastapi-m8 resolves the in-workspace SDK, not PyPI.
-          python -m pip install './auth-sdk-m8[security,fastapi,events,config,observability]'
-          python -m pip install ./fastapi-m8
+          # The db extra is required: auth_sdk_m8.controllers.base imports
+          # sqlalchemy at module load, and fastapi_m8/__init__.py imports it.
+          python -m pip install './auth-sdk-m8[security,fastapi,events,config,observability,db]'
+          python -m pip install './fastapi-m8[db]'
       - name: Lint the conformance harness
         run: |
           python -m ruff check scripts/conformance

@@ -66,9 +66,7 @@ def run(argv: Sequence[str] | None = None) -> int:
     # The loader verifies schema version + checksum; a mismatch raises here and
     # is reported as a fail-closed error rather than a silent local expectation.
     fixture_matrix = load_authorization_fixture_matrix()
-    sections.append(
-        ("Issuer/consumer parity", run_parity_matrix(fixture_matrix))
-    )
+    sections.append(("Issuer/consumer parity", run_parity_matrix(fixture_matrix)))
     sections.append(
         (
             "API-key principal conformance (§3.12)",

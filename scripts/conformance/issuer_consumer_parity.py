@@ -23,17 +23,16 @@ parity end to end (serialization → signing → validation → guard).
 
 from __future__ import annotations
 
-from pydantic import SecretStr
-
 from auth_sdk_m8 import has_minimum_role, has_superuser_privileges
 from auth_sdk_m8.core.exceptions import InvalidToken
 from auth_sdk_m8.schemas.auth import TokenSecret
 from auth_sdk_m8.schemas.base import RoleType
 from auth_sdk_m8.security import TokenValidationConfig, TokenValidator
 from fastapi import HTTPException
-
 from fastapi_m8._deps import _require_role
 from fastapi_m8._revocation import RemoteRevocationClient
+from pydantic import SecretStr
+
 from scripts.conformance import CheckResult
 
 #: Role thresholds the consumer's ``_require_role`` guard is exercised against.
@@ -47,7 +46,7 @@ class _ConsumerUser:
     reads both — the same two attributes a validated ``UserModel`` exposes.
     """
 
-    __slots__ = ("role", "is_superuser")
+    __slots__ = ("is_superuser", "role")
 
     def __init__(self, role: RoleType, is_superuser: bool) -> None:
         self.role = role

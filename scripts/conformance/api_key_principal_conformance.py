@@ -46,13 +46,13 @@ from auth_sdk_m8.schemas.api_key import (
 )
 from auth_sdk_m8.schemas.base import ApiKeyAccessMode, RoleType
 from fastapi import Depends, FastAPI
-
 from fastapi_m8._api_key import (
     ApiKeyIntrospectionClient,
     ApiKeyIntrospectionError,
     ApiKeyQuotaExceededError,
 )
 from fastapi_m8._route_audit import audit_api_key_routes
+
 from scripts.conformance import CheckResult
 
 #: The consumer identity the fixture ``active_response`` is minted for. The
@@ -108,7 +108,9 @@ class _CountingTransport:
         return reply
 
 
-def _client(audience_id: str, transport: _CountingTransport) -> ApiKeyIntrospectionClient:
+def _client(
+    audience_id: str, transport: _CountingTransport
+) -> ApiKeyIntrospectionClient:
     """A real introspection client whose transport is the counting stub."""
     client = ApiKeyIntrospectionClient(
         introspection_url="http://auth:8000/user/private/v1/api-keys/introspect",
@@ -378,7 +380,9 @@ def no_positive_caching(matrix: dict) -> list[CheckResult]:
     results.append(
         CheckResult(
             "caching.failure_not_served_from_prior_success",
-            isinstance(ok, ApiKeyPrincipal) and outcome == "failed_closed" and calls2 == 2,
+            isinstance(ok, ApiKeyPrincipal)
+            and outcome == "failed_closed"
+            and calls2 == 2,
             f"first resolved, second {outcome} (calls={calls2}); no stale reuse",
         )
     )
@@ -395,8 +399,18 @@ def downgrade_denies_next_request(matrix: dict) -> list[CheckResult]:
     that carried WRITER capability before the downgrade is denied it after.
     """
     base = matrix["api_key_introspection_fixtures"]["active_response"]["principal"]
-    writer = {**base, "role": "writer", "is_superuser": False, "access_mode": "read_write"}
-    reader = {**base, "role": "reader", "is_superuser": False, "access_mode": "read_write"}
+    writer = {
+        **base,
+        "role": "writer",
+        "is_superuser": False,
+        "access_mode": "read_write",
+    }
+    reader = {
+        **base,
+        "role": "reader",
+        "is_superuser": False,
+        "access_mode": "read_write",
+    }
 
     async def _sequence() -> tuple[bool, bool]:
         transport = _CountingTransport([_active_reply(writer), _active_reply(reader)])
@@ -406,7 +420,9 @@ def downgrade_denies_next_request(matrix: dict) -> list[CheckResult]:
         await client.close()
         assert isinstance(before, ApiKeyPrincipal)
         assert isinstance(after, ApiKeyPrincipal)
-        return before.has_capability(RoleType.WRITER), after.has_capability(RoleType.WRITER)
+        return before.has_capability(RoleType.WRITER), after.has_capability(
+            RoleType.WRITER
+        )
 
     before_can, after_can = _run(_sequence())  # type: ignore[misc]
     return [
@@ -444,8 +460,7 @@ def forged_keys_indistinguishable(matrix: dict) -> list[CheckResult]:
         CheckResult(
             "indistinguishable.issuer_inactive_scenarios_share_shape",
             all_generic and len(inactive_scenarios) >= 3,
-            f"{len(inactive_scenarios)} inactive causes all 200 + "
-            f"{inactive_fixture}",
+            f"{len(inactive_scenarios)} inactive causes all 200 + {inactive_fixture}",
         )
     )
 
@@ -508,7 +523,9 @@ def capability_ceiling_and_no_superuser(matrix: dict) -> list[CheckResult]:
     results.append(
         CheckResult(
             "ceiling.superuser_owner_capped_at_writer",
-            owner_is_superuser and key_writer and admin_unrequestable
+            owner_is_superuser
+            and key_writer
+            and admin_unrequestable
             and forged_flag_grants_nothing,
             f"owner_superuser={owner_is_superuser} key_writer={key_writer} "
             f"admin_unrequestable={admin_unrequestable} "
@@ -534,7 +551,10 @@ def route_audit_forbids_bare_key_deps() -> list[CheckResult]:
         raise AssertionError("stub dependency is never invoked in a static audit")
 
     async def writer_capped(
-        _p: ApiKeyPrincipal = Depends(bare_principal),
+        # B008 is suppressed deliberately: the audit under test resolves
+        # FastAPI's dependency graph, so this sub-dependency must be wired the
+        # idiomatic way for the fixture to mean anything.
+        _p: ApiKeyPrincipal = Depends(bare_principal),  # noqa: B008
     ) -> ApiKeyPrincipal:  # pragma: no cover - never called
         raise AssertionError("stub dependency is never invoked in a static audit")
 

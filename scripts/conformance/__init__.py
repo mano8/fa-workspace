@@ -39,8 +39,8 @@ child-agnostic and installs no platform packages). It runs in its own opt-in
 from __future__ import annotations
 
 __all__ = [
-    "ConformanceError",
     "CheckResult",
+    "ConformanceError",
 ]
 
 
@@ -59,7 +59,7 @@ class CheckResult:
     the same minimal footprint as the rest of ``scripts/`` workspace tooling.
     """
 
-    __slots__ = ("name", "passed", "detail")
+    __slots__ = ("detail", "name", "passed")
 
     def __init__(self, name: str, passed: bool, detail: str) -> None:
         self.name = name

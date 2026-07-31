@@ -14,10 +14,19 @@ checksum-verified fixture matrix (`FIXTURE-01`).
 ## What it proves
 
 1. **Local-package matrix (dependency order).** `auth_sdk_m8` → `fastapi_m8` →
-   `fa-auth-m8`/examples resolve to their in-workspace source at the intended
-   versions (SDK `3.1.0`, fastapi `4.1.0`, issuer `2.0.0`), and each declared
-   dependency floor admits the installed platform version. A shadowing PyPI
-   copy, a drifted version, or an excluding floor fails closed.
+   `fa-auth-m8`/examples resolve at the intended versions (SDK `3.1.0`, fastapi
+   `4.2.1`, issuer `2.0.0`), each import is *version-identical* to the
+   in-workspace source of truth, and each declared dependency floor admits the
+   installed platform version. A shadowing copy at a different version, a
+   drifted version, or an excluding floor fails closed.
+
+   The identity check originally demanded the import resolve to the workspace
+   checkout. That premise held only while the platform packages were
+   unpublished; both are released now, so a published, version-identical copy
+   from the index — what a clean runner installs — is an equally valid
+   resolution. The declared matrix is kept honest by
+   `tests/test_local_package_matrix.py`, which reads each expected version from
+   the repository that declares it rather than from a repeated literal.
 2. **Issuer/consumer parity.** For every role/flag row, every current/required
    role pair, and every canonical signed JWT (valid **and** invalid), the
    issuer decision (the SDK predicate the issuer applies before signing) and the
@@ -63,6 +72,17 @@ It is intentionally **not** part of `workspace-policy-lint` (which stays
 child-agnostic and installs no platform packages). It runs in its own
 [`cross-repo-conformance`](../../.github/workflows/cross-repo-conformance.yml)
 workflow and locally.
+
+## In CI
+
+`fa-workspace` is not a monorepo — a workspace checkout carries none of the
+children — so
+[`cross-repo-conformance.yml`](../../.github/workflows/cross-repo-conformance.yml)
+checks each child out beside the root at the exact ref of the version matrix
+above (`SDK_REF` / `FASTAPI_REF` / `ISSUER_REF`) before installing the platform
+packages. Those refs and the `EXPECTED_*_VERSION` constants must move together;
+the unit tests fail if either side drifts. The issuer ref tracks its release
+branch until `2.0.0` is tagged.
 
 ## Running it
 

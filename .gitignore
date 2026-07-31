@@ -21,7 +21,7 @@
 
 # Directories owned by fa-workspace.
 
-# Root-only workspace policy CI. Child repositories own their own workflows.
+# Root-only workspace CI. Child repositories own their own workflows.
 !/.github/
 !/.github/**
 
@@ -78,5 +78,7 @@ CLAUDE.local.md
 !/scripts/**
 !/docs/
 
-# Python
-*.pyc
+# Python build artifacts. Without these, the un-ignored /scripts/** above tracks
+# every stale __pycache__ produced by running the workspace tooling.
+__pycache__/
+*.py[cod]

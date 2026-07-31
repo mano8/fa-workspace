@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from scripts.conformance import ConformanceError
 from scripts.conformance.local_package_matrix import (
@@ -10,8 +11,10 @@ from scripts.conformance.local_package_matrix import (
     EXPECTED_ISSUER_VERSION,
     EXPECTED_SDK_VERSION,
     _floor_for,
+    _read_declared_version,
     resolve_local_package_matrix,
     specifier_admits,
+    workspace_root,
 )
 
 
@@ -64,9 +67,9 @@ class ResolveMatrixTests(unittest.TestCase):
         names = {r.name for r in self.results}
         for required in (
             "sdk.version",
-            "sdk.resolves_in_workspace",
+            "sdk.resolves_version_identical",
             "fastapi.version",
-            "fastapi.resolves_in_workspace",
+            "fastapi.resolves_version_identical",
             "fastapi.sdk_floor_admits_installed_sdk",
             "issuer.version",
             "issuer.sdk_floor_admits_installed_sdk",
@@ -74,11 +77,24 @@ class ResolveMatrixTests(unittest.TestCase):
         ):
             self.assertIn(required, names)
 
-    def test_intended_versions_are_the_current_matrix(self) -> None:
-        # Guards against a silent version bump that forgets this harness.
-        self.assertEqual(EXPECTED_SDK_VERSION, "3.1.0")
-        self.assertEqual(EXPECTED_FASTAPI_VERSION, "4.1.0")
-        self.assertEqual(EXPECTED_ISSUER_VERSION, "2.0.0")
+    def test_intended_versions_track_the_repositories(self) -> None:
+        """Guard against a version bump that forgets this harness.
+
+        Read from each repository's own declaration rather than repeated
+        literals: the literals are exactly what went stale at ``4.1.0`` and left
+        the harness reporting RED on a correct stack.
+        """
+        root: Path = workspace_root()
+        for constant, declaration in (
+            (EXPECTED_SDK_VERSION, Path("auth-sdk-m8/auth_sdk_m8/__init__.py")),
+            (EXPECTED_FASTAPI_VERSION, Path("fastapi-m8/fastapi_m8/_version.py")),
+            (
+                EXPECTED_ISSUER_VERSION,
+                Path("fa-auth-m8/auth_user_service/__init__.py"),
+            ),
+        ):
+            with self.subTest(declaration=declaration.as_posix()):
+                self.assertEqual(constant, _read_declared_version(root / declaration))
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -24,7 +24,7 @@ class ApiKeyPrincipalConformanceTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.matrix = load_authorization_fixture_matrix()
 
-    def _assert_all_pass(self, results) -> None:  # noqa: ANN001 - test helper
+    def _assert_all_pass(self, results) -> None:
         failures = [f"{r.name}: {r.detail}" for r in results if not r.passed]
         self.assertEqual(failures, [], f"conformance failures: {failures}")
 

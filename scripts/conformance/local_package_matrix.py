@@ -7,14 +7,18 @@ Proves the first cross-repository integration requirement of
     and examples. Assert imports resolve to the intended workspace versions.
 
 The platform packages (``auth_sdk_m8``, ``fastapi_m8``) are **imported** and
-checked to resolve to their in-workspace source at the intended version. The
-issuer and its examples are **services**; to honour the no-cross-service-source
--import rule this module never imports them — it reads their declared package
-version and dependency floors from source-of-truth files and asserts the
-dependency-order contract holds (the issuer's SDK floor admits the installed
-SDK; the example's ``fastapi-m8`` floor admits the installed framework).
+checked to resolve at the intended version, and to be *version-identical* to
+the in-workspace source of truth — either because they resolve to that source
+directly (an editable/`-e` install) or because a published copy from the index
+carries the very same version. The issuer and its examples are **services**; to
+honour the no-cross-service-source-import rule this module never imports them —
+it reads their declared package version and dependency floors from
+source-of-truth files and asserts the dependency-order contract holds (the
+issuer's SDK floor admits the installed SDK; the example's ``fastapi-m8`` floor
+admits the installed framework).
 
-All checks fail closed: a shadowing PyPI copy, a version drift, or a floor that
+All checks fail closed: a shadowing copy at a *different* version than the
+workspace source, a version drift from the intended matrix, or a floor that
 excludes the installed platform version is an error.
 """
 
@@ -25,10 +29,20 @@ from pathlib import Path
 
 from scripts.conformance import CheckResult, ConformanceError
 
-#: Intended workspace versions (2026-07-23 version matrix, §90 evidence).
+#: Intended workspace versions (2026-07-31 version matrix, §90 evidence).
+#: ``scripts/conformance/tests`` asserts each entry still equals the version the
+#: corresponding repository declares, so a bump that forgets this harness fails
+#: as a stale-matrix error rather than as a confusing resolution mismatch.
 EXPECTED_SDK_VERSION = "3.1.0"
-EXPECTED_FASTAPI_VERSION = "4.1.0"
+EXPECTED_FASTAPI_VERSION = "4.2.1"
 EXPECTED_ISSUER_VERSION = "2.0.0"
+
+#: Where each platform package declares its own version, relative to the
+#: workspace root. Used for the version-identity check below.
+PLATFORM_VERSION_SOURCES = {
+    "auth_sdk_m8": Path("auth-sdk-m8") / "auth_sdk_m8" / "__init__.py",
+    "fastapi_m8": Path("fastapi-m8") / "fastapi_m8" / "_version.py",
+}
 
 
 def workspace_root() -> Path:
@@ -114,6 +128,31 @@ def _read_declared_version(init_path: Path) -> str:
     return match.group(1)
 
 
+def _version_identity(
+    label: str, package: str, module_path: Path, installed: str, root: Path
+) -> CheckResult:
+    """Assert the imported platform package is version-identical to its source.
+
+    The original assertion demanded the import resolve to the in-workspace
+    checkout. That premise held only while these packages were unpublished. Both
+    are released now, so a published copy pulled from the index is an equally
+    valid resolution — it is what a clean runner installs — provided it carries
+    the *same* version the workspace source declares. What must still fail
+    closed is a shadowing copy at a different version, which is the drift the
+    original check existed to catch.
+    """
+    source = root / PLATFORM_VERSION_SOURCES[package]
+    declared = _read_declared_version(source)
+    in_workspace = str(module_path).startswith(str(source.parent.parent.resolve()))
+    origin = "workspace source" if in_workspace else "published distribution"
+    return CheckResult(
+        f"{label}.resolves_version_identical",
+        installed == declared,
+        f"{package}=={installed} from {origin} ({module_path}); "
+        f"{source.relative_to(root).as_posix()} declares {declared}",
+    )
+
+
 def resolve_local_package_matrix(root: Path | None = None) -> list[CheckResult]:
     """Resolve the SDK -> fastapi -> issuer/examples matrix in dependency order.
 
@@ -125,12 +164,13 @@ def resolve_local_package_matrix(root: Path | None = None) -> list[CheckResult]:
     root = root or workspace_root()
     results: list[CheckResult] = []
 
-    # 1. SDK leg — imported, in-workspace, intended version.
-    import auth_sdk_m8  # noqa: PLC0415 - lazy so import errors surface as failures
+    # 1. SDK leg — imported, version-identical to its source, intended version.
+    # Imported lazily so a missing or misresolved package surfaces as a clean
+    # conformance failure rather than a module-load crash.
+    import auth_sdk_m8
 
     sdk_version = _module_version(auth_sdk_m8)
     sdk_path = Path(auth_sdk_m8.__file__ or "").resolve()
-    sdk_in_ws = str(sdk_path).startswith(str((root / "auth-sdk-m8").resolve()))
     results.append(
         CheckResult(
             "sdk.version",
@@ -138,22 +178,14 @@ def resolve_local_package_matrix(root: Path | None = None) -> list[CheckResult]:
             f"auth_sdk_m8=={sdk_version} (expected {EXPECTED_SDK_VERSION})",
         )
     )
-    results.append(
-        CheckResult(
-            "sdk.resolves_in_workspace",
-            sdk_in_ws,
-            f"auth_sdk_m8 imported from {sdk_path}",
-        )
-    )
+    results.append(_version_identity("sdk", "auth_sdk_m8", sdk_path, sdk_version, root))
 
-    # 2. fastapi leg — imported, in-workspace, intended version, SDK floor OK.
-    import fastapi_m8  # noqa: PLC0415
+    # 2. fastapi leg — imported, version-identical, intended version, SDK floor.
+    # Lazy for the same reason as the SDK import above.
+    import fastapi_m8
 
     fastapi_version = _module_version(fastapi_m8)
     fastapi_path = Path(fastapi_m8.__file__ or "").resolve()
-    fastapi_in_ws = str(fastapi_path).startswith(
-        str((root / "fastapi-m8").resolve())
-    )
     results.append(
         CheckResult(
             "fastapi.version",
@@ -162,11 +194,7 @@ def resolve_local_package_matrix(root: Path | None = None) -> list[CheckResult]:
         )
     )
     results.append(
-        CheckResult(
-            "fastapi.resolves_in_workspace",
-            fastapi_in_ws,
-            f"fastapi_m8 imported from {fastapi_path}",
-        )
+        _version_identity("fastapi", "fastapi_m8", fastapi_path, fastapi_version, root)
     )
     fastapi_sdk_floor = _floor_for(
         "auth-sdk-m8", (root / "fastapi-m8" / "pyproject.toml").read_text("utf-8")
@@ -206,9 +234,9 @@ def resolve_local_package_matrix(root: Path | None = None) -> list[CheckResult]:
     )
     example_floor = _floor_for(
         "fastapi-m8",
-        (
-            issuer / "examples" / "fastapi_full" / "requirements_base.txt"
-        ).read_text("utf-8"),
+        (issuer / "examples" / "fastapi_full" / "requirements_base.txt").read_text(
+            "utf-8"
+        ),
     )
     results.append(
         CheckResult(

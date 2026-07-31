@@ -49,30 +49,36 @@ apply it consistently to every CI and publish install step.
 
 For the current Astro baseline, use these dev-dependency ranges:
 
-- `@eslint/js`: `^9.39.5`;
-- `eslint`: `^9.39.5`;
-- `eslint-plugin-react`: `^7.37.5`;
-- `eslint-plugin-react-hooks`: `^5.1.0`;
+- `@eslint/js`: `^10.0.1`;
+- `@eslint-react/eslint-plugin`: `^5.18.0` for React/TSX packages;
+- `@typescript-eslint/eslint-plugin`: `^8.65.0`;
+- `@typescript-eslint/parser`: `^8.65.0`;
+- `eslint`: `^10.8.0`;
 - `eslint-plugin-security`: `^4.0.1`.
 
-Preserve the repository's established ESLint configuration format. In packages
-that already use a root `.eslintrc.json`, retain that format; do not migrate to
-flat config merely because ESLint 9 is in use. Scope linting to source files,
-ignore generated output and fixture consumers, preserve existing conventions,
-and keep repo-specific exceptions narrow and documented.
+ESLint 10 supports flat config only. Migrate `.eslintrc.*` and `.eslintignore`
+to `eslint.config.{js,mjs}`; remove `ESLINT_USE_FLAT_CONFIG` and `cross-env`
+from lint scripts. Scope linting to source files, use a leading `ignores` config
+for generated output and fixture consumers, preserve existing conventions, and
+keep repo-specific exceptions narrow and documented.
 
-For the `.eslintrc.json` setup, verify all of the following together:
+Use a current compatible TypeScript ESLint 8.x release (at least `^8.65.0`).
+For TSX packages, do not keep `eslint-plugin-react`: its current release is not
+compatible with ESLint 10. Use `@eslint-react/eslint-plugin` and keep a Node
+22+ CI matrix because that plugin requires Node 22 or newer.
+
+For the flat-config setup, verify all of the following together:
 
 - `package.json` exposes `lint`, declares the current ESLint baseline above,
-  and its lockfile contains the parser and every enabled TypeScript, React,
-  hooks, or security plugin;
-- `root`, `env`, `parser`, `plugins`, `extends`, `settings`, `rules`, and
-  `ignorePatterns` are valid JSON and match the repository's language surface;
-- browser and Node environments are enabled only where needed, while typed
-  parser project rules are limited to files included by the TypeScript project;
-- `ignorePatterns` covers generated `dist`, coverage, build caches, registry
-  output, and fixture consumers without masking package source;
-- no conflicting ESLint configuration file remains;
+  and its lockfile contains the parser and every enabled TypeScript, React, or
+  security plugin;
+- `eslint.config.{js,mjs}` imports each plugin, declares `languageOptions`,
+  `plugins`, and rules that match the repository's language surface;
+- browser and Node globals are enabled where needed, while typed parser project
+  rules are limited to files included by the TypeScript project;
+- the leading ignores config covers generated `dist`, coverage, build caches,
+  registry output, and fixture consumers without masking package source;
+- no `.eslintrc.*` or `.eslintignore` file remains;
 - `npm run lint` passes after a clean install.
 
 Always add `.codacy.yml`. Enable the ESLint and Markdownlint engines, then

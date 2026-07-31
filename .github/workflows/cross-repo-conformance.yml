@@ -27,9 +27,9 @@ env:
   # Must match EXPECTED_*_VERSION in scripts/conformance/local_package_matrix.py.
   SDK_REF: v3.1.0
   FASTAPI_REF: v4.2.1
-  # 2.0.0 is prepared but unpublished (no tag yet); it lives on the release
-  # branch until the issuer's release leg tags it. Flip this to v2.0.0 then.
-  ISSUER_REF: feat/auth-role-superuser-consistency
+  # 2.0.0 was tagged and released on 2026-07-31 (P9-12), so the issuer is now
+  # pinned to the published tag like the other two, not to a release branch.
+  ISSUER_REF: v2.0.0
   RUFF_VERSION: 0.16.0
 
 jobs:

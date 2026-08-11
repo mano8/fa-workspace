@@ -57,10 +57,29 @@ checksum-verified fixture matrix (`FIXTURE-01`).
    superuser owner is still capped at writer); and the static route audit flags
    a capability route wired to the bare key dependency.
 
+6. **Reparto declared contract vs served surface (§13.2a).** Every method+path
+   pair `astro-reparto-m8`'s `src/runtime/compatibility.ts` declares is served
+   by `reparto-docente-m8`, and the two agree on the contract version. The
+   withdrawn item `DELETE` on teaching activities and group-subject cells is
+   absent from **both** sides and the §20.12 `retire` action present on both —
+   a named regression, because the plugin declared and called those two
+   `DELETE`s for two releases while a version-only comparison reported the seam
+   as aligned (`S2-08`/`S2-09` in
+   [`2026-08-10-stage2-fa-ui-gap-audit.md`](../../.workspace/plans/docentes/analysis/2026-08-10-stage2-fa-ui-gap-audit.md)).
+
+   The served side is `reparto-docente-m8/docs/served-api-surface.json`, the
+   service's own tracked artifact generated from `app.openapi()` and gated
+   against drift inside that repository by `tests/test_served_api_surface.py`.
+   A snapshot is what makes the comparison possible at all: a document that
+   exists only on a running instance cannot gate a consumer's pull request. The
+   assertion runs one way — everything **declared** must be served; a service
+   may serve more than any one consumer uses.
+
 ## Ownership boundary
 
 The harness imports **platform** packages only (`auth_sdk_m8`, `fastapi_m8`). It
-never imports a **service** source module (`fa-auth-m8`), so it honours
+never imports a **service** source module (`fa-auth-m8`, `reparto-docente-m8`),
+so it honours
 `ARCH-LAYER-DIRECTION` and the no-cross-service-source-import rule in
 [`policies/tasks/cross-repository.md`](../../.workspace/policies/tasks/cross-repository.md).
 The issuer and consumer *halves* are each independently proven inside their own
@@ -83,6 +102,13 @@ above (`SDK_REF` / `FASTAPI_REF` / `ISSUER_REF`) before installing the platform
 packages. Those refs and the `EXPECTED_*_VERSION` constants must move together;
 the unit tests fail if either side drifts. The issuer ref tracks its release
 branch until `2.0.0` is tagged.
+
+The reparto seam adds two more checkouts, `REPARTO_SERVICE_REF` and
+`REPARTO_PLUGIN_REF`, both tracking the in-flight three-stage line — their
+newest tags predate the `2.0.0` contract — and both moving to tags when that
+line is released. Neither carries a version constant here: the contract version
+is read from the two repositories themselves and compared with each other, so
+there is no third literal to keep in step.
 
 ## Running it
 

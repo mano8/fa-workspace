@@ -10,7 +10,10 @@ prove issuer/consumer parity"* bullet. It:
    loader itself fails closed on schema-version drift or a checksum mismatch;
 3. proves issuer/consumer decision parity for every valid and invalid claim
    combination, plus the concurrent-login-during-downgrade generation race and
-   the durable-outbox propagation.
+   the durable-outbox propagation;
+4. asserts the ``astro-reparto-m8`` contract table's declared method+path pairs
+   against the surface ``reparto-docente-m8`` publishes from its own openapi
+   document (docentes plan §13.2a).
 
 Exit code is ``0`` only when every check passes; any failure (or an import that
 does not resolve in-workspace) exits non-zero, fail-closed.
@@ -58,6 +61,9 @@ def run(argv: Sequence[str] | None = None) -> int:
     )
     from scripts.conformance.issuer_consumer_parity import run_parity_matrix
     from scripts.conformance.local_package_matrix import resolve_local_package_matrix
+    from scripts.conformance.reparto_contract_surface import (
+        run_reparto_contract_surface,
+    )
 
     sections: list[tuple[str, list[CheckResult]]] = []
     matrix_results = resolve_local_package_matrix()
@@ -71,6 +77,12 @@ def run(argv: Sequence[str] | None = None) -> int:
         (
             "API-key principal conformance (§3.12)",
             run_api_key_conformance(fixture_matrix),
+        )
+    )
+    sections.append(
+        (
+            "Reparto declared contract vs served surface (§13.2a)",
+            run_reparto_contract_surface(),
         )
     )
 

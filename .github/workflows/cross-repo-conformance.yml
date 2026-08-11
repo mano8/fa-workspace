@@ -6,6 +6,10 @@ name: Cross-repo authorization conformance
 # (50-verification-conformance.md §6, TEST-CROSS-01; APIKEY-* in
 # 30-api-key-introspection.md). It installs the local platform packages in
 # dependency order (SDK -> fastapi) and runs the scripts/conformance harness.
+# It also runs the reparto contract-surface leg (docentes plan §13.2a): the
+# astro-reparto-m8 compatibility table's declared method+path pairs against the
+# surface reparto-docente-m8 publishes from its own openapi document.
+#
 # It is deliberately separate from workspace-policy-lint, which stays
 # child-agnostic and installs no platform packages.
 #
@@ -30,6 +34,13 @@ env:
   # 2.0.0 was tagged and released on 2026-07-31 (P9-12), so the issuer is now
   # pinned to the published tag like the other two, not to a release branch.
   ISSUER_REF: v2.0.0
+  # The reparto seam (§13.2a): the plugin's declared contract table is compared
+  # with the service's tracked served-API-surface artifact. Both sides track the
+  # in-flight three-stage line — their newest tags (v1.1.0 / v1.0.0) predate the
+  # 2.0.0 contract entirely — and move to tags when that line is released, the
+  # same way ISSUER_REF did.
+  REPARTO_SERVICE_REF: integration/three-stage-stack-aligned
+  REPARTO_PLUGIN_REF: feat/docentes-lan-read-mode
   RUFF_VERSION: 0.16.0
 
 jobs:
@@ -64,6 +75,23 @@ jobs:
           repository: mano8/fa-auth-m8
           ref: ${{ env.ISSUER_REF }}
           path: fa-auth-m8
+          fetch-depth: 1
+          persist-credentials: false
+      # The reparto seam. Both are read as files only — the service is never
+      # imported (ARCH-LAYER-DIRECTION) and the plugin is a TypeScript package,
+      # so no Node toolchain is installed for it.
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          repository: mano8/reparto-docente-m8
+          ref: ${{ env.REPARTO_SERVICE_REF }}
+          path: reparto-docente-m8
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          repository: mano8/astro-reparto-m8
+          ref: ${{ env.REPARTO_PLUGIN_REF }}
+          path: astro-reparto-m8
           fetch-depth: 1
           persist-credentials: false
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0

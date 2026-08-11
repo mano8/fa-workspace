@@ -17,13 +17,20 @@ This package realises the Phase 5 controller conformance bullets from
   guarantees of ``30-api-key-introspection.md`` (``APIKEY-*``)
   (:mod:`scripts.conformance.api_key_principal_conformance`).
 
+It additionally carries the reparto consumer/service seam from
+``.workspace/plans/docentes/todo/2026-07-14-three-stage-adaptation.md`` §13.2a:
+every method+path the ``astro-reparto-m8`` compatibility table declares is
+served by ``reparto-docente-m8``
+(:mod:`scripts.conformance.reparto_contract_surface`).
+
 Ownership boundary (``.workspace/architecture.md``):
 
 * ``fa-workspace`` owns cross-repository architecture and workspace-only CI, so
   the aggregate cross-repo proof lives here rather than inside any child.
 * The harness imports **platform** packages only — ``auth_sdk_m8`` (the
   canonical decision owner the issuer uses) and ``fastapi_m8`` (the consumer
-  framework). It never imports a **service** (``fa-auth-m8``) source module, so
+  framework). It never imports a **service** (``fa-auth-m8``,
+  ``reparto-docente-m8``) source module, so
   ``ARCH-LAYER-DIRECTION`` and the no-cross-service-source-import rule of
   ``policies/tasks/cross-repository.md`` hold: the issuer and consumer *halves*
   are each independently proven inside their own repositories' fixture-matrix

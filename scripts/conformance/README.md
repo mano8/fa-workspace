@@ -106,7 +106,12 @@ branch until `2.0.0` is tagged.
 The reparto seam adds two more checkouts, `REPARTO_SERVICE_REF` and
 `REPARTO_PLUGIN_REF`, both tracking the in-flight three-stage line — their
 newest tags predate the `2.0.0` contract — and both moving to tags when that
-line is released. Neither carries a version constant here: the contract version
+line is released. Both repositories live in the `DocentesTools` organisation,
+so those two steps read a `REPARTO_READ_TOKEN` secret; the job's own
+`GITHUB_TOKEN` has no access there. Without the secret the checkouts fail and
+the harness reports its fail-closed missing-checkout error, which is the
+intended outcome — a silently skipped leg is the shape of gap this check exists
+to remove. Neither carries a version constant here: the contract version
 is read from the two repositories themselves and compared with each other, so
 there is no third literal to keep in step.
 

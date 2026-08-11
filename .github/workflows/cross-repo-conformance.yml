@@ -80,17 +80,26 @@ jobs:
       # The reparto seam. Both are read as files only — the service is never
       # imported (ARCH-LAYER-DIRECTION) and the plugin is a TypeScript package,
       # so no Node toolchain is installed for it.
+      #
+      # Both live in the DocentesTools organisation, not mano8, so the job's own
+      # GITHUB_TOKEN cannot read them: these two steps need a token with read
+      # access there, supplied as the REPARTO_READ_TOKEN secret. Without it the
+      # checkouts fail and the harness's fail-closed missing-checkout error is
+      # what the log shows — deliberately, since a silently skipped leg is the
+      # shape of gap this whole check exists to remove.
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          repository: mano8/reparto-docente-m8
+          repository: DocentesTools/reparto-docente-m8
           ref: ${{ env.REPARTO_SERVICE_REF }}
+          token: ${{ secrets.REPARTO_READ_TOKEN || github.token }}
           path: reparto-docente-m8
           fetch-depth: 1
           persist-credentials: false
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          repository: mano8/astro-reparto-m8
+          repository: DocentesTools/astro-reparto-m8
           ref: ${{ env.REPARTO_PLUGIN_REF }}
+          token: ${{ secrets.REPARTO_READ_TOKEN || github.token }}
           path: astro-reparto-m8
           fetch-depth: 1
           persist-credentials: false

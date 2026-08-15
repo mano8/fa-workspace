@@ -20,6 +20,8 @@ work. A child must remain usable without this parent workspace.
   [invariant catalog](.workspace/invariants.json).
 - Environment profile rules and resolved `M8_*` tooling:
   [environment policy](.workspace/context/env.md).
+- Per-repository version-source mechanism and one documented read command per
+  mechanism: [version sources](.workspace/context/version-sources.md).
 - Repository facets and policy selection: [repository registry](.workspace/repo-types.json),
   [policy index](.workspace/policy.index.json), and
   [policy metadata](.workspace/policy.metadata.json).

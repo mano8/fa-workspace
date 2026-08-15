@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repair Astro 7 Config Loader"
+  short_description: "Resolve Astro 7.1.6 config-loader failures"
+  default_prompt: "Use $repair-astro-7-config-loader to diagnose and resolve this Astro 7.1.6 config-loader failure under the CI runtime."

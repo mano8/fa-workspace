@@ -12,15 +12,75 @@ Workspace invariant: [`CFG-SINGLE-WORKSPACE-OWNER`](../architecture.md#cfg-singl
 map; no child repository or agent-specific directory may keep a competing
 copy.
 
-## Map (measured 2026-08-15, re-verified against on-disk source this session)
+## Map (measured 2026-08-16 against on-disk source, whole fleet re-read)
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.1.0 · `astro-media-m8` 1.1.1 · `astro-prompt-m8` 1.1.1 · `astro-reparto-m8` 3.0.0 · `astro-ui-m8` 1.4.1 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.1.0 · `astro-media-m8` 1.2.0 · `astro-prompt-m8` 1.2.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.4.2 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
-| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.5.2 · `security-tests-m8` 0.6.0 |
+| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.6.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 1.0.0 · `media-worker-m8` (`worker`) 0.3.0 · `prompt-engine-m8` (`promt_engine_service`) 2.0.0 · `reparto-docente-m8` (`reparto_service`) 1.0.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.0.0 · `media-worker-m8` (`worker`) 0.4.0 · `prompt-engine-m8` (`promt_engine_service`) 2.0.0 · `reparto-docente-m8` (`reparto_service`) 2.0.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+
+## Published release vs working-tree version
+
+The map above records what the **working tree** holds. That is not the same
+question as what a consumer can install, and conflating the two is how the
+fleet's pin drift started. The table below separates them: *published* is the
+newest tag on `origin` (verified with `git ls-remote --tags origin`, not from
+a local tag list — several clones' local tags are stale), *working tree* is the
+value the map above reads.
+
+A consumer may only pin a **published** version. An unpublished working-tree
+version rides its repo's pending release per the remediation plan's Wave 6c
+one-bump-per-unpublished-release rule.
+
+| Repo | Published | Working tree | Pending? |
+| --- | --- | --- | --- |
+| `auth-sdk-m8` | 3.1.3 | 3.1.3 | — published |
+| `fastapi-m8` | 4.4.0 | 4.4.0 | — published |
+| `fa-auth-m8` | 2.0.2 | 2.0.3 | pending |
+| `imgtools_m8` | 2.1.0 | 2.1.1 | pending |
+| `security-tests-m8` | 0.5.1 | 0.6.0 | pending |
+| `media-sdk-m8` | 0.5.1 | 0.6.0 | pending |
+| `media-service-m8` | 1.0.0 | 2.0.0 | pending |
+| `media-worker-m8` | 0.3.0 | 0.4.0 | pending |
+| `prompt-engine-m8` | 1.0.0 | 2.0.0 | pending |
+| `reparto-docente-m8` | 1.1.0 | 2.0.0 | pending |
+| `fa-ui-m8` | — never published | 0.1.0 | pending |
+| `astro-ui-m8` | 1.4.2 | 1.4.2 | — published |
+| `astro-auth-m8` | 2.0.0 | 2.1.0 | pending |
+| `astro-media-m8` | 1.1.1 | 1.2.0 | pending |
+| `astro-prompt-m8` | 1.1.1 | 1.2.0 | pending |
+| `astro-reparto-m8` | 1.0.0 | 2.0.0 | pending |
+
+Read the published column with:
+
+```powershell
+# newest tag on the remote, per repo (local tags are frequently stale)
+git -C <repo> ls-remote --tags origin
+```
+
+### Service version is not contract version
+
+Four repos carry a second, independent version: the HTTP **contract** version,
+which does **not** move when the package version does. `media-service-m8` is
+the worked example — its package went `1.0.0` → `2.0.0` for the role tiers
+while `CONTRACT_VERSION` stayed `1.0` and `CONTRACT_RANGE` stayed
+`>=1.0.0 <2.0.0`, because the served HTTP surface did not change.
+
+| Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
+| --- | --- | --- | --- |
+| `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
+| `media-service-m8` | 2.0.0 | `media-service-m8@1.0` | `astro-media-m8` `>=2.0.0 <3.0.0` |
+| `prompt-engine-m8` | 2.0.0 | `prompt-engine-m8@2.0.0` | `astro-prompt-m8` `>=2.0.0 <3.0.0` |
+| `reparto-docente-m8` | 2.0.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
+
+Each plugin's gate is bounded on the **service** version and must admit its
+backend's package version; each also repeats the pair as declarative
+`package.json` metadata (`faAuthM8` / `mediaServiceM8` / `promptEngineM8` /
+`repartoDocenteM8`). Nothing enforces agreement between that metadata block and
+the `compatibility.ts` constants — a known gap, recorded rather than fixed.
 
 `fastapi-m8` is a special case: it carries **two** version sources for the
 same value — a literal `version = "x.y.z"` in `[project]` **and**
@@ -96,6 +156,8 @@ work, recorded here rather than silently dropped.
 
 `astro-reparto-m8` also had a version-source split **inside** one repo:
 `package.json` at `3.0.0`, `package-lock.json` at `2.0.0` — the same defect
-class, npm side. Fixed by regenerating the lockfile
-(`npm install --package-lock-only`); the other four `astro-*` plugins were
-already self-consistent.
+class, npm side. It was first closed by regenerating the lockfile up to `3.0.0`
+(`npm install --package-lock-only`); on 2026-08-16 the operator ruled `2.0.0`
+the correct version — `3.0.0` was never published, and the lockfile's original
+`2.0.0` was the right half of the split — so both files now read `2.0.0`. The
+other four `astro-*` plugins were already self-consistent.

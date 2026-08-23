@@ -14,9 +14,11 @@ copy.
 
 ## Map (measured 2026-08-16 against on-disk source, whole fleet re-read)
 
-One row corrected since that measurement: `astro-prompt-m8` `1.2.0` → `2.0.0`
-(2026-08-23), from a targeted re-read of that repository rather than a fleet
-re-measurement. Every other value still dates from 2026-08-16.
+One row of this map corrected since that measurement: `astro-prompt-m8`
+`1.2.0` → `2.0.0` (2026-08-23), from a targeted re-read of that repository
+rather than a fleet re-measurement. Every other value here still dates from
+2026-08-16. Three rows of the **published** table below also moved on
+2026-08-23; that section records which and why.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
@@ -49,14 +51,35 @@ one-bump-per-unpublished-release rule.
 | `media-sdk-m8` | 0.5.1 | 0.6.0 | pending |
 | `media-service-m8` | 1.0.0 | 2.0.0 | pending |
 | `media-worker-m8` | 0.3.0 | 0.4.0 | pending |
-| `prompt-engine-m8` | 1.0.0 | 2.0.0 | pending |
+| `prompt-engine-m8` | 2.0.0 | 2.0.0 | — published |
 | `reparto-docente-m8` | 1.1.0 | 2.0.0 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.4.2 | 1.4.2 | — published |
-| `astro-auth-m8` | 2.0.0 | 2.1.0 | pending |
+| `astro-auth-m8` | 2.1.0 | 2.1.0 | — published |
 | `astro-media-m8` | 1.1.1 | 1.2.0 | pending |
-| `astro-prompt-m8` | 1.1.1 | 2.0.0 | pending |
+| `astro-prompt-m8` | 2.0.0 | 2.0.0 | — published |
 | `astro-reparto-m8` | 1.0.0 | 2.0.0 | pending |
+
+Three rows moved on 2026-08-23, each re-read against its own remote rather
+than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and
+`astro-prompt-m8` `1.1.1` → `2.0.0`: the service/client pair released
+together, because the `1.1.1` client cannot drive a `2.0.0` service. Evidence
+is the tag on `origin` in both cases — `816e083` and `f69d6c1`, each the tip
+of its own `main` — plus the artifact each tag produced: the
+`Publish Docker Image` run for the service and
+`@mano8/astro-prompt-m8@2.0.0` on the npm registry for the client.
+`astro-auth-m8` `2.0.0` → `2.1.0` is not part of that release; the row was
+simply stale, caught because `astro-prompt-m8@2.0.0` names auth `^2.1.0` as a
+peer and the version was checked before the pin was moved. Its `v2.1.0` tag is
+on `origin` and `2.1.0` is npm's `latest`.
+
+The rule above — a consumer may only pin a published version — has a
+converse this release made visible: a consumer does not pick up a **major**
+through a caret it already carries. `fa-ui-m8` pinned
+`@mano8/astro-prompt-m8@^1.1.1`, which excludes `2.0.0`, so the host needed an
+explicit repoint to `^2.0.0` after the publish rather than an install. When a
+row here moves across a major, check the consumers' ranges as well as their
+lockfiles.
 
 Read the published column with:
 

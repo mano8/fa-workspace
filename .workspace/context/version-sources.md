@@ -14,9 +14,13 @@ copy.
 
 ## Map (measured 2026-08-16 against on-disk source, whole fleet re-read)
 
+One row corrected since that measurement: `astro-prompt-m8` `1.2.0` → `2.0.0`
+(2026-08-23), from a targeted re-read of that repository rather than a fleet
+re-measurement. Every other value still dates from 2026-08-16.
+
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.1.0 · `astro-media-m8` 1.2.0 · `astro-prompt-m8` 1.2.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.4.2 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.1.0 · `astro-media-m8` 1.2.0 · `astro-prompt-m8` 2.0.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.4.2 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.6.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
@@ -51,7 +55,7 @@ one-bump-per-unpublished-release rule.
 | `astro-ui-m8` | 1.4.2 | 1.4.2 | — published |
 | `astro-auth-m8` | 2.0.0 | 2.1.0 | pending |
 | `astro-media-m8` | 1.1.1 | 1.2.0 | pending |
-| `astro-prompt-m8` | 1.1.1 | 1.2.0 | pending |
+| `astro-prompt-m8` | 1.1.1 | 2.0.0 | pending |
 | `astro-reparto-m8` | 1.0.0 | 2.0.0 | pending |
 
 Read the published column with:

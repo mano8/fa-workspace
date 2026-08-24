@@ -91,15 +91,16 @@ git -C <repo> ls-remote --tags origin
 ### Service version is not contract version
 
 Four repos carry a second, independent version: the HTTP **contract** version,
-which does **not** move when the package version does. `media-service-m8` is
-the worked example — its package went `1.0.0` → `2.0.0` for the role tiers
-while `CONTRACT_VERSION` stayed `1.0` and `CONTRACT_RANGE` stayed
-`>=1.0.0 <2.0.0`, because the served HTTP surface did not change.
+which does **not** move merely because the package version does.
+`media-service-m8` is the worked example — its package went `1.0.0` → `2.0.0`
+for the role tiers while `CONTRACT_VERSION` stayed `1.0`. The later additive UX
+surface moved that contract to `1.1`; its compatibility range remains
+`>=1.0.0 <2.0.0` because 1.0 clients are still served.
 
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
-| `media-service-m8` | 2.0.0 | `media-service-m8@1.0` | `astro-media-m8` `>=2.0.0 <3.0.0` |
+| `media-service-m8` | 2.0.0 | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
 | `prompt-engine-m8` | 2.0.0 | `prompt-engine-m8@2.0.0` | `astro-prompt-m8` `>=2.0.0 <3.0.0` |
 | `reparto-docente-m8` | 2.0.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 

@@ -14,17 +14,18 @@ copy.
 
 ## Map (measured 2026-08-16 against on-disk source, whole fleet re-read)
 
-One row of this map corrected since that measurement: `astro-prompt-m8`
-`1.2.0` → `2.0.0` (2026-08-23), from a targeted re-read of that repository
-rather than a fleet re-measurement. Every other value here still dates from
-2026-08-16. Three rows of the **published** table below also moved on
-2026-08-23; that section records which and why.
+Three rows of this map were corrected after that measurement from targeted
+source re-reads rather than a fleet re-measurement: `astro-prompt-m8` `1.2.0`
+→ `2.0.0` (2026-08-23), then `astro-ui-m8` `1.4.2` → `1.5.0` and
+`media-sdk-m8` `0.6.0` → `0.7.0` (2026-08-24). Every other value here still
+dates from 2026-08-16. The published table below records the independently
+verified release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.1.0 · `astro-media-m8` 1.2.0 · `astro-prompt-m8` 2.0.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.4.2 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.1.0 · `astro-media-m8` 1.2.0 · `astro-prompt-m8` 2.0.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.0 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
-| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.6.0 · `security-tests-m8` 0.6.0 |
+| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.7.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
 | package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.0.0 · `media-worker-m8` (`worker`) 0.4.0 · `prompt-engine-m8` (`promt_engine_service`) 2.0.0 · `reparto-docente-m8` (`reparto_service`) 2.0.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
@@ -45,16 +46,16 @@ one-bump-per-unpublished-release rule.
 | --- | --- | --- | --- |
 | `auth-sdk-m8` | 3.1.3 | 3.1.3 | — published |
 | `fastapi-m8` | 4.4.0 | 4.4.0 | — published |
-| `fa-auth-m8` | 2.0.2 | 2.0.3 | pending |
-| `imgtools_m8` | 2.1.0 | 2.1.1 | pending |
-| `security-tests-m8` | 0.5.1 | 0.6.0 | pending |
-| `media-sdk-m8` | 0.5.1 | 0.6.0 | pending |
+| `fa-auth-m8` | 2.0.3 | 2.0.3 | — published |
+| `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
+| `security-tests-m8` | 0.6.0 | 0.6.0 | — published |
+| `media-sdk-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-service-m8` | 1.0.0 | 2.0.0 | pending |
 | `media-worker-m8` | 0.3.0 | 0.4.0 | pending |
 | `prompt-engine-m8` | 2.0.0 | 2.0.0 | — published |
 | `reparto-docente-m8` | 1.1.0 | 2.0.0 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
-| `astro-ui-m8` | 1.4.2 | 1.4.2 | — published |
+| `astro-ui-m8` | 1.4.2 | 1.5.0 | pending |
 | `astro-auth-m8` | 2.1.0 | 2.1.0 | — published |
 | `astro-media-m8` | 1.1.1 | 1.2.0 | pending |
 | `astro-prompt-m8` | 2.0.0 | 2.0.0 | — published |
@@ -72,6 +73,18 @@ of its own `main` — plus the artifact each tag produced: the
 simply stale, caught because `astro-prompt-m8@2.0.0` names auth `^2.1.0` as a
 peer and the version was checked before the pin was moved. Its `v2.1.0` tag is
 on `origin` and `2.1.0` is npm's `latest`.
+
+The requester supplied the current fleet publication ledger on 2026-08-24:
+`auth-sdk-m8@3.1.3`, `fastapi-m8@4.4.0`, `fa-auth-m8@2.0.3`,
+`imgtools_m8@2.1.1`, `security-tests-m8@0.6.0`,
+`prompt-engine-m8@2.0.0`, `astro-ui-m8@1.4.2`,
+`astro-auth-m8@2.1.0`, and `astro-prompt-m8@2.0.0` are published. A direct PyPI
+check additionally confirms `media-sdk-m8@0.7.0` is published; its wheel hash
+matches both consumer production locks. The other rows retain the pending state
+shown above. For this UX wave, `astro-ui-m8` has additionally moved to 1.5.0 in
+source for the shared `tree-view`, but npm and `origin` still stop at 1.4.2;
+`astro-media-m8` cannot produce a valid registry-backed 1.5.0 lock until that
+release exists.
 
 The rule above — a consumer may only pin a published version — has a
 converse this release made visible: a consumer does not pick up a **major**

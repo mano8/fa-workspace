@@ -56,7 +56,7 @@ one-bump-per-unpublished-release rule.
 | `reparto-docente-m8` | 1.1.0 | 2.0.0 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.4.2 | 1.5.0 | pending |
-| `astro-auth-m8` | 2.2.0 | 2.3.0 | pending |
+| `astro-auth-m8` | 2.3.0 | 2.3.0 | — published |
 | `astro-media-m8` | 1.1.1 | 1.2.0 | pending |
 | `astro-prompt-m8` | 2.0.0 | 2.0.0 | — published |
 | `astro-reparto-m8` | 1.0.0 | 2.0.0 | pending |
@@ -119,16 +119,22 @@ explicit repoint to `^2.0.0` after the publish rather than an install. When a
 row here moves across a major, check the consumers' ranges as well as their
 lockfiles.
 
-**Open as of 2026-08-29:** all four `astro-auth-m8` consumers
+~~**Open as of 2026-08-29:** all four `astro-auth-m8` consumers
 (`astro-media-m8`, `astro-prompt-m8`, `astro-reparto-m8` in both
 `peerDependencies` and `devDependencies`, and `fa-ui-m8/app` as a direct
-dependency) now name `^2.3.0`, which is **not yet published**. That is a
-deliberate inversion of the pin-only-published rule for the duration of a
-prepared release: the range states the requirement, and the four lockfiles
-still resolve the `2.2.0` tarball and cannot be regenerated until the human
-publishes `2.3.0`. Until then `npm ci` in those repositories will refuse the
-manifest/lockfile disagreement. Publishing `2.3.0` and re-running
-`npm install` in each consumer is the step that closes this.
+dependency) now name `^2.3.0`, which is **not yet published**.~~ ✅ **Half
+closed 2026-08-29: `astro-auth-m8@2.3.0` is published.** Independent evidence,
+as this file requires: `npm view @mano8/astro-auth-m8 versions` lists `2.3.0`
+and `dist-tags.latest` is `2.3.0`. The manifest ranges are no longer ahead of
+the registry, so the deliberate inversion of the pin-only-published rule is
+over.
+
+**Still open:** the four consumer **lockfiles** have not been regenerated and
+still resolve the `2.2.0` tarball, so `npm ci` in those repositories continues
+to refuse the manifest/lockfile disagreement. Running `npm install` in each of
+`astro-media-m8`, `astro-prompt-m8`, `astro-reparto-m8` and `fa-ui-m8/app` —
+and rebuilding the host, which is where `W3.1` and `W3.2` are still inert — is
+the step that closes the rest. Tracked as the remainder of the plan's `W7.4`.
 
 Read the published column with:
 

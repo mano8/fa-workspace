@@ -129,12 +129,14 @@ and `dist-tags.latest` is `2.3.0`. The manifest ranges are no longer ahead of
 the registry, so the deliberate inversion of the pin-only-published rule is
 over.
 
-**Still open:** the four consumer **lockfiles** have not been regenerated and
-still resolve the `2.2.0` tarball, so `npm ci` in those repositories continues
-to refuse the manifest/lockfile disagreement. Running `npm install` in each of
-`astro-media-m8`, `astro-prompt-m8`, `astro-reparto-m8` and `fa-ui-m8/app` —
-and rebuilding the host, which is where `W3.1` and `W3.2` are still inert — is
-the step that closes the rest. Tracked as the remainder of the plan's `W7.4`.
+✅ **Fully closed 2026-08-29.** `npm install` was run in each of
+`astro-media-m8`, `astro-prompt-m8`, `astro-reparto-m8` and `fa-ui-m8/app`; all
+four lockfiles now resolve `astro-auth-m8-2.3.0.tgz`, so `npm ci` no longer
+disagrees with the manifest in any of them. The host was rebuilt against the
+new install and verified to actually carry `W3.1`/`W3.2`: the installed
+package now ships `dist/src/runtime/sessionHint.js` and `runRefresh`
+references, both absent from the old `2.2.0` install. This was the remainder
+of the plan's `W7.4`, now fully delivered.
 
 Read the published column with:
 

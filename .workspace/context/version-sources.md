@@ -23,7 +23,7 @@ verified release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.1.0 · `astro-media-m8` 1.2.0 · `astro-prompt-m8` 2.0.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.0 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.3.0 · `astro-media-m8` 1.2.0 · `astro-prompt-m8` 2.0.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.0 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.7.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
@@ -56,7 +56,7 @@ one-bump-per-unpublished-release rule.
 | `reparto-docente-m8` | 1.1.0 | 2.0.0 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.4.2 | 1.5.0 | pending |
-| `astro-auth-m8` | 2.1.0 | 2.1.0 | — published |
+| `astro-auth-m8` | 2.2.0 | 2.3.0 | pending |
 | `astro-media-m8` | 1.1.1 | 1.2.0 | pending |
 | `astro-prompt-m8` | 2.0.0 | 2.0.0 | — published |
 | `astro-reparto-m8` | 1.0.0 | 2.0.0 | pending |
@@ -86,6 +86,31 @@ source for the shared `tree-view`, but npm and `origin` still stop at 1.4.2;
 `astro-media-m8` cannot produce a valid registry-backed 1.5.0 lock until that
 release exists.
 
+Three rows moved on 2026-08-29 while preparing the reparto release pair
+(remediation `W7.3`, plan
+`.workspace/plans/docentes/todo/2026-08-28-reparto-limitations-remediation-plan.md`).
+
+`astro-auth-m8`'s row was **stale, not merely behind**: it read published
+`2.1.0` / working tree `2.1.0`, while `2.2.0` had been the working-tree value
+since `53bf224 chore(release): prepare astro auth 2.2.0` and is published.
+`fa-ui-m8/app/package-lock.json` resolves
+`https://registry.npmjs.org/@mano8/astro-auth-m8/-/astro-auth-m8-2.2.0.tgz`,
+which is the independent evidence for the published column. The working tree is
+now `2.3.0`: additive behaviour (a coordinated single-flight refresh, a
+negative-only session hint) plus **one new `localStorage` key**, which reads as
+a minor rather than a patch.
+
+`reparto-docente-m8` and `astro-reparto-m8` keep published `1.1.0` / `1.0.0`
+against a working tree of `2.0.0` **and do not move to `3.0.0`**, though both
+carry breaking changes. The operator ruled on 2026-08-29 that neither `2.0.0`
+was ever published, so the breaking work rides the pending release rather than
+taking a number of its own — the Wave 6c one-bump-per-unpublished-release rule
+recorded above, and the same ruling that settled this repository's earlier
+`3.0.0`/`2.0.0` split (see *Convergence*). Both `[Unreleased]` changelog
+sections were folded into the existing, never-published `## [2.0.0]` sections
+and redated `2026-08-29`. This supersedes the remediation plan's decision 6,
+which had argued `3.0.0` for the pair.
+
 The rule above — a consumer may only pin a published version — has a
 converse this release made visible: a consumer does not pick up a **major**
 through a caret it already carries. `fa-ui-m8` pinned
@@ -93,6 +118,17 @@ through a caret it already carries. `fa-ui-m8` pinned
 explicit repoint to `^2.0.0` after the publish rather than an install. When a
 row here moves across a major, check the consumers' ranges as well as their
 lockfiles.
+
+**Open as of 2026-08-29:** all four `astro-auth-m8` consumers
+(`astro-media-m8`, `astro-prompt-m8`, `astro-reparto-m8` in both
+`peerDependencies` and `devDependencies`, and `fa-ui-m8/app` as a direct
+dependency) now name `^2.3.0`, which is **not yet published**. That is a
+deliberate inversion of the pin-only-published rule for the duration of a
+prepared release: the range states the requirement, and the four lockfiles
+still resolve the `2.2.0` tarball and cannot be regenerated until the human
+publishes `2.3.0`. Until then `npm ci` in those repositories will refuse the
+manifest/lockfile disagreement. Publishing `2.3.0` and re-running
+`npm install` in each consumer is the step that closes this.
 
 Read the published column with:
 

@@ -27,7 +27,7 @@ verified release state.
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.7.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.0.0 · `media-worker-m8` (`worker`) 0.4.0 · `prompt-engine-m8` (`promt_engine_service`) 2.0.0 · `reparto-docente-m8` (`reparto_service`) 2.0.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.0.0 · `media-worker-m8` (`worker`) 0.4.0 · `prompt-engine-m8` (`promt_engine_service`) 2.0.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -53,7 +53,7 @@ one-bump-per-unpublished-release rule.
 | `media-service-m8` | 1.0.0 | 2.0.0 | pending |
 | `media-worker-m8` | 0.3.0 | 0.4.0 | pending |
 | `prompt-engine-m8` | 2.0.0 | 2.1.0 | pending |
-| `reparto-docente-m8` | 2.0.0 | 2.0.0 | — published |
+| `reparto-docente-m8` | 2.0.0 | 2.1.0 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.0 | 1.5.0 | — published |
 | `astro-auth-m8` | 2.4.0 | 2.4.0 | — published |
@@ -241,6 +241,25 @@ now published at their floor. The converse rule still binds any *external*
 consumer of these packages, and it bound `fa-ui-m8` itself for
 `astro-prompt-m8@2.0.0` when that dependency was registry-ranged.
 
+### `reparto-docente-m8` 2.0.0 → 2.1.0 (2026-08-30, pending)
+
+The working-tree row moves `2.0.0` → **`2.1.0`** (`reparto_service/__init__.py`,
+read via the documented source-file command, not `import`). Prepared under the
+SSE-DB-session-pinning plan's `R1`/`R2`: the `/{process_id}/events` SSE route no
+longer holds a `SessionDep` open for the life of the stream, which previously
+pinned one connection pool slot per concurrent viewer. `reparto-docente-m8@2.0.0`
+is published (`git ls-remote --tags origin` shows `v2.0.0` as the newest tag), so
+this is its own bump, not a ride.
+
+**The contract does not move.** `CONTRACT_VERSION`/`CONTRACT_RANGE` stay
+`2.0.0`/`>=2.0.0 <3.0.0` — the fix changes no endpoint, schema, status code or
+field, and `astro-reparto-m8`'s gate is an exact-match `Set`, not a range, so
+moving the contract would reject every published client at preflight.
+`astro-reparto-m8` needs **no release**: its `serviceVersionRange` metadata
+already admits `2.1.0`, and `npm run verify:contract-operations` was re-run
+against `reparto-docente-m8@2.1.0` and confirms the served surface is
+unchanged.
+
 ### The prompt pair moves the contract axis (2026-08-30, pending)
 
 `prompt-engine-m8`'s working-tree row moves `2.0.0` → **`2.1.0`**, and the
@@ -301,7 +320,7 @@ surface moved that contract to `1.1`; its compatibility range remains
 | `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
 | `media-service-m8` | 2.0.0 | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
 | `prompt-engine-m8` | 2.1.0 (pending) | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
-| `reparto-docente-m8` | 2.0.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
+| `reparto-docente-m8` | 2.1.0 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
 Each plugin's gate is bounded on the **service** version and must admit its
 backend's package version; each also repeats the pair as declarative

@@ -23,7 +23,7 @@ verified release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.3.0 · `astro-media-m8` 1.2.0 · `astro-prompt-m8` 2.0.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.0 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.4.0 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.0 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.7.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
@@ -53,12 +53,12 @@ one-bump-per-unpublished-release rule.
 | `media-service-m8` | 1.0.0 | 2.0.0 | pending |
 | `media-worker-m8` | 0.3.0 | 0.4.0 | pending |
 | `prompt-engine-m8` | 2.0.0 | 2.0.0 | — published |
-| `reparto-docente-m8` | 1.1.0 | 2.0.0 | pending |
+| `reparto-docente-m8` | 2.0.0 | 2.0.0 | — published |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
-| `astro-ui-m8` | 1.4.2 | 1.5.0 | pending |
-| `astro-auth-m8` | 2.3.0 | 2.3.0 | — published |
-| `astro-media-m8` | 1.1.1 | 1.2.0 | pending |
-| `astro-prompt-m8` | 2.0.0 | 2.0.0 | — published |
+| `astro-ui-m8` | 1.5.0 | 1.5.0 | — published |
+| `astro-auth-m8` | 2.4.0 | 2.4.0 | — published |
+| `astro-media-m8` | 1.1.1 | 2.0.0 | pending |
+| `astro-prompt-m8` | 2.0.0 | 2.1.0 | pending |
 | `astro-reparto-m8` | 1.0.0 | 2.0.0 | pending |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
@@ -111,6 +111,22 @@ sections were folded into the existing, never-published `## [2.0.0]` sections
 and redated `2026-08-29`. This supersedes the remediation plan's decision 6,
 which had argued `3.0.0` for the pair.
 
+`astro-prompt-m8` moved `2.0.0` → `2.1.0` on 2026-08-29, closing the reparto
+remediation plan's own loose end. `2.0.0` **is** published, so the two changes
+`W7.3` and `W7.7` left in its `[Unreleased]` section — the auth peer floor
+`^2.1.0` → `^2.3.0`, which is published surface, and the fleet gate exemption —
+had no version to ride, and the repository's `C22` changelog/version parity test
+was failing on exactly that (it requires the `package.json` version to head a
+non-empty entry *and* `[Unreleased]` to be genuinely empty after a fold). The
+same release carries `W7.7`'s named follow-up: the third copy of the role
+hierarchy is deleted in favour of the `@mano8/astro-auth-m8/authorization`
+import the widened `C12` now permits. A minor, not a major: this repository's
+own rule is that its major tracks the supported `prompt-engine-m8` **API
+contract**, which does not move here, and no published name, signature or
+answer changes. Pending until it is tagged, so the Wave 6c rule applies to it
+— further pre-tag work belongs in `## [2.1.0]` rather than in a new section.
+Publication is the human's act.
+
 The rule above — a consumer may only pin a published version — has a
 converse this release made visible: a consumer does not pick up a **major**
 through a caret it already carries. `fa-ui-m8` pinned
@@ -137,6 +153,93 @@ new install and verified to actually carry `W3.1`/`W3.2`: the installed
 package now ships `dist/src/runtime/sessionHint.js` and `runRefresh`
 references, both absent from the old `2.2.0` install. This was the remainder
 of the plan's `W7.4`, now fully delivered.
+
+### `astro-auth-m8` 2.3.0 → 2.4.0 (2026-08-30, pending)
+
+The working tree moved to `2.4.0` on the open PR
+[`mano8/astro-auth-m8#21`](https://github.com/mano8/astro-auth-m8/pull/21)
+(`feat/auth-role-superuser-consistency`). **This is the fleet's first release
+whose entire justification is a commitment rather than a code change.** The
+published diff against `2.3.0` is one JSDoc block in
+`src/runtime/authorization.ts`; nothing a consumer executes moves at all. The
+bump exists because `./authorization` changed *standing*: remediation `W7.7`
+made it the one subpath of this package a sibling business plugin may import,
+and `^2.4.0` is the range that carries that guarantee. Two consumers already
+depend on it in code rather than in principle —
+`astro-prompt-m8/src/runtime/authAdapter.ts` and
+`astro-reparto-m8/src/runtime/authAdapter.ts` both `import … from
+"@mano8/astro-auth-m8/authorization"` instead of mirroring the hierarchy — so
+for them the floor is load-bearing, not bookkeeping.
+
+Minor rather than patch, on this repository's own rule: the major tracks the
+supported `fa-auth-m8` API contract, which does not move (`fa-auth-m8@2.0`,
+`>=2.0.0 <3.0.0`), and a *new supported import surface* is added capability, not
+a fix.
+
+The release was blocked by a red gate, since green: `d9254e2` bumped
+`package.json`/`package-lock.json` but left the work in `[Unreleased]`, so the
+`A32` changelog/version-parity test failed on both Node matrix legs — the same
+defect class this file records for `astro-prompt-m8@2.1.0`, one release later.
+`e4812fa` folded the entry.
+
+✅ **Closed 2026-08-30, in one pass.** `2.4.0` is published — `npm view
+@mano8/astro-auth-m8 dist-tags.latest` answers `2.4.0`, the independent
+evidence this file requires. The pin-ahead-of-registry window was real but
+short: all four consumer manifests were moved to `^2.4.0` first and `npm
+install` answered `ETARGET — No matching version found` in each, so no
+lockfile could be or was regenerated until the publish landed. Afterwards
+`npm install` ran in `astro-media-m8`, `astro-prompt-m8`, `astro-reparto-m8`
+and `fa-ui-m8/app`; all four lockfiles now resolve
+`astro-auth-m8-2.4.0.tgz`, and `npm ls @mano8/astro-auth-m8` from
+`fa-ui-m8/app` resolves the host's own dependency and all three plugins to a
+single `2.4.0` — no duplicate copy of the hierarchy in the host's tree, which
+is the property the whole `W7.7` exercise exists to produce.
+
+Every consumer gate was re-run green against that install: `astro-media-m8`
+(9 fleet gates, 100% coverage), `astro-prompt-m8` (9 gates, 100%),
+`astro-reparto-m8` (9 gates, 992 tests at 100%, and
+`verify:contract-operations` reporting 116 declared operations all served by
+`reparto-docente-m8@2.0.0`), and the `fa-ui-m8` host (144 tests, clean
+typecheck and lint, 192 pages built with `dist/index.html` present).
+
+### Three further rows measured 2026-08-30
+
+Re-measured in the same pass, because a matrix that is only right about the
+row you came to change is not a matrix.
+
+`reparto-docente-m8` `1.1.0` → **`2.0.0`, published.** Evidence is the tag on
+`origin`: `git ls-remote --tags origin` lists
+`e523f40da0cc04ee211add88a2c3d3267b1587f0 refs/tags/v2.0.0`. This is the
+service half of the release pair remediation `W7.3` prepared and decision 6
+settled (the breaking work rides the never-published `2.0.0` rather than
+taking a `3.0.0`). **The client half is still pending** — `astro-reparto-m8`
+remains published `1.0.0` against a working tree of `2.0.0` — so the pair is
+currently half-released, which is exactly the state this table exists to make
+visible rather than to hide.
+
+`astro-ui-m8` `1.4.2` → **`1.5.0`, published.** This closes the constraint
+recorded above under the 2026-08-24 ledger, that "`astro-media-m8` cannot
+produce a valid registry-backed 1.5.0 lock until that release exists". It now
+exists.
+
+`astro-media-m8`'s **working tree** row was stale, not behind: it read
+`1.2.0`, while `package.json` has been `2.0.0`. Corrected by direct read
+(`(Get-Content astro-media-m8/package.json -Raw | ConvertFrom-Json).version`
+→ `2.0.0`) and confirmed by the resolved install tree, which reports
+`@mano8/astro-media-m8@2.0.0`. Published still stops at `1.1.1`, so the row
+stays pending, and the gap is now a **major**.
+
+That last point does **not** trigger the converse rule recorded below, and the
+reason is worth stating because it is easy to get wrong: `fa-ui-m8/app`
+consumes the three business plugins as path links
+(`"@mano8/astro-media-m8": "file:../../astro-media-m8"`, likewise prompt and
+reparto), not as registry ranges. A `file:` link has no semver range to
+exclude a major, so the host tracks those three working trees directly and
+needs no repoint when they publish. Only `@mano8/astro-auth-m8` (`^2.4.0`) and
+`@mano8/astro-ui-m8` (`^1.5.0`) are registry-ranged in the host, and both are
+now published at their floor. The converse rule still binds any *external*
+consumer of these packages, and it bound `fa-ui-m8` itself for
+`astro-prompt-m8@2.0.0` when that dependency was registry-ranged.
 
 Read the published column with:
 

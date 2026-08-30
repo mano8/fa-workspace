@@ -470,6 +470,32 @@ Gate: 1158 tests at 100% coverage, markdownlint clean. One incidental change:
 repo's own `.gitattributes` (`* text=auto eol=lf`); editing the version line
 normalized it to LF, so the whole five-line file shows as changed.
 
+**The re-pin was written ahead of the image, on operator instruction
+(2026-08-30).** All **ten** live pin sites moved `2.0.0` → `2.1.0`:
+`media-service-m8` `aeb1130` (five — `hardened_media_m8/docker-compose.yml`
+×2, that stack's README ×2, the `docker_compose/README.md` stacks index) and
+`fa-ui-m8` `525e4ab` on `pre-alpha` (five — `dev_ui_m8` ×2, `hardened_ui_m8`
+×1, and `compose_policy_tests/test_compose_image_pins.py` in both its docstring
+and its `_PREVIOUSLY_LATEST` map, which must move in the same commit or that
+stack's gate goes red).
+
+⚠️ **This inverts the rule the rest of this file records.** `A29`/`B5`/`B17`
+require confirming `docker pull` before writing any pin, and §0.2 of the
+consumer-alignment plan states "publishing precedes pinning, always". Here the
+pins were written first, deliberately, so
+`docker pull tepochtli/media-service-m8:2.1.0` fails and **all three stacks —
+`hardened_media_m8`, `dev_ui_m8`, `hardened_ui_m8` — are unrunnable until the
+`v2.1.0` GitHub Release is published.** The window is the cost of pinning
+ahead; it closes on publish and nothing else needs to change afterwards.
+Recorded because a future reader comparing this to `B17`'s pull-confirmed
+re-pins should see the difference was a decision, not an omission.
+
+`dev_media_m8` carries no media-service pin (it builds from local source), and
+the `fa-auth-m8` `2.0.3` / `media-worker-m8` `0.4.1` pins are untouched — both
+published, neither moved by this release. Gates: `test_compose_image_pins.py`
+7 passed in `media-service-m8`, the full `compose_policy_tests` suite 171
+passed in `fa-ui-m8`.
+
 `astro-media-m8` `feat/eslint-10-flat-config` (`8b40b83` then `e13322b`): the
 `[Unreleased]` fold, then the `1.2.0` fold and the corrected major
 justification. Gate: typecheck, lint and markdownlint clean.

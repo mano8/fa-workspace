@@ -52,7 +52,7 @@ one-bump-per-unpublished-release rule.
 | `media-sdk-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-service-m8` | 1.0.0 | 2.0.0 | pending |
 | `media-worker-m8` | 0.3.0 | 0.4.0 | pending |
-| `prompt-engine-m8` | 2.0.0 | 2.0.0 | — published |
+| `prompt-engine-m8` | 2.0.0 | 2.1.0 | pending |
 | `reparto-docente-m8` | 2.0.0 | 2.0.0 | — published |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.0 | 1.5.0 | — published |
@@ -241,6 +241,45 @@ now published at their floor. The converse rule still binds any *external*
 consumer of these packages, and it bound `fa-ui-m8` itself for
 `astro-prompt-m8@2.0.0` when that dependency was registry-ranged.
 
+### The prompt pair moves the contract axis (2026-08-30, pending)
+
+`prompt-engine-m8`'s working-tree row moves `2.0.0` → **`2.1.0`**, and the
+contract row moves with it: `prompt-engine-m8@2.0.0` → **`@2.1.0`**, with
+`CONTRACT_RANGE` and `astro-prompt-m8`'s client gate both raised to
+`>=2.1.0 <3.0.0`. Prepared under remediation `B20` (service) and `B6`
+(client); neither is published yet, so both rows read **pending**.
+
+**The service row had been reading `— published` while carrying unreleased
+routes.** `A-C8` added `GET /prompt-block/export/` and
+`GET /prompt-template/export/` after `2.0.0` shipped, and wrote its changelog
+entries into the **already-published** `## [2.0.0]` section of *both*
+repositories while leaving `[Unreleased]` empty and neither version bumped —
+finding `G14`. So the changelog of a shipped artifact claimed routes that
+artifact does not serve, and this table said there was nothing pending. Both
+halves are corrected: the entries moved to `2.1.0` sections and the service
+version follows. `astro-prompt-m8` was already at `2.1.0` from the `W7.7`
+auth wave, but its release note read "no published API surface changes" while
+the export wrappers shipped inside it; that summary is corrected too.
+
+**Why the range moves here when `media-service-m8`'s did not.** The precedent
+recorded above is that a contract range names who the service still serves —
+media went `1.0` → `1.1` and kept `>=1.0.0 <2.0.0`, because 1.0 clients are
+still served. The prompt pair is the documented exception, and the difference
+is in the *client*: `astro-media-m8` carries a tolerant
+`MEDIA_SERVICE_M8_COMPATIBLE_CONTRACTS` set (`{1.0, 1.1}`), so a 1.0 client
+genuinely can drive a 1.1 service. `astro-prompt-m8` compares the contract
+axis by **exact string equality**, so a published `astro-prompt-m8@2.0.0`
+refuses a `2.1.0` service on its own side no matter what the service
+declares. Declaring `>=2.0.0` would advertise support nothing can take up.
+
+⚠️ **Consequence, recorded rather than smoothed over:** the pair must be
+released and installed **together**. A `2.1.0` client refuses a `2.0.0`
+service — which is the point, since it calls routes `2.0.0` does not serve —
+and a published `2.0.0` client refuses a `2.1.0` service. `fa-ui-m8` consumes
+this plugin as a `file:` link, so the host tracks both working trees directly;
+the constraint binds external consumers and any stack pinning the published
+image.
+
 Read the published column with:
 
 ```powershell
@@ -261,7 +300,7 @@ surface moved that contract to `1.1`; its compatibility range remains
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
 | `media-service-m8` | 2.0.0 | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
-| `prompt-engine-m8` | 2.0.0 | `prompt-engine-m8@2.0.0` | `astro-prompt-m8` `>=2.0.0 <3.0.0` |
+| `prompt-engine-m8` | 2.1.0 (pending) | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.0.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
 Each plugin's gate is bounded on the **service** version and must admit its

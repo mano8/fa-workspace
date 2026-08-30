@@ -36,7 +36,7 @@ release state.
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.7.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.0.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.1.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -59,7 +59,7 @@ one-bump-per-unpublished-release rule.
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
 | `security-tests-m8` | 0.6.0 | 0.6.0 | — published |
 | `media-sdk-m8` | 0.7.0 | 0.7.0 | — published |
-| `media-service-m8` | 2.0.0 | 2.0.0 | — published |
+| `media-service-m8` | 2.0.0 | 2.1.0 | pending |
 | `media-worker-m8` | 0.4.1 | 0.4.1 | — published |
 | `prompt-engine-m8` | 2.1.0 | 2.1.0 | — published |
 | `reparto-docente-m8` | 2.1.0 | 2.1.0 | — published |
@@ -372,23 +372,39 @@ longer: both of those were **caught by a changelog/version-parity gate**, and
 `astro-media-m8` has no such gate, so nothing was red and nothing announced it.
 Adding one is named follow-on work, not done here.
 
-**How the split arose, since it bears on the number.** `ac96cbf feat(media): add
-category page and library upload dialog` moved `package.json` `1.2.0` → `2.0.0`
-inside an ordinary feature commit, one-line message, no changelog section and no
-stated reason for a **major**. The fold therefore had to supply a justification
-after the fact, and the defensible one is the install contract: the required
-`@mano8/astro-auth-m8` peer moves `^2.2.0` → `^2.4.1`, so a consumer cannot take
-this release without also moving its auth plugin. No export of this package is
-removed or renamed.
+**How the split arose, and what actually makes it a major.** `ac96cbf
+feat(media): add category page and library upload dialog` moved `package.json`
+`1.2.0` → `2.0.0` inside an ordinary feature commit, one-line message, no
+changelog section and no stated reason. The fold had to supply the reason after
+the fact, and the **governing** one is the backend repoint, not the auth peer:
+`e3e3b72 fix(compat): admit media-service-m8 2.x service versions` moved
+`MEDIA_SERVICE_M8_MIN_SERVICE_VERSION` `1.0.0` → `2.0.0` and the exclusive
+maximum `2.0.0` → `3.0.0`, so a pre-tier `1.x` service is **no longer
+admitted** — it cannot serve the role-tier authorization this plugin's guards
+assume, and a consumer pointed at one is refused at preflight. The auth
+generation jump (`^1.5.0` → `^2.4.1`) is the second, weaker reason. No export
+is removed or renamed; both breaking changes are to what the package requires
+around it.
 
-⚠️ **Open, an operator decision rather than a matrix fact:** `1.2.0` was
-**never published either** — `origin`'s newest tag is `v1.1.1`, so there are now
-two unpublished numbered sections (`1.2.0` and `2.0.0`) against one unpublished
-release. A strict reading of the Wave 6c one-bump-per-unpublished-release rule
-folds `1.2.0` into `2.0.0` as well. That was **not** done here: it merges two
-written, dated sections rather than an empty `[Unreleased]` into one, which is a
-content decision of the kind the operator has settled before (the
-`3.0.0`/`2.0.0` split recorded under *Convergence*, and reparto decision 6).
+**This package's major tracks the supported `media-service-m8` *service-version
+line*, not its contract** — the distinction matters here and nowhere else in the
+fleet. The sibling plugins state that their major tracks the backend **API
+contract**; for `astro-media-m8` that would be wrong, because its compatibility
+helper admits several contracts (`{1.0, 1.1}`) against one service line, so the
+contract can move without moving the major. That policy note is now carried in
+the repository's own changelog header rather than only here.
+
+~~⚠️ **Open, an operator decision rather than a matrix fact:** `1.2.0` was
+**never published either** … A strict reading of the Wave 6c
+one-bump-per-unpublished-release rule folds `1.2.0` into `2.0.0` as well.~~ ✅
+**Settled and applied 2026-08-30 (`e13322b`).** The operator ruled the strict
+reading. `1.2.0` and `2.0.0` are one unpublished release — `origin`'s newest tag
+is `v1.1.1` — and are folded under `## [2.0.0]`. The decisive fact is that
+`1.2.0` **was numbered a minor while carrying the backend repoint above**, so
+folding it was a correction rather than tidying: the merged section takes the
+major the work actually earns. All ten entry bullets from both sections are
+preserved. This follows the same operator practice as the `3.0.0`/`2.0.0` split
+under *Convergence* and reparto decision 6.
 
 The pair's pins were checked in the same pass and are clean: `astro-media-m8`
 names `@mano8/astro-auth-m8@^2.4.1` (peer and dev) and
@@ -424,16 +440,39 @@ and both stacks' `media-worker-m8` `0.4.0` → `0.4.1` re-pin (`693a577`) for
 the same CVE. Gate: 16 tests green including
 `tests/test_changelog_version_parity.py`, markdownlint clean.
 
-⚠️ **A `2.1.0` bump was requested for `media-service-m8` and deliberately not
-made.** The repository had **zero** commits since `v2.0.0` and a clean tree, so
-`2.1.0` would have been an empty release. The operator ruled on 2026-08-30 to
-amend the published `## [2.0.0]` section instead, since both undocumented
-commits are already inside that tag. The row therefore stays
-`2.0.0 / 2.0.0 / — published`. Recorded because "the version did not move" is
-exactly the kind of decision this file exists to make findable later.
+### `media-service-m8` 2.0.0 → 2.1.0 (2026-08-30, pending)
 
-`astro-media-m8` `feat/eslint-10-flat-config` (`8b40b83`, pushed): the fold
-described above. Gate: typecheck and lint clean.
+`71297bb`, on the same branch. The repository had **zero** commits since
+`v2.0.0` and a clean tree, so the first ruling was to amend the published
+`## [2.0.0]` section and leave the version alone. The operator then reversed
+that: a repository change takes a version rather than editing a published tag's
+notes silently. Both rulings are recorded because the reversal is the rule —
+**this fleet does not edit shipped release notes without releasing the edit.**
+
+**No runtime change.** No dependency floor, lock, image pin, contract or served
+response moves; `GET /media/meta` answers what `2.0.0` answered apart from
+`version`. The two recovered entries stay under `## [2.0.0]`, where they
+factually belong — both shipped inside that tag — and `## [2.1.0]` records that
+the correction was made. This is the second release in the fleet whose entire
+justification is not a code change; `astro-auth-m8@2.4.0` was the first, and
+set the minor-not-patch precedent followed here.
+
+**Neither contract constant moves.** `CONTRACT_VERSION` stays `1.1` and
+`CONTRACT_RANGE` stays `>=2.0.0 <3.0.0`. Since that range is the
+**service-version** range, `2.1.0` is inside it and the service keeps
+advertising a range that admits itself — the defect `1256b99` fixed does not
+recur. **`astro-media-m8` needs no release:** its gate is `>=2.0.0 <3.0.0` on
+the service version and already admits `2.1.0`. Same shape as the
+`reparto-docente-m8` `2.1.0` precedent recorded above.
+
+Gate: 1158 tests at 100% coverage, markdownlint clean. One incidental change:
+`media_service/__init__.py`'s blob had been committed with CRLF against the
+repo's own `.gitattributes` (`* text=auto eol=lf`); editing the version line
+normalized it to LF, so the whole five-line file shows as changed.
+
+`astro-media-m8` `feat/eslint-10-flat-config` (`8b40b83` then `e13322b`): the
+`[Unreleased]` fold, then the `1.2.0` fold and the corrected major
+justification. Gate: typecheck, lint and markdownlint clean.
 
 Read the published column with:
 
@@ -472,7 +511,7 @@ versions coincide, so one range brackets both.
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
-| `media-service-m8` | 2.0.0 | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
+| `media-service-m8` | 2.1.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
 | `prompt-engine-m8` | 2.1.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.1.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 

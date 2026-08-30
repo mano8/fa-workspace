@@ -14,20 +14,29 @@ copy.
 
 ## Map (measured 2026-08-16 against on-disk source, whole fleet re-read)
 
-Three rows of this map were corrected after that measurement from targeted
+Rows of this map have been corrected after that measurement from targeted
 source re-reads rather than a fleet re-measurement: `astro-prompt-m8` `1.2.0`
 → `2.0.0` (2026-08-23), then `astro-ui-m8` `1.4.2` → `1.5.0` and
-`media-sdk-m8` `0.6.0` → `0.7.0` (2026-08-24). Every other value here still
-dates from 2026-08-16. The published table below records the independently
-verified release state.
+`media-sdk-m8` `0.6.0` → `0.7.0` (2026-08-24), then on 2026-08-30
+`astro-auth-m8` `2.4.0` → `2.4.1`, `astro-ui-m8` `1.5.0` → `1.5.1` and
+`media-worker-m8` `0.4.0` → `0.4.1` (see *The media pair re-measured*).
+
+`prompt-engine-m8` `2.0.0` → `2.1.0` was corrected in the same pass for a
+different reason: this table had been **contradicting the two tables below it**,
+which already carried `2.1.0 (pending)`. A row can go stale against source; a
+row that disagrees with its own file is a transcription miss, and it survived
+because the 2026-08-30 prompt-pair edit moved the published and contract tables
+without moving the mechanism map. Every other value here still dates from
+2026-08-16. The published table below records the independently verified
+release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.4.0 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.0 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.4.1 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.7.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.0.0 · `media-worker-m8` (`worker`) 0.4.0 · `prompt-engine-m8` (`promt_engine_service`) 2.0.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.0.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -50,16 +59,16 @@ one-bump-per-unpublished-release rule.
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
 | `security-tests-m8` | 0.6.0 | 0.6.0 | — published |
 | `media-sdk-m8` | 0.7.0 | 0.7.0 | — published |
-| `media-service-m8` | 1.0.0 | 2.0.0 | pending |
-| `media-worker-m8` | 0.3.0 | 0.4.0 | pending |
-| `prompt-engine-m8` | 2.0.0 | 2.1.0 | pending |
-| `reparto-docente-m8` | 2.0.0 | 2.1.0 | pending |
+| `media-service-m8` | 2.0.0 | 2.0.0 | — published |
+| `media-worker-m8` | 0.4.1 | 0.4.1 | — published |
+| `prompt-engine-m8` | 2.1.0 | 2.1.0 | — published |
+| `reparto-docente-m8` | 2.1.0 | 2.1.0 | — published |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
-| `astro-ui-m8` | 1.5.0 | 1.5.0 | — published |
-| `astro-auth-m8` | 2.4.0 | 2.4.0 | — published |
+| `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
+| `astro-auth-m8` | 2.4.1 | 2.4.1 | — published |
 | `astro-media-m8` | 1.1.1 | 2.0.0 | pending |
-| `astro-prompt-m8` | 2.0.0 | 2.1.0 | pending |
-| `astro-reparto-m8` | 1.0.0 | 2.0.0 | pending |
+| `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
+| `astro-reparto-m8` | 2.0.0 | 2.0.0 | — published |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
 than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and
@@ -123,9 +132,11 @@ hierarchy is deleted in favour of the `@mano8/astro-auth-m8/authorization`
 import the widened `C12` now permits. A minor, not a major: this repository's
 own rule is that its major tracks the supported `prompt-engine-m8` **API
 contract**, which does not move here, and no published name, signature or
-answer changes. Pending until it is tagged, so the Wave 6c rule applies to it
-— further pre-tag work belongs in `## [2.1.0]` rather than in a new section.
-Publication is the human's act.
+answer changes. ~~Pending until it is tagged, so the Wave 6c rule applies to it
+— further pre-tag work belongs in `## [2.1.0]` rather than in a new section.~~
+Publication is the human's act, and it has happened: `astro-prompt-m8@2.1.0` is
+tagged on `origin` (`092cf70da0b3`), so the Wave 6c ride is over and further
+work here takes a new version rather than joining `## [2.1.0]`.
 
 The rule above — a consumer may only pin a published version — has a
 converse this release made visible: a consumer does not pick up a **major**
@@ -212,10 +223,12 @@ row you came to change is not a matrix.
 `e523f40da0cc04ee211add88a2c3d3267b1587f0 refs/tags/v2.0.0`. This is the
 service half of the release pair remediation `W7.3` prepared and decision 6
 settled (the breaking work rides the never-published `2.0.0` rather than
-taking a `3.0.0`). **The client half is still pending** — `astro-reparto-m8`
+taking a `3.0.0`). ~~**The client half is still pending** — `astro-reparto-m8`
 remains published `1.0.0` against a working tree of `2.0.0` — so the pair is
 currently half-released, which is exactly the state this table exists to make
-visible rather than to hide.
+visible rather than to hide.~~ ✅ **Closed 2026-08-30: `astro-reparto-m8@2.0.0`
+is published** (`refs/tags/v2.0.0` on `origin`, `01144c558a3f`). The reparto
+pair is whole.
 
 `astro-ui-m8` `1.4.2` → **`1.5.0`, published.** This closes the constraint
 recorded above under the 2026-08-24 ledger, that "`astro-media-m8` cannot
@@ -235,8 +248,8 @@ consumes the three business plugins as path links
 (`"@mano8/astro-media-m8": "file:../../astro-media-m8"`, likewise prompt and
 reparto), not as registry ranges. A `file:` link has no semver range to
 exclude a major, so the host tracks those three working trees directly and
-needs no repoint when they publish. Only `@mano8/astro-auth-m8` (`^2.4.0`) and
-`@mano8/astro-ui-m8` (`^1.5.0`) are registry-ranged in the host, and both are
+needs no repoint when they publish. Only `@mano8/astro-auth-m8` (`^2.4.1`) and
+`@mano8/astro-ui-m8` (`^1.5.1`) are registry-ranged in the host, and both are
 now published at their floor. The converse rule still binds any *external*
 consumer of these packages, and it bound `fa-ui-m8` itself for
 `astro-prompt-m8@2.0.0` when that dependency was registry-ranged.
@@ -266,7 +279,11 @@ unchanged.
 contract row moves with it: `prompt-engine-m8@2.0.0` → **`@2.1.0`**, with
 `CONTRACT_RANGE` and `astro-prompt-m8`'s client gate both raised to
 `>=2.1.0 <3.0.0`. Prepared under remediation `B20` (service) and `B6`
-(client); neither is published yet, so both rows read **pending**.
+(client); neither was published when that note was written, so both rows read
+**pending**. ✅ **Both published 2026-08-30** — `refs/tags/v2.1.0` is on
+`origin` for each (`ae95f4fedf45`, `092cf70da0b3`), so the rows now read
+`— published` and the release-together constraint below is satisfied rather
+than outstanding.
 
 **The service row had been reading `— published` while carrying unreleased
 routes.** `A-C8` added `GET /prompt-block/export/` and
@@ -299,6 +316,125 @@ this plugin as a `file:` link, so the host tracks both working trees directly;
 the constraint binds external consumers and any stack pinning the published
 image.
 
+### The media pair re-measured (2026-08-30)
+
+Measured on request against on-disk source and `git ls-remote --tags origin`,
+because the pair's rows had been carried forward since the 2026-08-16 sweep
+without being re-read. **Four rows moved, and the pair is no longer
+half-released in the direction this file recorded.**
+
+`media-service-m8` `1.0.0` → **`2.0.0`, published.** Evidence is the tag on
+`origin`: `git ls-remote --tags origin` lists
+`693a577d6e7bc7bc1356427b2afc4c338146356e refs/tags/v2.0.0`, contained in
+`origin/main`. The row had read published `1.0.0` / working tree `2.0.0` /
+pending; in fact the working tree **is** the tag — `git rev-list --count
+v2.0.0..HEAD` answers `0`, `CHANGELOG.md` opens on
+`## [2.0.0] — 2026-08-26` with no `[Unreleased]` section, and
+`media_service/__init__.py` reads `2.0.0`. Nothing was pending. The service half
+of the media pair has been fully released since 2026-08-26 and this table said
+it was not.
+
+`media-worker-m8` `0.3.0`/`0.4.0` → **`0.4.1`/`0.4.1`, published.** Both halves
+of the row were stale. `refs/tags/v0.4.1` is on `origin` and
+`worker/__init__.py` reads `0.4.1`. The bump is visible in the media-service
+tag's own tip commit, `chore(compose): re-pin media-worker-m8 0.4.0 -> 0.4.1
+(B22)` — the compose pin moved while this table still named `0.3.0` published.
+
+`astro-media-m8` keeps published `1.1.1` / working tree `2.0.0` / **pending** —
+the one row of the four that was already right. `refs/tags/v1.1.1` is still the
+newest tag on `origin`; `package.json` and `package-lock.json` both read
+`2.0.0`, so the repo is internally self-consistent. The gap remains a **major**.
+
+**Consequence for the pair, restated because it has inverted.** An earlier
+2026-08-30 note described the *reparto* pair as half-released; that pair has
+since closed, and the media pair now holds the shape alone — more sharply, in
+fact: the service is published at `2.0.0` while the client that targets it is
+published only at `1.1.1`. After this pass `astro-media-m8` is the fleet's
+**only** library row still pending (`fa-ui-m8` aside, which is a host and has
+never published). A consumer installing `@mano8/astro-media-m8`
+from the registry gets a `1.1.1` client whose service gate predates the role
+tiers, pointed at a `2.0.0` service that enforces them. The working-tree client
+is correct — `MEDIA_SERVICE_M8_MIN_SERVICE_VERSION = "2.0.0"` — but it is not
+published. `fa-ui-m8` is insulated, since it consumes this plugin as a `file:`
+link and tracks the working tree directly; any external consumer is not.
+Publishing `astro-media-m8@2.0.0` is the human's act and closes it.
+
+~~⚠️ **A version-source split inside `astro-media-m8`.**
+`package.json`/`package-lock.json` read `2.0.0`, but `CHANGELOG.md`'s newest
+released section is `## [1.2.0] - 2026-08-25` — there is no `## [2.0.0]`
+section at all, and the work sits in a non-empty `## [Unreleased]`.~~ ✅
+**Closed 2026-08-30.** The `[Unreleased]` body was folded into a new
+`## [2.0.0] - 2026-08-30` section and `## [Unreleased]` left empty, the
+convention `astro-prompt-m8` and `astro-auth-m8` already follow. This was the
+same defect class this file records for those two (`astro-prompt-m8@2.1.0` and
+`astro-auth-m8@2.4.0`), with one difference that explains why it went unseen for
+longer: both of those were **caught by a changelog/version-parity gate**, and
+`astro-media-m8` has no such gate, so nothing was red and nothing announced it.
+Adding one is named follow-on work, not done here.
+
+**How the split arose, since it bears on the number.** `ac96cbf feat(media): add
+category page and library upload dialog` moved `package.json` `1.2.0` → `2.0.0`
+inside an ordinary feature commit, one-line message, no changelog section and no
+stated reason for a **major**. The fold therefore had to supply a justification
+after the fact, and the defensible one is the install contract: the required
+`@mano8/astro-auth-m8` peer moves `^2.2.0` → `^2.4.1`, so a consumer cannot take
+this release without also moving its auth plugin. No export of this package is
+removed or renamed.
+
+⚠️ **Open, an operator decision rather than a matrix fact:** `1.2.0` was
+**never published either** — `origin`'s newest tag is `v1.1.1`, so there are now
+two unpublished numbered sections (`1.2.0` and `2.0.0`) against one unpublished
+release. A strict reading of the Wave 6c one-bump-per-unpublished-release rule
+folds `1.2.0` into `2.0.0` as well. That was **not** done here: it merges two
+written, dated sections rather than an empty `[Unreleased]` into one, which is a
+content decision of the kind the operator has settled before (the
+`3.0.0`/`2.0.0` split recorded under *Convergence*, and reparto decision 6).
+
+The pair's pins were checked in the same pass and are clean: `astro-media-m8`
+names `@mano8/astro-auth-m8@^2.4.1` (peer and dev) and
+`@mano8/astro-ui-m8@^1.5.1`, its lockfile resolves
+`astro-auth-m8-2.4.1.tgz` and `astro-ui-m8-1.5.1.tgz`, and both of those are
+published (`refs/tags/v2.4.1`, `refs/tags/v1.5.1`). No pin here is ahead of the
+registry. The contract table's media row was verified against source and needed
+no change: package `2.0.0`, contract `media-service-m8@1.1`
+(`CONTRACT_VERSION = "1.1"`), client gate `>=2.0.0 <3.0.0`, and
+`package.json`'s `mediaServiceM8` metadata block agrees with
+`compatibility.ts` on all three. `CONTRACT_RANGE` was **wrongly reported as a
+defect** in the first pass of this section and is not one — see *Service version
+is not contract version* below for the corrected reading.
+
+**Two rows outside the media pair moved in the same read** and are corrected
+here rather than left for a later sweep, since both are `astro-media-m8`'s own
+pins: `astro-auth-m8` `2.4.0` → `2.4.1` and `astro-ui-m8` `1.5.0` → `1.5.1`,
+each published on `origin` and each with working tree equal to the tag. The
+`^2.4.0`/`^1.5.0` figures in the host paragraph above were updated to match.
+
+#### What this pass changed in the repositories
+
+The matrix corrections above are documentation. Two repository commits were
+made alongside them, both changelog-only — no source, manifest, lockfile or
+**version** moved in either.
+
+`media-service-m8` `docs/record-shipped-2-0-0-changes` (`7d7aa3c`, branched
+from `main`, pushed): two commits contained in the `v2.0.0` tag had no
+changelog entry, so the published notes understated the tag. The OpenSSL apt
+pin raise `3.5.6-1~deb13u2` → `3.5.7-1~deb13u2` for CVE-2026-14456
+(`aeee519`) — 3 HIGH Trivy findings that **blocked the 2.0.0 publish run** —
+and both stacks' `media-worker-m8` `0.4.0` → `0.4.1` re-pin (`693a577`) for
+the same CVE. Gate: 16 tests green including
+`tests/test_changelog_version_parity.py`, markdownlint clean.
+
+⚠️ **A `2.1.0` bump was requested for `media-service-m8` and deliberately not
+made.** The repository had **zero** commits since `v2.0.0` and a clean tree, so
+`2.1.0` would have been an empty release. The operator ruled on 2026-08-30 to
+amend the published `## [2.0.0]` section instead, since both undocumented
+commits are already inside that tag. The row therefore stays
+`2.0.0 / 2.0.0 / — published`. Recorded because "the version did not move" is
+exactly the kind of decision this file exists to make findable later.
+
+`astro-media-m8` `feat/eslint-10-flat-config` (`8b40b83`, pushed): the fold
+described above. Gate: typecheck and lint clean.
+
 Read the published column with:
 
 ```powershell
@@ -312,15 +448,33 @@ Four repos carry a second, independent version: the HTTP **contract** version,
 which does **not** move merely because the package version does.
 `media-service-m8` is the worked example — its package went `1.0.0` → `2.0.0`
 for the role tiers while `CONTRACT_VERSION` stayed `1.0`. The later additive UX
-surface moved that contract to `1.1`; its compatibility range remains
-`>=1.0.0 <2.0.0` because 1.0 clients are still served.
+surface moved that contract to `1.1`, and 1.0 clients are still served —
+`astro-media-m8` carries the tolerant `{1.0, 1.1}` set recorded below.
+
+**`CONTRACT_RANGE` is a *service-version* range, not a contract-version
+range.** This file claimed `>=1.0.0 <2.0.0` until 2026-08-30 and was wrong on
+both the value and the meaning; the source reads `>=2.0.0 <3.0.0`. The field is
+served as `contract.range` by `GET {prefix}/meta`, and `media-service-m8`'s own
+history uses it that way twice — `0.0.9` moved it to `>=0.0.9 <0.1.0` and
+`1.0.0` to `>=1.0.0 <2.0.0`, each tracking the **package** version. It was left
+behind by the `2.0.0` major, so the service briefly advertised a supported range
+excluding its own version; `1256b99 fix(meta): bump CONTRACT_RANGE to the 2.x
+service line` corrected it before the `2.0.0` tag, deliberately matching
+`astro-media-m8`'s `MEDIA_SERVICE_M8_SERVICE_VERSION_RANGE`.
+`tests/test_meta.py` asserts the served block as a literal, so the value cannot
+drift silently.
+
+Read the field's name with care: `fastapi-m8/fastapi_m8/config.py` describes it
+as "Compatible **contract** semver range", which is what misled this file. The
+two sibling services are no evidence either way — their contract and package
+versions coincide, so one range brackets both.
 
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
 | `media-service-m8` | 2.0.0 | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
-| `prompt-engine-m8` | 2.1.0 (pending) | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
-| `reparto-docente-m8` | 2.1.0 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
+| `prompt-engine-m8` | 2.1.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
+| `reparto-docente-m8` | 2.1.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
 Each plugin's gate is bounded on the **service** version and must admit its
 backend's package version; each also repeats the pair as declarative

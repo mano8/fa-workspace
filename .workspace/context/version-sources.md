@@ -36,7 +36,7 @@ release state.
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.7.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.1.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.1.1 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -59,7 +59,7 @@ one-bump-per-unpublished-release rule.
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
 | `security-tests-m8` | 0.6.0 | 0.6.0 | — published |
 | `media-sdk-m8` | 0.7.0 | 0.7.0 | — published |
-| `media-service-m8` | 2.0.0 | 2.1.0 | pending |
+| `media-service-m8` | 2.1.0 | 2.1.1 | pending |
 | `media-worker-m8` | 0.4.1 | 0.4.1 | — published |
 | `prompt-engine-m8` | 2.1.0 | 2.1.0 | — published |
 | `reparto-docente-m8` | 2.1.0 | 2.1.0 | — published |
@@ -500,6 +500,91 @@ passed in `fa-ui-m8`.
 `[Unreleased]` fold, then the `1.2.0` fold and the corrected major
 justification. Gate: typecheck, lint and markdownlint clean.
 
+### `media-service-m8` 2.1.0 → 2.1.1 and the media pair re-measured (2026-09-01)
+
+**`2.1.0` is published.** `git ls-remote --tags origin` now answers
+`903f8a3 refs/tags/v2.1.0`, and that SHA is `origin/main` — the merge of
+`docs/record-shipped-2-0-0-changes` (PR #17). So the ordering inversion recorded
+immediately above has closed on its own terms: the ten pin sites that were
+written ahead of the image are now pins on a released version, and all three
+stacks are runnable again with no further change. The row moves published
+`2.0.0` → `2.1.0`, and the Wave 6c ride for this repository is over —
+further work takes a number rather than joining `## [2.1.0]`.
+
+**`media-service-m8` `2.1.0` → `2.1.1`, pending.** `fde8fc0` on
+`fix/object-detail-category-projection`, branched from `origin/main` at
+`903f8a3` and pushed. `GET /media/v1/objects/{id}` answered `categories: []` for
+an object that *was* filed — the detail path validated the database model
+directly while the list and both write paths passed their filing through
+`update=`. `MediaObject` names the relationship `user_categories` precisely so
+that `model_validate` cannot lazy-load it per row, so the unenriched call could
+only ever produce the schema's empty default. It now uses
+`category_refs_by_object`, the list path's own helper, chosen over
+`assigned_category_refs` because it takes `UserModel | None` and this route's
+principal is `OptionalPrincipal`.
+
+**A patch, and the first entry in this file to take one.** The field was already
+declared, already documented and already populated on every other surface, so no
+served shape changes — which is exactly what separates it from the two
+minor-not-patch precedents above (`astro-auth-m8@2.4.0`, `media-service-m8@2.1.0`),
+both of which had no code change at all and needed a number only to carry a
+notes correction. **Neither contract constant moves:** `CONTRACT_VERSION` stays
+`1.1`, `CONTRACT_RANGE` stays `>=2.0.0 <3.0.0`, and `2.1.1` is inside it.
+
+**The compose pins deliberately stay at `2.1.0`.** A consumer may only pin a
+published version and no `2.1.1` image exists, so this release does **not**
+repeat the pin-ahead inversion — the rule is followed here, not inverted. All
+ten sites are correct as they stand and need no edit until `v2.1.1` is
+published.
+
+**`astro-media-m8` needs no release, and takes no number.** `e8ee005` on
+`feat/eslint-10-flat-config`, pushed. Its `2.0.0` is still unpublished
+(`origin`'s newest tag remains `v1.1.1`), so this work rides it under the Wave
+6c rule — the opposite side of the ruling applied to the service in the same
+pass, and worth reading as a pair: the rule turns on whether a tag exists, not
+on how much changed. Three tree-view defects (the category pane clipped a deep
+hierarchy with no horizontal scroll, the child indent was the largest single
+contributor to that width, and every branch opened expanded) plus two contract
+gaps.
+
+**The contract axis was measured on both sides, not assumed.** Every Zod schema
+and every call site in `astro-media-m8` was diffed against `media-service-m8`'s
+generated OpenAPI. All 40 client calls resolve to a real endpoint, every
+response model pairs with the right schema, and the object-list query parameters
+match one for one. Three findings, all client-side:
+
+1. `UploadCompleteRequestSchema` omitted `category_ids`, which the served
+   endpoint accepts and which the `.strict()` schema would therefore have
+   rejected client-side. Added.
+2. `astro-media-m8/REPOSITORY_CONTEXT.md` recorded the range as
+   `>=1.0.0 <2.0.0` — **the same `CONTRACT_RANGE` misreading this file itself
+   corrected on 2026-08-30**, surviving in a second repository after the first
+   was fixed. It is a service-version range, not a range of contract versions,
+   and the value also predated the 2.x repoint, so it excluded every service the
+   package admits. Corrected in place, with the retraction written into the line
+   rather than silently replacing it — the misreading has now recurred once and
+   should be expected to recur again.
+3. `MEDIA_SERVICE_M8_TESTED_SERVICE_VERSION` and
+   `mediaServiceM8.testedServiceVersion` were stale at `2.0.0`; both move to
+   `2.1.1`, the service the client was actually exercised against. Written ahead
+   of that tag and recorded as such, but **not** the same hazard as a pin-ahead:
+   the constant resolves nothing and installs nothing, and the gate is the
+   range, which admits the published `2.1.0` unchanged.
+
+**What did *not* move, and why.** The service's `OpenAPI` declares `slug`
+required on `CategoryCreate`/`CategoryUpdate` while the client sends only
+`name`, which reads as a break and is not one: `CategoryGenerators` carries a
+`model_validator(mode="before")` that slugifies `name`, so the field is filled
+before validation. The schema is misleading, the runtime is correct, and the
+client is right to omit it — recorded here so the next audit does not re-report
+it. Likewise `apply_scan_result` returns an unenriched `MediaObjectPublic`, but
+it is `include_in_schema=False`, has no principal to scope a category query by,
+and answers the worker rather than a UI.
+
+Gates: `media-service-m8` 1159 tests, ruff and mypy clean over 80 source files;
+`astro-media-m8` 237 tests, typecheck, `eslint --max-warnings 0`, 9 fleet gates
+and the registry-drift gate all green.
+
 Read the published column with:
 
 ```powershell
@@ -537,7 +622,7 @@ versions coincide, so one range brackets both.
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
-| `media-service-m8` | 2.1.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
+| `media-service-m8` | 2.1.1 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
 | `prompt-engine-m8` | 2.1.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.1.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 

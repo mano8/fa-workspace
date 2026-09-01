@@ -531,11 +531,39 @@ both of which had no code change at all and needed a number only to carry a
 notes correction. **Neither contract constant moves:** `CONTRACT_VERSION` stays
 `1.1`, `CONTRACT_RANGE` stays `>=2.0.0 <3.0.0`, and `2.1.1` is inside it.
 
-**The compose pins deliberately stay at `2.1.0`.** A consumer may only pin a
-published version and no `2.1.1` image exists, so this release does **not**
-repeat the pin-ahead inversion — the rule is followed here, not inverted. All
-ten sites are correct as they stand and need no edit until `v2.1.1` is
-published.
+**All ten pin sites moved `2.1.0` → `2.1.1`, ahead of the image, on operator
+instruction (2026-09-01).** `media-service-m8` `546c5b4` on
+`chore/pin-media-service-2.1.1` (five — `hardened_media_m8/docker-compose.yml`
+×2, that stack's README ×2, the `docker_compose/README.md` stacks index; PR #19)
+and `fa-ui-m8` `5aa7738` on `pre-alpha`, pushed (five — `dev_ui_m8` ×2,
+`hardened_ui_m8` ×1, and `compose_policy_tests/test_compose_image_pins.py` in
+both its docstring and its `_PREVIOUSLY_LATEST` map, which must move in the same
+commit or that stack's gate goes red).
+
+⚠️ **This inverts the rule this file records, for the second consecutive
+release.** `A29`/`B5`/`B17` require confirming `docker pull` before writing any
+pin, and §0.2 of the consumer-alignment plan states "publishing precedes
+pinning, always". The operator's standing rule is the inverse — *all pins
+updated before publish* — so `docker pull tepochtli/media-service-m8:2.1.1`
+fails and **all three stacks — `hardened_media_m8`, `dev_ui_m8`,
+`hardened_ui_m8` — are unrunnable until the `v2.1.1` GitHub Release is
+published.** The window is the cost of pinning ahead; it closes on publish and
+nothing else needs to change afterwards.
+
+An earlier revision of this section recorded the opposite — that the pins would
+stay at `2.1.0` because a consumer may only pin a published version. That was
+the file's own rule applied correctly and it was overridden by instruction, not
+by error; the retraction is written here rather than silently replaced, because
+the inversion has now happened twice and should be expected to be the operating
+norm rather than the exception. The rule as stated near the head of this file is
+left standing and unedited: it remains what the plan requires, and each
+departure is recorded at the release that took it.
+
+`dev_media_m8` carries no media-service pin (it builds from local source), and
+the `fa-auth-m8` `2.0.3` / `media-worker-m8` `0.4.1` pins are untouched — both
+published, neither moved by this release. Gates: `test_compose_image_pins.py`
+7 passed and the full suite 1159 passed at 100% coverage in `media-service-m8`,
+the full `compose_policy_tests` suite 171 passed in `fa-ui-m8`.
 
 **`astro-media-m8` needs no release, and takes no number.** `e8ee005` on
 `feat/eslint-10-flat-config`, pushed. Its `2.0.0` is still unpublished

@@ -28,6 +28,11 @@ work. A child must remain usable without this parent workspace.
 - Semantic authority, repository scope, task authorization, and canonical
   delivery: [agent-context contract](.workspace/contracts/agent-context-w2a.contract.md).
 
+## Commit conventions
+
+Never add a `Co-Authored-By` trailer to a commit, in any repository of this
+workspace. Commits are authored under the human's identity alone.
+
 ## Claude delivery
 
 The current Claude capability evidence is limited. Use a verified

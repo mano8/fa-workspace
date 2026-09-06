@@ -34,9 +34,9 @@ release state.
 | --- | --- |
 | npm `package.json` at repo root | `astro-auth-m8` 2.4.1 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
-| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.7.0 · `security-tests-m8` 0.6.0 |
+| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.8.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.1.1 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.2.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -58,8 +58,8 @@ one-bump-per-unpublished-release rule.
 | `fa-auth-m8` | 2.0.3 | 2.0.3 | — published |
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
 | `security-tests-m8` | 0.6.0 | 0.6.0 | — published |
-| `media-sdk-m8` | 0.7.0 | 0.7.0 | — published |
-| `media-service-m8` | 2.1.0 | 2.1.1 | pending |
+| `media-sdk-m8` | 0.7.0 | 0.8.0 | pending |
+| `media-service-m8` | 2.1.0 | 2.2.0 | pending (2.1.1 also unpublished) |
 | `media-worker-m8` | 0.4.1 | 0.4.1 | — published |
 | `prompt-engine-m8` | 2.1.0 | 2.1.0 | — published |
 | `reparto-docente-m8` | 2.1.0 | 2.1.0 | — published |
@@ -650,7 +650,7 @@ versions coincide, so one range brackets both.
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
-| `media-service-m8` | 2.1.1 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
+| `media-service-m8` | 2.2.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
 | `prompt-engine-m8` | 2.1.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.1.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
@@ -667,6 +667,34 @@ enforced their agreement until `fastapi-m8/tests/test_version_source_parity.py`
 (added by this step) locked `fastapi_m8.__version__` to the `pyproject.toml`
 literal. `auth-sdk-m8` has no `_version.py` at all, only the `[project]`
 literal — a single source, just not the dynamic one.
+
+Two rows moved on 2026-09-06, both inside the media stack.
+
+`media-sdk-m8` `0.7.0` → **`0.8.0` in the working tree, still `0.7.0`
+published.** The row was stale, not behind: `T8-sdk-release-cut` of the
+object-storage backend migration cut `0.8.0` in `pyproject.toml` on
+2026-09-05 (boto3 replaces `minio-py` inside `ObjectStorage`) and this table
+was not re-read then. PyPI still answers `0.7.0` for
+`pip index versions media-sdk-m8`, so both consumers' `>=0.8.0,<0.9.0` floor
+and their regenerated `requirements_prod.lock`s pin ahead of the publish —
+the inversion recorded twice above for this fleet's Docker image tags, now
+recorded for a Python package too. It closes on publish.
+
+`media-service-m8` `2.1.1` → **`2.2.0` in the working tree**, published still
+`2.1.0`. `T10-settings-s3-rename` renames the storage settings `MINIO_*` →
+`S3_*` behind a deprecation shim; a feature plus a deprecation cannot ride the
+already-written `2.1.1` patch heading, so the pending release takes a minor
+number. **Consequence, recorded rather than smoothed over:** the fleet now
+holds *two* unpublished `media-service-m8` versions, and the five compose
+sites re-pinned `2.1.0` → `2.1.1` on 2026-09-01 name the older of them. Either
+`2.1.1` publishes first and `2.2.0` follows with its own re-pin, or the
+operator applies the Wave 6c one-bump-per-unpublished-release rule above and
+folds `2.1.1` into `2.2.0` — which is a five-site re-pin of its own, which is
+why this step did not decide it unilaterally. The `3.0.0` that removes the
+shim is deliberately *not* taken here: `astro-media-m8`'s published
+`MEDIA_SERVICE_M8_MAX_SERVICE_VERSION_EXCLUSIVE` is `3.0.0`, so that bump must
+be coordinated with the client, and Wave 2 of the migration plan routes no
+client repository.
 
 ## One documented read command per mechanism
 

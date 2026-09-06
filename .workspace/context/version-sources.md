@@ -242,16 +242,27 @@ exists.
 `@mano8/astro-media-m8@2.0.0`. Published still stops at `1.1.1`, so the row
 stays pending, and the gap is now a **major**.
 
-That last point does **not** trigger the converse rule recorded below, and the
-reason is worth stating because it is easy to get wrong: `fa-ui-m8/app`
+~~That last point does **not** trigger the converse rule recorded below, and
+the reason is worth stating because it is easy to get wrong: `fa-ui-m8/app`
 consumes the three business plugins as path links
 (`"@mano8/astro-media-m8": "file:../../astro-media-m8"`, likewise prompt and
 reparto), not as registry ranges. A `file:` link has no semver range to
 exclude a major, so the host tracks those three working trees directly and
-needs no repoint when they publish. Only `@mano8/astro-auth-m8` (`^2.4.1`) and
-`@mano8/astro-ui-m8` (`^1.5.1`) are registry-ranged in the host, and both are
-now published at their floor. The converse rule still binds any *external*
-consumer of these packages, and it bound `fa-ui-m8` itself for
+needs no repoint when they publish.~~ ❌ **Retracted 2026-09-06: this is not
+what the host does.** There is no `file:` specifier in
+`fa-ui-m8/app/package.json`; all three business plugins are registry caret
+ranges under `optionalDependencies`, so the host tracks *published versions*
+and not the working trees, and the converse rule binds it like any other
+consumer. See *`fa-ui-m8` does not consume the business plugins as `file:`
+links* below for the measurement and its two consequences. The retraction is
+written in place rather than replacing the text, because the claim was
+load-bearing for several conclusions above it.
+
+Only `@mano8/astro-auth-m8` (`^2.4.1`) and
+`@mano8/astro-ui-m8` (`^1.5.1`) are registry-ranged **as ordinary
+dependencies** in the host, and both are now published at their floor. The
+converse rule still binds any *external* consumer of these packages, and it
+bound `fa-ui-m8` itself for
 `astro-prompt-m8@2.0.0` when that dependency was registry-ranged.
 
 ### `reparto-docente-m8` 2.0.0 → 2.1.0 (2026-08-30, pending)
@@ -812,6 +823,47 @@ requires no re-pin anywhere**, so the pin-ahead-of-image inversion recorded
 twice above for the media stack has no analogue here and no window to open. A
 stack that later consumes the published reparto image is the point at which
 that changes.
+
+#### ⚠️ `fa-ui-m8` does **not** consume the business plugins as `file:` links
+
+The 2026-08-30 entry above states that "`fa-ui-m8/app` consumes the three
+business plugins as path links (`"@mano8/astro-media-m8":
+"file:../../astro-media-m8"`, likewise prompt and reparto), not as registry
+ranges", and draws the conclusion that "the host tracks those three working
+trees directly and needs no repoint when they publish". **Measured against
+`fa-ui-m8/app/package.json` on 2026-09-06, that is not what the host does**,
+and the conclusion does not hold. There is no `file:` specifier in the file.
+All three are registry caret ranges under `optionalDependencies`:
+
+| Declared | Range | Installed in `node_modules` | Newest on npm |
+| --- | --- | --- | --- |
+| `@mano8/astro-media-m8` | `^2.0.0` | 2.0.0 | 1.1.1 |
+| `@mano8/astro-prompt-m8` | `^2.1.0` | 2.1.0 | 2.1.0 |
+| `@mano8/astro-reparto-m8` | `^2.0.0` | 2.1.0 | 2.0.0 |
+
+Two of the three installed trees are therefore **hand-placed local builds
+that no registry could supply** — the layout under `node_modules` is exactly
+the `files` allowlist of an `npm pack`, not a symlink. They are real, they are
+what the host builds against, and they are invisible to git. A plain
+`npm ci` replaces them with whatever the range resolves to, silently.
+
+Two consequences, both the opposite of what the superseded paragraph implies:
+
+- **The host does not track any plugin working tree.** A change made in
+  `astro-reparto-m8` reaches `fa-ui-m8` only when someone rebuilds and
+  re-places that tree, or when the version publishes. This is the mechanism
+  behind a "the fix isn't showing in the running stack" report, and the answer
+  is to rebuild and re-place, not to look for a caching bug.
+- **`astro-media-m8`'s range cannot currently resolve at all.** `^2.0.0` has
+  no match on a registry whose newest is `1.1.1`; because the entry is
+  *optional*, npm skips it rather than failing, so a clean `npm ci` yields a
+  host silently missing the media plugin. Recorded, not acted on — the media
+  stack is out of scope for this pass — but it should be treated as open.
+
+The reparto row is the benign one: `^2.0.0` admits `2.1.0`, so once
+`@mano8/astro-reparto-m8@2.1.0` publishes the host picks it up on the next
+install with no repoint. That is a property of the caret, not of a `file:`
+link.
 
 ## One documented read command per mechanism
 

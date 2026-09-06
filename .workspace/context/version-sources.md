@@ -32,11 +32,11 @@ release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.4.1 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.0.0 · `astro-ui-m8` 1.5.1 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.4.1 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.8.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.2.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.2.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -62,13 +62,13 @@ one-bump-per-unpublished-release rule.
 | `media-service-m8` | 2.1.0 | 2.2.0 | pending (2.1.1 also unpublished) |
 | `media-worker-m8` | 0.4.1 | 0.4.1 | — published |
 | `prompt-engine-m8` | 2.1.0 | 2.1.0 | — published |
-| `reparto-docente-m8` | 2.1.0 | 2.1.0 | — published |
+| `reparto-docente-m8` | 2.1.0 | 2.1.1 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
 | `astro-auth-m8` | 2.4.1 | 2.4.1 | — published |
 | `astro-media-m8` | 1.1.1 | 2.0.0 | pending |
 | `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
-| `astro-reparto-m8` | 2.0.0 | 2.0.0 | — published |
+| `astro-reparto-m8` | 2.0.0 | 2.1.0 | pending |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
 than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and
@@ -652,7 +652,7 @@ versions coincide, so one range brackets both.
 | `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
 | `media-service-m8` | 2.2.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
 | `prompt-engine-m8` | 2.1.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
-| `reparto-docente-m8` | 2.1.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
+| `reparto-docente-m8` | 2.1.1 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
 Each plugin's gate is bounded on the **service** version and must admit its
 backend's package version; each also repeats the pair as declarative
@@ -695,6 +695,123 @@ shim is deliberately *not* taken here: `astro-media-m8`'s published
 `MEDIA_SERVICE_M8_MAX_SERVICE_VERSION_EXCLUSIVE` is `3.0.0`, so that bump must
 be coordinated with the client, and Wave 2 of the migration plan routes no
 client repository.
+
+### The reparto pair re-measured and cut (2026-09-06)
+
+Measured against on-disk source and `git ls-remote --tags origin`. **Both rows
+were wrong, in the two different ways this file distinguishes**, and both are
+corrected here.
+
+`reparto-docente-m8` `2.1.0` → **`2.1.1` in the working tree**, published still
+`2.1.0`. The row was *behind*, not stale: `v2.1.0` is on `origin`
+(`77adff7ceb9a`) and was the newest tag, but `20f9d8b fix(exports): render the
+plan §15 documents instead of refusing them` had landed on top of it with no
+version and no changelog entry, so the repository was carrying a released
+number over unreleased code. The bump is cut here.
+
+**A patch, on this file's own precedent.** `POST …/exports` answered `501` for
+every `pdf` request while the export centre asks for `pdf` on every document
+type but the backup, so three of four document buttons and the final export
+could never succeed. Nothing in the request or response *schema* moves — the
+`format` and `export_type` values were already declared and already accepted —
+so this closes a gap between what the schema promised and what the handler
+served, which is the same shape as `media-service-m8@2.1.1` (a declared field
+that was empty on one path) and takes the same number class. Evidence that no
+surface moved is the service's own drift gate:
+`tests/test_served_api_surface.py` is green against the working tree, and
+`docs/served-api-surface.json` is byte-identical to `astro-reparto-m8`'s
+vendored `contract/served-api-surface.json`.
+
+**Neither contract constant moves.** `CONTRACT_VERSION` stays `2.0.0` and
+`CONTRACT_RANGE` stays `>=2.0.0 <3.0.0`, which admits `2.1.1`.
+**`astro-reparto-m8` needs no release for it** — its gate is an exact-match
+`Set` on the contract, not a numeric service range, so a moved contract would
+reject every published client at preflight. Same shape as the
+`reparto-docente-m8@2.1.0` precedent recorded above.
+
+⚠️ **The export commit had shipped below the repository's own coverage bar,
+and the bump is what caught it.** `pytest --cov --cov-fail-under=100` was red
+at **99.85%** — 6 statements and 7 branches, *all* of them in the new
+`services/document_rendering.py` and none anywhere else in 7342 statements.
+The uncovered paths were the renderer's defensive joins: a link whose
+group-subject is absent, a cell whose teaching group is absent, a repeated
+group code, an assignment naming an activity or participant the snapshot does
+not carry, and the two plan warnings (stale, and not-`FEASIBLE`). A route
+cannot produce those, since a live process is internally consistent — but
+`restore-draft` accepts a caller-supplied payload, so a restored backup can,
+which is what makes them worth holding rather than excluding. Six unit tests
+against `DocumentRenderingService.render` on deliberately broken snapshots
+close it; the suite is 2048 passing at **100.00%**. Recorded here because the
+gap was invisible to every other gate — ruff, mypy and bandit were green
+throughout, and the feature's own route tests passed.
+
+Gates at the cut: 2048 tests at 100% coverage, `ruff format --check` and
+`ruff check` clean over 167 files, `mypy reparto_service --ignore-missing-imports`
+clean over 105 files, `bandit -r . --severity-level medium` clean, and
+`tests/test_served_api_surface.py` green. One note for a future reader: this
+repository's `REPOSITORY_CONTEXT.md` documents the local command as `mypy .`,
+which includes `tests/` and reports 15 pre-existing errors there, while CI
+gates `mypy reparto_service` and is clean. The two are not the same command,
+and only the narrower one is a gate.
+
+`astro-reparto-m8` `2.0.0`/`2.0.0`/published → **`2.0.0` published, `2.1.0`
+working tree, pending.** This row was **stale in both columns at once**:
+`package.json` had read `2.1.0` since a `## [2.1.0] - 2026-09-04` changelog
+section, and `origin`'s newest tag has never been anything but `v2.0.0`
+(`01144c558a3f`) — independently confirmed against the registry, where
+`npm view @mano8/astro-reparto-m8 versions` answers `['0.0.1', '1.0.0',
+'2.0.0']`. So the table called a version published that npm has never held.
+
+That discovery changed the number this pass cut. A first pass took the new
+export-delivery and checklist/UX work to `2.2.0` on the reading that `2.1.0`
+was a released boundary; on finding `2.1.0` unpublished, the operator ruled the
+Wave 6c one-bump-per-unpublished-release rule instead, and the two changelog
+sections were folded into one `## [2.1.0]` redated `2026-09-06` with every
+entry bullet preserved. `package.json` and `package-lock.json` are back at
+`2.1.0`. This is the fourth application of that rule recorded in this file
+(after the reparto pair's own `2.0.0`, `astro-media-m8`'s `1.2.0`/`2.0.0`, and
+this repository's earlier `3.0.0`/`2.0.0` split) and the first where the rule
+*reversed* a bump already applied.
+
+**One range moved, and it is the one that should.** `astro-reparto-m8`'s
+`repartoDocenteM8.testedServiceVersion` was stale at `2.0.0` and moves to
+`2.1.1` — the service the client is now exercised against, with
+`npm run verify:contract-operations` re-run green (116 declared operations, all
+served, every wrapper declared). `contract` stays `reparto-docente-m8@2.0.0`
+and `serviceVersionRange` stays `>=2.0.0 <3.0.0`. This is the same stale-tested
+-version defect this file records for `astro-media-m8` on 2026-09-01, in the
+sibling repository, caught the same way: by checking all three fields when only
+one had a reason to move. `REPOSITORY_CONTEXT.md` carried the same stale `2.0.0`
+and is corrected with it, plus a note stating why the three fields move
+independently — the misreading recurred once already and should be expected to
+recur again.
+
+#### No compose pin exists for this service, and that is the answer
+
+The pass went looking for the `reparto-docente-m8` pin sites to re-pin, on the
+`media-service-m8` model of five sites moving per release. **There are none**,
+and the fleet is asymmetric here in a way worth recording so the next sweep
+does not re-investigate it:
+
+- Every stack that runs `reparto_service` **builds it from local source**:
+  `reparto-docente-m8/docker_compose/dev_reparto_m8` (`build:` on `../..`) and
+  `fa-ui-m8/docker_compose/dev_local_full_ui_m8` (`build:` on
+  `../../../reparto-docente-m8`), which is the only `fa-ui-m8` stack carrying
+  the service at all.
+- The two stacks that consume **published** images — `dev_ui_m8` and
+  `hardened_ui_m8` — do not run `reparto_service`. Their pins are
+  `fa-auth-m8:2.0.3`, `media-worker-m8:0.4.1` and `media-service-m8:2.1.1`,
+  and `compose_policy_tests/test_compose_image_pins.py`'s `_PREVIOUSLY_LATEST`
+  map names those three and no reparto entry.
+- `reparto-docente-m8/.github/workflows/docker-publish.yaml` **does** publish
+  `<registry-user>/reparto-docente-m8` on release, so an image exists; nothing
+  in this workspace consumes it.
+
+The consequence is the useful part: **publishing `reparto-docente-m8@2.1.1`
+requires no re-pin anywhere**, so the pin-ahead-of-image inversion recorded
+twice above for the media stack has no analogue here and no window to open. A
+stack that later consumes the published reparto image is the point at which
+that changes.
 
 ## One documented read command per mechanism
 

@@ -34,9 +34,9 @@ release state.
 | --- | --- |
 | npm `package.json` at repo root | `astro-auth-m8` 2.4.1 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
-| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.1.3 · `fastapi-m8` 4.4.0 · `media-sdk-m8` 0.8.0 · `security-tests-m8` 0.6.0 |
+| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 0.8.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.0.3 · `media-service-m8` (`media_service`) 2.2.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 2.2.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -53,9 +53,9 @@ one-bump-per-unpublished-release rule.
 
 | Repo | Published | Working tree | Pending? |
 | --- | --- | --- | --- |
-| `auth-sdk-m8` | 3.1.3 | 3.1.3 | — published |
-| `fastapi-m8` | 4.4.0 | 4.4.0 | — published |
-| `fa-auth-m8` | 2.0.3 | 2.0.3 | — published |
+| `auth-sdk-m8` | 3.2.0 | 3.2.0 | — published |
+| `fastapi-m8` | 4.5.1 | 4.5.1 | — published |
+| `fa-auth-m8` | 2.2.0 | 2.2.1 | pending |
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
 | `security-tests-m8` | 0.6.0 | 0.6.0 | — published |
 | `media-sdk-m8` | 0.7.0 | 0.8.0 | pending |
@@ -660,7 +660,7 @@ versions coincide, so one range brackets both.
 
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
-| `fa-auth-m8` | 2.0.3 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
+| `fa-auth-m8` | 2.2.1 (pending) | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
 | `media-service-m8` | 2.2.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
 | `prompt-engine-m8` | 2.1.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.1.1 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
@@ -864,6 +864,55 @@ The reparto row is the benign one: `^2.0.0` admits `2.1.0`, so once
 `@mano8/astro-reparto-m8@2.1.0` publishes the host picks it up on the next
 install with no repoint. That is a property of the caret, not of a `file:`
 link.
+
+### The auth triad re-measured (2026-09-13)
+
+Measured against on-disk source, `git ls-remote --tags origin`, and
+`pip index versions`. **Three rows were stale**, none *behind*: every value
+this file carried had been true once and was simply never re-read after the
+JWKS `kid` release train (`J1`–`J4`, 2026-09-09 → 09-12) moved all three
+repositories in four days. Caught while cutting `fa-auth-m8@2.2.1`, by
+checking the neighbours a patch release has no reason to move.
+
+`fa-auth-m8` `2.0.3` → **`2.2.0` published, `2.2.1` in the working tree.**
+Two minors had shipped since the row was last read — `v2.1.0` (the issuer half
+of the `kid` binding, with a `BREAKING` boot refusal for an unbound
+`ACCESS_KEY_ID`) and `v2.2.0` (the dependency realignment onto the published
+consumer half) — and the row still read the `2026-08-24` ledger value. Both
+tags are on `origin`; `origin/main` reads `2.2.0`. The pending `2.2.1` is
+`fix/jwks-kid-key-binding`, a patch: `init-keys.sh`'s keys-exist rerun branch
+now verifies the `kid` binding instead of skipping it (`W3.1`). No service
+behaviour, API, or dependency floor moves, so `CONTRACT_VERSION` and
+`CONTRACT_RANGE` (`>=2.0.0 <3.0.0`) stay, and the compatibility table's gate
+column needs nothing: `astro-auth-m8`'s `compatibility.ts` already reads
+`FA_AUTH_M8_TESTED_SERVICE_VERSION = "2.2.0"` inside an unchanged
+`>=2.0.0 <3.0.0` range — that client was re-read against `2.2.0` when this
+file was not.
+
+`auth-sdk-m8` `3.1.3` → **`3.2.0`, published.** `v3.2.0` is on `origin` and
+`pip index versions auth-sdk-m8` answers `3.2.0`. This is the consumer half of
+`J3` (`JwksKeyResolver` recovers from key material changing under an unchanged
+`kid`), and `fa-auth-m8@2.2.0`'s own changelog names it as the reason its
+floor moved to `>=3.2.0,<4.0.0` — evidence this file could have read a day
+earlier.
+
+`fastapi-m8` `4.4.0` → **`4.5.1`, published.** `v4.5.1` is on `origin` and
+PyPI answers `4.5.1`. `4.5.0` declared the `auth-sdk-m8>=3.2.0` floor while
+its compiled `constraints.txt` still pinned `3.1.3`; `4.5.1` (2026-09-12) is
+the release where the lockfiles stopped contradicting the floor, which is why
+the `fa-auth-m8` examples pin `>=4.5.1` rather than `>=4.5.0`.
+
+**The compose sites had already moved; this file had not.** The
+`fa-auth-m8` `2.0.3` pins recorded above under 2026-09-01 as "untouched" were
+re-pinned to `2.2.0` by the release train at six of seven sites — `dev_ui_m8`,
+`hardened_ui_m8` (both compose files), `dev_media_m8`, `hardened_media_m8`,
+and `dev_prompt_engine_m8` — measured by `git grep 'tepochtli/fa-auth-m8:'`
+over each sibling's tracked compose files. The one holdout is
+`reparto-docente-m8/docker_compose/dev_reparto_m8/docker-compose.yml`, still
+`2.0.3`, two minors behind the published image and short of `2.1.0`'s
+unbound-`kid` boot refusal. Recorded, not acted on: it is one site, it belongs
+with the reparto repository's next pass, and it should land on `2.2.1` once
+that publishes rather than on `2.2.0` today.
 
 ## One documented read command per mechanism
 

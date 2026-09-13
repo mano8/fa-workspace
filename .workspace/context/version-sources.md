@@ -32,7 +32,7 @@ release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.4.1 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 0.8.0 · `security-tests-m8` 0.6.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
@@ -65,7 +65,7 @@ one-bump-per-unpublished-release rule.
 | `reparto-docente-m8` | 2.1.0 | 2.1.1 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
-| `astro-auth-m8` | 2.4.1 | 2.4.1 | — published |
+| `astro-auth-m8` | 2.5.0 | 2.6.0 | pending |
 | `astro-media-m8` | 1.1.1 | 2.0.0 | pending |
 | `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
 | `astro-reparto-m8` | 2.0.0 | 2.1.0 | pending |
@@ -907,12 +907,35 @@ the `fa-auth-m8` examples pin `>=4.5.1` rather than `>=4.5.0`.
 re-pinned to `2.2.0` by the release train at six of seven sites — `dev_ui_m8`,
 `hardened_ui_m8` (both compose files), `dev_media_m8`, `hardened_media_m8`,
 and `dev_prompt_engine_m8` — measured by `git grep 'tepochtli/fa-auth-m8:'`
-over each sibling's tracked compose files. The one holdout is
+over each sibling's tracked compose files. The one holdout was
 `reparto-docente-m8/docker_compose/dev_reparto_m8/docker-compose.yml`, still
-`2.0.3`, two minors behind the published image and short of `2.1.0`'s
-unbound-`kid` boot refusal. Recorded, not acted on: it is one site, it belongs
-with the reparto repository's next pass, and it should land on `2.2.1` once
-that publishes rather than on `2.2.0` today.
+`2.0.3` on the plan branch (its `2.2.0` repin sits on
+`fix/export-document-text-renderer`, a branch the plan's never merges with).
+
+**Superseded the same day.** The human ruled the whole fleet onto `2.2.1`
+ahead of its publish, per the standing pin-before-publish rule. All seven
+sites now pin `tepochtli/fa-auth-m8:2.2.1`, one commit per repository on each
+repository's `fix/jwks-kid-key-binding`: `media-service-m8` `16f06f6`,
+`fa-ui-m8` `0e57a49` (its `_PREVIOUSLY_LATEST` pin test moved with it),
+`prompt-engine-m8` `699cdf5`, `reparto-docente-m8` `b03ad2f` (`2.0.3` →
+`2.2.1` directly; the `2.2.0` line on the export branch will conflict on
+merge — resolve to `2.2.1`). The host-local `rpi_server/docente_reparto`
+compose was repinned on disk and, being ignored, propagates nowhere. The
+`fa-ui-m8` pin sits on a branch cut from `feat/object-storage-backend-migration`,
+not `main`, and reaches `main` only through that branch (recorded under
+`W0.4` of the plan).
+
+`astro-auth-m8` `2.4.1` → **`2.5.0` published, `2.6.0` in the working tree.**
+Two rows stale at once, same shape as `fa-auth-m8` above: `v2.5.0` is on
+`origin` and npm `latest` answers `2.5.0` (released 2026-09-12 to track the
+`2.2.0` issuer — `testedServiceVersion` `2.0.0` → `2.2.0`, `MIN` held at
+`2.0.0`), and this file still carried the `2.4.1` the 2026-08-29 pass
+recorded. The pending `2.6.0` (`5928f88`, `fix/jwks-kid-key-binding` off
+`main` `47be766`) moves `testedServiceVersion` to `2.2.1` with the contract
+and range unchanged, so the compatibility table above keeps its gate column.
+It tracks an unpublished issuer and must not publish to npm before
+`tepochtli/fa-auth-m8:2.2.1` exists. `fa-ui-m8` depends on
+`@mano8/astro-auth-m8 ^2.4.1`, which admits `2.6.0` without a repoint.
 
 ## One documented read command per mechanism
 

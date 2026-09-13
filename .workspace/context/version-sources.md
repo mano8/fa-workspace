@@ -34,9 +34,9 @@ release state.
 | --- | --- |
 | npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
-| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 0.8.0 · `security-tests-m8` 0.6.0 |
+| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 0.8.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 2.2.0 · `media-worker-m8` (`worker`) 0.4.1 · `prompt-engine-m8` (`promt_engine_service`) 2.1.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 2.3.0 · `media-worker-m8` (`worker`) 0.5.0 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -55,17 +55,17 @@ one-bump-per-unpublished-release rule.
 | --- | --- | --- | --- |
 | `auth-sdk-m8` | 3.2.0 | 3.2.0 | — published |
 | `fastapi-m8` | 4.5.1 | 4.5.1 | — published |
-| `fa-auth-m8` | 2.2.0 | 2.2.1 | pending |
+| `fa-auth-m8` | 2.2.1 | 2.2.1 | — published |
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
-| `security-tests-m8` | 0.6.0 | 0.6.0 | — published |
+| `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-sdk-m8` | 0.7.0 | 0.8.0 | pending |
-| `media-service-m8` | 2.1.0 | 2.2.0 | pending (2.1.1 also unpublished) |
-| `media-worker-m8` | 0.4.1 | 0.4.1 | — published |
-| `prompt-engine-m8` | 2.1.0 | 2.1.0 | — published |
+| `media-service-m8` | 2.1.0 | 2.3.0 | pending (2.1.1, 2.2.0 folded in — see *Wave 4 release cut*) |
+| `media-worker-m8` | 0.4.1 | 0.5.0 | pending |
+| `prompt-engine-m8` | 2.2.0 | 2.2.0 | — published |
 | `reparto-docente-m8` | 2.1.0 | 2.1.1 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
-| `astro-auth-m8` | 2.5.0 | 2.6.0 | pending |
+| `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
 | `astro-media-m8` | 1.1.1 | 2.0.0 | pending |
 | `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
 | `astro-reparto-m8` | 2.0.0 | 2.1.0 | pending |
@@ -660,9 +660,9 @@ versions coincide, so one range brackets both.
 
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
-| `fa-auth-m8` | 2.2.1 (pending) | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
-| `media-service-m8` | 2.2.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
-| `prompt-engine-m8` | 2.1.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
+| `fa-auth-m8` | 2.2.1 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
+| `media-service-m8` | 2.3.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
+| `prompt-engine-m8` | 2.2.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.1.1 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
 Each plugin's gate is bounded on the **service** version and must admit its
@@ -936,6 +936,160 @@ and range unchanged, so the compatibility table above keeps its gate column.
 It tracks an unpublished issuer and must not publish to npm before
 `tepochtli/fa-auth-m8:2.2.1` exists. `fa-ui-m8` depends on
 `@mano8/astro-auth-m8 ^2.4.1`, which admits `2.6.0` without a repoint.
+
+### `fa-auth-m8` 2.2.1 published (2026-09-13)
+
+✅ **`fa-auth-m8` `2.2.1` is published; the row above flips to
+`2.2.1 · 2.2.1 · — published`.** Independent evidence, as this file requires:
+PR #126 merged to `main` at `77f302c` (2026-09-13 05:40Z); `v2.2.1` is on
+`origin` and resolves to that merge commit, no stale local tag; the GitHub
+release is published and the `docker-publish.yaml` run for it (`34740917970`)
+is green; Docker Hub serves `tepochtli/fa-auth-m8:2.2.1` (also `2.2`, `2`,
+`latest`) at index digest
+`sha256:12ac4d5194bea94990893e2bd7379cc01c8d8e995dc9031123503b8204409272`;
+the pulled image answers `auth_user_service.__version__` → `2.2.1` and
+`importlib.metadata.version("auth-sdk-m8")` → `3.2.0`; the Hub overview is
+byte-identical to `DOCKERHUB.md` (9729 chars, `2.2.1` ×3). Every `2.2.1`
+compose pin recorded above is now a pin on a published version — the
+pin-before-publish debt is cleared.
+
+~~The `astro-auth-m8` `2.6.0` row **stays pending**: the condition it was
+waiting on (the `2.2.1` image existing) is now met, but `5928f88` has no PR,
+`v2.6.0` is not on `origin`, and npm `latest` still answers `2.5.0`.~~
+✅ **Closed later the same day: `astro-auth-m8` `2.6.0` is published**, row
+flipped to `2.6.0 · 2.6.0 · — published`. Evidence: PR #28 merged at
+`898679c`, `v2.6.0` on `origin` at that commit, `npm-publish.yml` run
+`34743230244` green (06:38Z — after the `2.2.1` image push at 05:45Z, so the
+pin-only-published rule held), `npm view @mano8/astro-auth-m8
+dist-tags.latest` → `2.6.0`, tarball `astro-auth-m8-2.6.0.tgz` on the
+registry. The published `compatibility.ts` reads
+`FA_AUTH_M8_TESTED_SERVICE_VERSION = "2.2.1"`, `MIN` `2.0.0`, range
+`>=2.0.0 <3.0.0` — the compatibility table's gate column is unchanged.
+
+### `prompt-engine-m8` 2.1.0 → 2.2.0 (2026-09-13, pending)
+
+`promt_engine_service.__version__` reads `2.2.0` on `fix/jwks-kid-key-binding`
+(`2081752`, [`mano8/prompt-engine-m8#39`](https://github.com/mano8/prompt-engine-m8/pull/39)),
+cut to carry the `fastapi-m8>=4.5.1` floor (transitive `auth-sdk-m8 3.2.0`),
+the `fa-auth-m8:2.2.1` image repin and the re-vendored `init-keys.sh` under
+their own number. The contract axis does not move — `CONTRACT_VERSION`
+`2.1.0`, `CONTRACT_RANGE` `>=2.1.0 <3.0.0` — so the compatibility table's
+gate column and `astro-prompt-m8`'s `>=2.1.0 <3.0.0` need nothing;
+`astro-prompt-m8`'s `PROMPT_ENGINE_M8_TESTED_SERVICE_VERSION` (`2.1.0`) is a
+tracked-version note for that repo, not a gate. ~~Published `2.1.0` stands
+(`v2.1.0` on `origin`, Hub `latest` 2026-08-30) until `v2.2.0` is tagged and
+the image workflow publishes.~~ ✅ **Closed later the same day: `2.2.0` is
+published**, row flipped to `2.2.0 · 2.2.0 · — published`. Evidence: #39
+merged at `2616be7`; #40 (`19caa6e`) then regenerated
+`requirements_prod.lock`, which the floor raise had left at
+`fastapi-m8 4.4.0` / `auth-sdk-m8 3.1.3` — the constraints had moved, the
+`--require-hashes` graph the image installs had not; `v2.2.0` is on `origin`
+at `19caa6e` (after #40); release published, `docker-publish.yaml` run
+`34752711752` green; Hub `2.2.0` / `2.2` / `2` / `latest` at index digest
+`sha256:dca03f6a8f1f3628cde967a5be489aa578528459ee259d31ece74611fec868f4`;
+the pulled image answers `promt_engine_service 2.2.0`, `fastapi-m8 4.5.1`,
+`auth-sdk-m8 3.2.0`. It is the first published consumer image resolving
+`auth-sdk-m8 3.2.0`. Lesson for the next consumer cut (`reparto-docente-m8`,
+`media-service-m8` — both held with in-course work, not to be hurried): a
+floor raise is not done until `requirements_prod.lock` moves with
+`constraints*.txt`.
+
+### Wave 4 release cut — `media-service-m8` and `media-worker-m8` (2026-09-13, pending publish)
+
+`T26-changelog-release` closes Wave 4 of the object-storage backend
+migration plan (`.workspace/plans/media-service-m8/todo/
+object-storage-backend-migration-2026-09-05.md`). Both moved rows are
+**image-publish pending** — the version bump, `CHANGELOG.md` entry and
+compose image-pin re-point are cut here on the plan's own branch
+(`feat/object-storage-backend-migration`) and pushed; building and tagging
+the Docker image (the GitHub Release / tag that triggers
+`docker-publish.yaml`) is the human operator's own act, not done by this
+step, matching this file's write-then-verify convention: the pin sites are
+updated first, the matrix rows are re-measured only after the images
+actually exist on the registry.
+
+`media-service-m8` `2.1.0` (published) → **`2.3.0` in the working tree**,
+folding the two already-unpublished rows this file recorded on 2026-09-06
+(`2.1.1`, `2.2.0`) together with Wave 3 (the MinIO → SeaweedFS backend swap,
+`T15`-`T21`) and Wave 4 (`T22`-`T25`: hygiene, live e2e, the S1-S15 security
+regression matrix, the data-migration runbook, and the F1 filename-key fix)
+under the Wave 6c one-bump-per-unpublished-release rule above — none of
+`T15`-`T25` took a version number of their own, each explicitly deferring to
+this step. `CONTRACT_VERSION` stays `1.1`, `CONTRACT_RANGE` stays
+`>=2.0.0 <3.0.0` — nothing at the served HTTP contract moved. The existing
+`## [2.1.1]` and `## [2.2.0]` `CHANGELOG.md` sections are left as written
+(they are historically accurate — that content really was cut on those
+dates); the fold is at the *publish* event, not the changelog record — all
+three numbers arrive at the registry as one `2.3.0` image, and `2.1.1`/`2.2.0`
+never get their own tag. Five compose sites moved, the same shape as the
+`2.1.0` → `2.1.1` precedent: `docker_compose/hardened_media_m8/docker-compose.yml`
+(×2), `docker_compose/hardened_media_m8/README.md` (×2, table rows) and
+`docker_compose/README.md` (×1, stack-index row), all in `media-service-m8`
+itself; `fa-ui-m8`'s three stacks (`docker_compose/dev_ui_m8/docker-compose.yml`
+×2, `docker_compose/hardened_ui_m8/docker-compose.yml` ×1, plus the
+`compose_policy_tests/test_compose_image_pins.py` fixture) re-point their own
+`tepochtli/media-service-m8` pin to `2.3.0` in step. Gates: `media-service-m8`
+49 passed (`tests/test_compose_image_pins.py`,
+`tests/test_compose_storage_policy.py`); `fa-ui-m8` 216 passed
+(`docker_compose/compose_policy_tests`); `docker compose config -q` clean on
+`hardened_media_m8`. Branch `feat/object-storage-backend-migration`,
+`media-service-m8` commit `a8cbc7a`, `fa-ui-m8` commit `a79fbc1`, both pushed.
+
+`media-worker-m8` `0.4.1` (published) → **`0.5.0` in the working tree,
+pending.** This row was *behind*, not stale: `T9-consumers-repin` and
+`T11-worker-s3-rename` (Waves 1-2) had both landed on the plan branch with
+their content left under `[Unreleased]` and an explicit note deferring the
+version number to `T26`, and this file had not been told. No shim — unlike
+`media-service-m8`'s `Settings` (`extra="forbid"`), `WorkerConfig` already
+uses `extra="ignore"`, so an unmigrated `MINIO_*` deployment silently falls
+back to defaults rather than failing to load; combined with the
+`media-sdk-m8@0.8.0` repin (dependency floor `>=0.7.0,<0.8.0` →
+`>=0.8.0,<0.9.0`, `minio` dropped), this is enough behind-the-scenes change
+to take a minor number rather than a patch, on the same reasoning
+`media-service-m8@2.2.0` used for its own `S3_*` rename. No Wave 3+ content
+applies to this repository — the worker only consumes `media_sdk_m8`'s
+storage client, so the SeaweedFS backend swap itself is invisible to it.
+Two compose sites moved to match: `media-service-m8/docker_compose/
+{dev_media_m8,hardened_media_m8}/docker-compose.yml` (+ both stacks'
+`README.md` service tables) and `fa-ui-m8/docker_compose/
+{dev_ui_m8,hardened_ui_m8}/docker-compose.yml` (+ the same
+`test_compose_image_pins.py` fixture, alongside the `media-service-m8` pin
+above). Gates: `media-worker-m8` 110 passed, 100% coverage. Branch
+`feat/object-storage-backend-migration`, commit `a7f8b7b`, pushed.
+
+`media-sdk-m8` and `security-tests-m8` need **no change** for `T26`:
+`media-sdk-m8`'s `CHANGELOG.md` carries no `[Unreleased]` section — its
+`0.8.0` release (`T8-sdk-release-cut`, Wave 1) and its one follow-on doc fix
+(`T14`, folded into the same `0.8.0` entry) are its whole contribution to
+this plan, and both rows above are unchanged (`0.7.0` published, `0.8.0`
+working tree, still pending on the same PyPI-publish window recorded since
+Wave 1). `security-tests-m8`'s `T22` work (blocking the `seaweedfs/` runtime
+directory name) already shipped inside its own, unrelated `0.7.0` release
+cut (`CHANGELOG.md`'s `## 0.7.0 — 2026-09-13`, published — see below); this
+file's mechanism-map row for it (`0.6.0`) is now stale against source and is
+corrected here to `0.7.0` in passing, though the publish itself predates and
+is outside `T26`'s own scope.
+
+`fa-ui-m8` needs **no version bump** for `T26` — it carries no
+`CHANGELOG.md` at all (confirmed: only vendored Grafana-plugin changelogs
+exist under `docker_compose/dev_local_full_ui_m8/grafana/data/plugins/`,
+none of them this repository's own), so there is no changelog convention for
+this step to fold into, and its row stays `— never published · 0.1.0
+working tree · pending` exactly as this file already recorded. Its `T26`
+contribution is the compose re-pin above only.
+
+**Not done here, and is the operator's own step:** building and pushing the
+`tepochtli/media-service-m8:2.3.0` and `tepochtli/media-worker-m8:0.5.0`
+images (creating the GitHub Release / tag that triggers each repo's
+`docker-publish.yaml`). Until that happens, `docker pull` for both tags
+fails and the re-pinned compose stacks are red — the same pin-ahead-of-publish
+window this file has now recorded four times (`media-sdk-m8@0.8.0`,
+`media-service-m8@2.1.0`, `media-service-m8@2.1.1`, and now this cut). The
+map above and the published-vs-working-tree table are updated on the
+assumption that the human takes that step next; if the eventual published
+tag differs from `2.3.0`/`0.5.0` (e.g. the operator instead publishes `2.1.1`
+first per the alternative this file flagged on 2026-09-06), this section
+needs a follow-up correction, not a silent re-read.
 
 ## One documented read command per mechanism
 

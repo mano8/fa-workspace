@@ -1091,6 +1091,18 @@ tag differs from `2.3.0`/`0.5.0` (e.g. the operator instead publishes `2.1.1`
 first per the alternative this file flagged on 2026-09-06), this section
 needs a follow-up correction, not a silent re-read.
 
+**Re-measured 2026-09-14 (`T31-operator-closeout`, Step 1): nothing has
+moved.** PyPI's JSON index for `media-sdk-m8` lists releases through `0.7.0`;
+Docker Hub's tag list for `tepochtli/media-service-m8` stops at `2.1.1` and
+for `tepochtli/media-worker-m8` at `0.4.1`; `gh pr list --state all` shows no
+pull request on `media-sdk-m8`'s `feat/wave0-s3-conformance-contract` or on
+the `feat/object-storage-backend-migration` branches of `media-service-m8`,
+`media-worker-m8` and `fa-ui-m8`. The pending rows above therefore stand as
+written. The operator recorded the plan's open decisions that day and chose
+to leave the publish, the PRs and the release tags for a later session; the
+`pending` rows flip only after those acts, per the write-then-verify
+convention.
+
 ## One documented read command per mechanism
 
 Run from the workspace root; each command prints the repo's authoritative

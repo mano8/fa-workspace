@@ -40,6 +40,32 @@ Watchlist (not production):         RustFS — revisit after a stable 1.x series
   regresses any of S9–S12 in `media-sdk-m8/tests/conformance/`, the default
   switches to Garage without re-planning — the conformance harness is what
   makes that a test run instead of a re-analysis.
+- **Fallback parity rule** (operator decision, 2026-09-14): a Garage failover
+  must stay *semantically identical* to the SeaweedFS default. Application
+  and bootstrap code may use only the S3 surface both backends implement, so
+  object versioning and Object Lock are ruled out permanently — not merely
+  "not adopted" — and no retention/immutability requirement exists for any
+  media bucket. `FORBIDDEN_OPERATIONS` (below) is the enforceable form.
+
+## Backend attack surface (SeaweedFS)
+
+The loopback binding above is necessary but not sufficient. Measured on
+`chrislusf/seaweedfs:4.45` (`T29`, 2026-09-13), `-s3.ip.bind=0.0.0.0` also
+publishes three listeners that are a property of the backend, not of any one
+stack, and every SeaweedFS deployment in this fleet must close them:
+
+| Listener | Default port | Why it matters | Required closure |
+| --- | --- | --- | --- |
+| S3 component gRPC | S3 port + 10000 (`18333`) | Serves an IAM service whose `PutIdentity` RPC minted a working `Admin` S3 identity from a sibling container **with no credential** — a full escape from the scoped per-bucket grant. No bind flag of its own. | mTLS on `[grpc.s3]` via `security.toml`, with the signing CA key destroyed after the server certificate is issued (no acceptable client certificate can ever exist). |
+| Iceberg REST catalog | `8181` | On by default in 4.x, binds `0.0.0.0`, unused by a media store. | `-s3.port.iceberg=0` |
+| Lance namespace server | `9101` | Same. | `-s3.port.lance=0` |
+
+Reference implementation: `media-service-m8/docker_compose/hardened_media_m8/`
+(`storage-tls-init` one-shot + tracked `seaweedfs/security.toml`), mirrored in
+every `media-service-m8` and `fa-ui-m8` stack and guarded by
+`TestStorageExtraListenersClosed` in both repositories plus a live probe that
+fails against an unfixed node. Garage exposes only its RPC port, which the
+fallback profile keeps on loopback; it needed no equivalent change.
 
 ## Evidence
 

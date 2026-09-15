@@ -34,9 +34,9 @@ release state.
 | --- | --- |
 | npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
-| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 0.8.0 · `security-tests-m8` 0.7.0 |
+| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 2.3.0 · `media-worker-m8` (`worker`) 0.5.0 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 3.0.0 · `media-worker-m8` (`worker`) 1.0.0 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -58,9 +58,9 @@ one-bump-per-unpublished-release rule.
 | `fa-auth-m8` | 2.2.1 | 2.2.1 | — published |
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
-| `media-sdk-m8` | 0.7.0 | 0.8.0 | pending |
-| `media-service-m8` | 2.1.0 | 2.3.0 | pending (2.1.1, 2.2.0 folded in — see *Wave 4 release cut*) |
-| `media-worker-m8` | 0.4.1 | 0.5.0 | pending |
+| `media-sdk-m8` | 0.7.0 | 1.0.0 | pending (0.8.0 renumbered before publish — see *Major recut* below) |
+| `media-service-m8` | 2.1.0 | 3.0.0 | pending (2.1.1, 2.2.0, 2.3.0 folded in — see *Wave 4 release cut* and *Major recut*) |
+| `media-worker-m8` | 0.4.1 | 1.0.0 | pending (0.5.0 renumbered before publish — see *Major recut* below) |
 | `prompt-engine-m8` | 2.2.0 | 2.2.0 | — published |
 | `reparto-docente-m8` | 2.1.0 | 2.1.1 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
@@ -661,7 +661,7 @@ versions coincide, so one range brackets both.
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.2.1 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
-| `media-service-m8` | 2.3.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <3.0.0` |
+| `media-service-m8` | 3.0.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <4.0.0` |
 | `prompt-engine-m8` | 2.2.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.1.1 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
@@ -1102,6 +1102,68 @@ written. The operator recorded the plan's open decisions that day and chose
 to leave the publish, the PRs and the release tags for a later session; the
 `pending` rows flip only after those acts, per the write-then-verify
 convention.
+
+### Major recut — the media triad crosses 1.0 / 3.0 together (2026-09-14, pending publish)
+
+`T37-fleet-repin-and-record` closes Wave 7 of the object-storage backend
+migration plan (`.workspace/plans/media-service-m8/todo/
+object-storage-backend-migration-2026-09-05.md`). The operator's read of
+Waves 1-6 (`T31` Step 1) was that this is a major change for the three media
+repos and the `MINIO_*` deprecation shim should not survive into the first
+published version that speaks `S3_*`, so the `0.8.0`/`2.3.0`/`0.5.0` cut this
+file recorded above under *Wave 4 release cut* was renumbered before
+publish, not published and then re-cut — none of those three tags was ever
+pushed, so nothing here is a retraction of a released artefact, and the Wave
+6c one-bump-per-unpublished-release rule applies as it does to any
+unpublished row.
+
+`media-sdk-m8` `0.8.0` → **`1.0.0` in the working tree**
+(`T33-sdk-1-0-0`, `3a5ec86`): the boto3-based, provider-neutral
+`ObjectStorage` is the stable API. Still `0.7.0` published.
+
+`media-service-m8` `2.3.0` → **`3.0.0` in the working tree**
+(`T34-service-3-0-0-drop-shim`, `8d4d5d0`/`7a8d55c`): the fourteen `MINIO_*`
+settings fields and their translation shim are removed in the same cut that
+would otherwise have published `2.3.0` — `Settings` is `extra="forbid"`, so a
+stray `MINIO_*` key now fails at boot. `CONTRACT_RANGE` moves
+`">=2.0.0 <3.0.0"` → `">=3.0.0 <4.0.0"`, tracking the package major as it
+always has; `CONTRACT_VERSION` stays `1.1` (service version is not contract
+version, as above). SDK floor raised to `>=1.0.0,<2.0.0`. Still `2.1.0`
+published.
+
+`media-worker-m8` `0.5.0` → **`1.0.0` in the working tree**
+(`T35-worker-1-0-0`, `a53933b`): no code change — the worker never carried
+the shim — but the SDK floor raise to `>=1.0.0,<2.0.0` rides the same
+unpublished-release fold as its sibling. Still `0.4.1` published.
+
+`astro-media-m8` `MEDIA_SERVICE_M8_MAX_SERVICE_VERSION_EXCLUSIVE` `"3.0.0"`
+→ **`"4.0.0"`** (`T36-astro-media-gate`, `1ef0af6`), admitting the `3.x`
+service line; `MIN_SERVICE_VERSION` stays `"2.0.0"`, so the gate widens
+additively and the client cut is a minor, `package.json` `2.0.0` → `2.1.0`.
+The client-gate row in the table above now reads `astro-media-m8`
+`>=2.0.0 <4.0.0`. `astro-media-m8` itself keeps published `1.1.1` / working
+tree `2.1.0` / pending — the Wave 7 client work is additive to the same
+unpublished row this file already tracked.
+
+**Eight pin sites re-pointed from the superseded `2.3.0`/`0.5.0` cut to
+`3.0.0`/`1.0.0`** (`T37-fleet-repin-and-record`): `media-service-m8`
+`docker_compose/{dev_media_m8,hardened_media_m8}/docker-compose.yml` and
+their `README.md`s, plus `docker_compose/README.md`'s stack-index row;
+`fa-ui-m8` `docker_compose/{dev_ui_m8,hardened_ui_m8}/docker-compose.yml` and
+`compose_policy_tests/test_compose_image_pins.py`'s docstring and
+`_PREVIOUSLY_LATEST` map. Gates: `media-service-m8`
+`tests/test_compose_image_pins.py` + `tests/test_compose_storage_policy.py`
+73 passed; `fa-ui-m8`'s full `compose_policy_tests` suite 240 passed. No
+image was ever built for `2.3.0`/`0.5.0` under any tag, so this re-pin
+carries no `docker pull` regression — both tags were already unpublished and
+red before this cut.
+
+**Not done here, and still the operator's own act:** publishing
+`media-sdk-m8@1.0.0` to PyPI and cutting the
+`tepochtli/media-service-m8:3.0.0` / `tepochtli/media-worker-m8:1.0.0` /
+`astro-media-m8` images/releases — that is `T31` Step 2 (Wave 8), gated on
+this wave. Until then all three re-pinned stacks' `docker pull` stays red,
+the same window this file has recorded for every prior media-stack cut.
 
 ## One documented read command per mechanism
 

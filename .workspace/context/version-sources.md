@@ -32,11 +32,11 @@ release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.0.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.2.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 3.0.0 · `media-worker-m8` (`worker`) 1.0.0 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 3.0.1 · `media-worker-m8` (`worker`) 1.0.0 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -58,15 +58,15 @@ one-bump-per-unpublished-release rule.
 | `fa-auth-m8` | 2.2.1 | 2.2.1 | — published |
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
-| `media-sdk-m8` | 0.7.0 | 1.0.0 | pending (0.8.0 renumbered before publish — see *Major recut* below) |
-| `media-service-m8` | 2.1.0 | 3.0.0 | pending (2.1.1, 2.2.0, 2.3.0 folded in — see *Wave 4 release cut* and *Major recut*) |
-| `media-worker-m8` | 0.4.1 | 1.0.0 | pending (0.5.0 renumbered before publish — see *Major recut* below) |
+| `media-sdk-m8` | 1.0.0 | 1.0.0 | — published (2026-09-15; see *Wave 8 publish* below) |
+| `media-service-m8` | 3.0.0 | 3.0.1 | pending (3.0.0 published 2026-09-16; 3.0.1 is the hard-purge FK patch — see *Wave 8 publish* below) |
+| `media-worker-m8` | 1.0.0 | 1.0.0 | — published (2026-09-16; see *Wave 8 publish* below) |
 | `prompt-engine-m8` | 2.2.0 | 2.2.0 | — published |
 | `reparto-docente-m8` | 2.1.0 | 2.1.1 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
 | `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
-| `astro-media-m8` | 1.1.1 | 2.0.0 | pending |
+| `astro-media-m8` | 2.1.0 | 2.2.0 | pending (2.1.0 published 2026-09-16; 2.2.0 tracks `media-service-m8` `3.0.1` — this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
 | `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
 | `astro-reparto-m8` | 2.0.0 | 2.1.0 | pending |
 
@@ -661,7 +661,7 @@ versions coincide, so one range brackets both.
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.2.1 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
-| `media-service-m8` | 3.0.0 (pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <4.0.0` |
+| `media-service-m8` | 3.0.0 (published; 3.0.1 pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <4.0.0` (published in `2.1.0`) |
 | `prompt-engine-m8` | 2.2.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.1.1 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
@@ -1164,6 +1164,91 @@ red before this cut.
 `astro-media-m8` images/releases — that is `T31` Step 2 (Wave 8), gated on
 this wave. Until then all three re-pinned stacks' `docker pull` stays red,
 the same window this file has recorded for every prior media-stack cut.
+
+### Wave 8 publish — the media triad is published, and a 3.0.1 patch follows (2026-09-16)
+
+`T31-operator-closeout` Step 2 (Wave 8 of the object-storage backend
+migration plan, `.workspace/plans/media-service-m8/todo/
+object-storage-backend-migration-2026-09-05.md`). The publish is the
+operator's own act and it has happened; this file's rows flip on the
+independent evidence this file requires, re-measured on 2026-09-16:
+
+- `media-sdk-m8` **`1.0.0` published** — PyPI's JSON index lists `1.0.0`
+  as the latest release; `v1.0.0` on `origin` (`dbf0e1c`, tip of `main`),
+  the `Upload Python Package` run for that release succeeded on
+  2026-09-15T17:13Z. PR #26 (`feat/wave0-s3-conformance-contract` → `main`,
+  Waves 0–1 + `T33`) and #27 (`chore/release-1.0.0-lock-refresh`, the lock
+  regenerated against the real index before publish) merged the same day.
+  Both consumers' `requirements_prod.lock` now pin a version the index
+  serves — `media-worker-m8` `75ea054` re-pinned to the published wheel
+  hashes; the `T9` pin-ahead-of-publish window recorded since 2026-09-05 is
+  closed.
+- `media-service-m8` **`3.0.0` published** — Docker Hub serves
+  `tepochtli/media-service-m8:3.0.0` (pushed 2026-09-16T16:49Z, digest
+  `sha256:2f87fcc…`); `v3.0.0` on `origin` at `1828254`, the merge of PR
+  #20 (`fix/jwks-kid-key-binding` → `main`; the branch name is historical,
+  the diff is Waves 1–7 merged onto it). `2.1.1`, `2.2.0` and `2.3.0` never
+  got a tag of their own, as the *Wave 4 release cut* and *Major recut*
+  sections predicted.
+- `media-worker-m8` **`1.0.0` published** — Docker Hub serves
+  `tepochtli/media-worker-m8:1.0.0` (2026-09-16T03:32Z, digest
+  `sha256:5a7ac60…`); `v1.0.0` on `origin` at `482106b`, the merge of PR #6.
+- `astro-media-m8` **`2.1.0` published** — `npm view @mano8/astro-media-m8
+  dist-tags.latest` → `2.1.0`; `v2.1.0` release on `origin` (2026-09-16T19:46Z)
+  at `3bf34f4`, the merge of PR #13 (`feat/service-3-x-gate-widen`, `T36`
+  plus `23bb883`'s `astro-auth-m8` `^2.6.0` repin and `js-yaml` `4.3.2` lift).
+  The published client's gate is `>=2.0.0 <4.0.0`, so a deployed `3.x`
+  service is admitted. **This row had been stale twice over**: it still read
+  published `1.1.1` / working tree `2.0.0` although `2.0.0` was tagged and
+  on npm since 2026-09-01 (`v2.0.0` at `e974bee`, PR #11) and the working
+  tree had been `2.1.0` since `T36` — the *Major recut* section noted the
+  latter in prose without moving the row.
+- `fa-ui-m8` — its share (compose pins and docs only, PR #22 →
+  `pre-alpha`, then PR #23 `integration/pending-work` → `main` at `64dc59c`)
+  is on `main`; the repo's own row is unchanged (never published, `0.1.0`).
+
+**The live acceptance found a bug in the published `3.0.0`, so the cut does
+not close here.** `T31` re-ran the plan's live suites against
+`hardened_media_m8` on the published images with the base stack's
+working-tree source bind mount dropped (the same `volumes: !override` shape
+`docker-compose.production.yml` uses — the base compose file mounts
+`../../media_service` over the image's own code, so a run without that
+override measures the working tree, not the artefact): `T24`'s invariants
+42 passed, `T29`'s admin-surface probes 11 passed, `T23`'s workflow steps
+1–8 pass — including the `T32` archive tier, live for the first time — and
+step 9 (`purge-expired`) answers **500**: `media_variant` / `variant_job`
+reference `media_object` without `ON DELETE CASCADE`, so the hard purge was
+a foreign-key violation for every image that ever had a variant (the only
+prior live purge, 2026-09-13, purged the quarantined EICAR upload, which has
+none; the unit suite runs SQLite with foreign keys off). Fixed as
+`media-service-m8` **`3.0.1` in the working tree** (`2a6f90c` on
+`release/3.0.1-hard-purge-fk`, cut off `main`; PR #22 → `main`, pushed, not
+tagged — PR #21, opened from the historical `fix/jwks-kid-key-binding`
+branch, was closed in its favour and that branch restored to its merged
+tip `0cbaac8`): the purge
+deletes the variant and job rows first and removes the variant bytes from
+the bucket as stored; pinned by a foreign-keys-on unit test; the full live
+workflow passes on an image built from that tree with the mount dropped.
+Contract untouched (`1.1`, range `>=3.0.0 <4.0.0`), so the patch needs no
+client release. Pins moved first, per this file's write-then-verify
+convention: the five `media-service-m8` sites (`2fcd69b`, same PR) and
+`fa-ui-m8`'s three stacks + `test_compose_image_pins.py` fixture (`9ced278`
+on `chore/pin-media-service-3.0.1`, PR #24 → `main`) now name `3.0.1`, which
+the registry does not serve yet — the same window this file has recorded for
+every media-stack cut, expected to close when the operator merges #22/#24
+and cuts `v3.0.1`. The `media-service-m8` row above flips only after that.
+
+`astro-media-m8` **`2.2.0` in the working tree** (`e72f02e` on
+`chore/tested-service-3.0.1`, PR #14 → `main`, pushed, not published) is
+the matching client tracking release: `MEDIA_SERVICE_M8_TESTED_SERVICE_VERSION`
+and `mediaServiceM8.testedServiceVersion` move `3.0.0` → `3.0.1`, a minor
+rather than a patch on the same reasoning `astro-auth-m8` `2.5.0`/`2.6.0`
+recorded (an exported compatibility constant changes value); the contract
+(`1.1`) and the `>=2.0.0 <4.0.0` gate are untouched, so this release gates
+nothing and exists to keep the tracked version in step with the compose
+pins. Merge order: after `media-service-m8` #22 and its `v3.0.1` release,
+so the tested version names a published service; then `v2.2.0` publishes
+the client. Both rows flip on the registry evidence, not before.
 
 ## One documented read command per mechanism
 

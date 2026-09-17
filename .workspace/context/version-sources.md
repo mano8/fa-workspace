@@ -1265,6 +1265,15 @@ published `3.0.1` with the source mount dropped (container reads
 steps pass**, `T24` invariants 42 passed, `T29` admin-surface 11 passed.
 Every consumer pin in the fleet now names a version its registry serves,
 and the plan moved to `.workspace/plans/media-service-m8/done/`.
+Re-measured 2026-09-17 for the JWKS `kid`/key-binding plan's residual: the
+pulled `tepochtli/media-service-m8:3.0.1` (index digest
+`sha256:9674dbda01b8b8c7f681a056e3c750a3b0536c633a6ae671ce799e4d00ae4f07`)
+answers `media_service 3.0.1`, `fastapi-m8 4.5.1`, `auth-sdk-m8 3.2.0` —
+the second published consumer image resolving `auth-sdk-m8 3.2.0`, after
+`prompt-engine-m8 2.2.0`; its `requirements_prod.lock` at `v3.0.1` already
+pinned both, so the `prompt-engine-m8` #40 lock lesson did not recur.
+`reparto-docente-m8` remains the one consumer still on the pre-`W3.2`
+floor (`2.1.0` on Hub, 2026-08-30).
 
 ## One documented read command per mechanism
 

@@ -59,14 +59,14 @@ one-bump-per-unpublished-release rule.
 | `imgtools_m8` | 2.1.1 | 2.1.1 | — published |
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-sdk-m8` | 1.0.0 | 1.0.0 | — published (2026-09-15; see *Wave 8 publish* below) |
-| `media-service-m8` | 3.0.0 | 3.0.1 | pending (3.0.0 published 2026-09-16; 3.0.1 is the hard-purge FK patch — see *Wave 8 publish* below) |
+| `media-service-m8` | 3.0.1 | 3.0.1 | — published (3.0.0 and the 3.0.1 hard-purge FK patch both on 2026-09-16; see *Wave 8 publish* below) |
 | `media-worker-m8` | 1.0.0 | 1.0.0 | — published (2026-09-16; see *Wave 8 publish* below) |
 | `prompt-engine-m8` | 2.2.0 | 2.2.0 | — published |
 | `reparto-docente-m8` | 2.1.0 | 2.1.1 | pending |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
 | `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
-| `astro-media-m8` | 2.1.0 | 2.2.0 | pending (2.1.0 published 2026-09-16; 2.2.0 tracks `media-service-m8` `3.0.1` — this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
+| `astro-media-m8` | 2.2.0 | 2.2.0 | — published (2.1.0 and the 2.2.0 tracking release both on 2026-09-16; this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
 | `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
 | `astro-reparto-m8` | 2.0.0 | 2.1.0 | pending |
 
@@ -661,7 +661,7 @@ versions coincide, so one range brackets both.
 | Service | Package version | Contract | Client gate (`<plugin>/src/runtime/compatibility.ts`) |
 | --- | --- | --- | --- |
 | `fa-auth-m8` | 2.2.1 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
-| `media-service-m8` | 3.0.0 (published; 3.0.1 pending) | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <4.0.0` (published in `2.1.0`) |
+| `media-service-m8` | 3.0.1 | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <4.0.0` (published in `2.1.0`; `2.2.0` tests against `3.0.1`) |
 | `prompt-engine-m8` | 2.2.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.1.1 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
 
@@ -997,8 +997,9 @@ floor raise is not done until `requirements_prod.lock` moves with
 ### Wave 4 release cut — `media-service-m8` and `media-worker-m8` (2026-09-13, pending publish)
 
 `T26-changelog-release` closes Wave 4 of the object-storage backend
-migration plan (`.workspace/plans/media-service-m8/todo/
-object-storage-backend-migration-2026-09-05.md`). Both moved rows are
+migration plan (`.workspace/plans/media-service-m8/done/
+object-storage-backend-migration-2026-09-05.md`, under `todo/` until it
+closed on 2026-09-16). Both moved rows are
 **image-publish pending** — the version bump, `CHANGELOG.md` entry and
 compose image-pin re-point are cut here on the plan's own branch
 (`feat/object-storage-backend-migration`) and pushed; building and tagging
@@ -1106,8 +1107,9 @@ convention.
 ### Major recut — the media triad crosses 1.0 / 3.0 together (2026-09-14, pending publish)
 
 `T37-fleet-repin-and-record` closes Wave 7 of the object-storage backend
-migration plan (`.workspace/plans/media-service-m8/todo/
-object-storage-backend-migration-2026-09-05.md`). The operator's read of
+migration plan (`.workspace/plans/media-service-m8/done/
+object-storage-backend-migration-2026-09-05.md`, under `todo/` until it
+closed on 2026-09-16). The operator's read of
 Waves 1-6 (`T31` Step 1) was that this is a major change for the three media
 repos and the `MINIO_*` deprecation shim should not survive into the first
 published version that speaks `S3_*`, so the `0.8.0`/`2.3.0`/`0.5.0` cut this
@@ -1168,8 +1170,9 @@ the same window this file has recorded for every prior media-stack cut.
 ### Wave 8 publish — the media triad is published, and a 3.0.1 patch follows (2026-09-16)
 
 `T31-operator-closeout` Step 2 (Wave 8 of the object-storage backend
-migration plan, `.workspace/plans/media-service-m8/todo/
-object-storage-backend-migration-2026-09-05.md`). The publish is the
+migration plan, `.workspace/plans/media-service-m8/done/
+object-storage-backend-migration-2026-09-05.md`, moved from `todo/` when
+it closed on 2026-09-16). The publish is the
 operator's own act and it has happened; this file's rows flip on the
 independent evidence this file requires, re-measured on 2026-09-16:
 
@@ -1249,6 +1252,19 @@ nothing and exists to keep the tracked version in step with the compose
 pins. Merge order: after `media-service-m8` #22 and its `v3.0.1` release,
 so the tested version names a published service; then `v2.2.0` publishes
 the client. Both rows flip on the registry evidence, not before.
+
+**Closed 2026-09-16, both rows flipped.** `media-service-m8` `v3.0.1`
+(`a6ecbe6`, merge of PR #22, release 20:50Z) → Docker Hub serves
+`tepochtli/media-service-m8:3.0.1` (20:57Z, digest `sha256:9674dbd…`),
+`Publish Docker Image` run green; `fa-ui-m8` PR #24 merged (`48a07c3`);
+`astro-media-m8` `v2.2.0` (`4b3a075`, merge of PR #14, release 20:49Z) →
+`npm view @mano8/astro-media-m8 dist-tags.latest` → `2.2.0`, `Publish
+Package` run green. The plan's acceptance was then re-run against the
+published `3.0.1` with the source mount dropped (container reads
+`__version__` `3.0.1`, `GET /media/meta` serves it): `T23` workflow **9/9
+steps pass**, `T24` invariants 42 passed, `T29` admin-surface 11 passed.
+Every consumer pin in the fleet now names a version its registry serves,
+and the plan moved to `.workspace/plans/media-service-m8/done/`.
 
 ## One documented read command per mechanism
 

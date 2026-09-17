@@ -2,8 +2,10 @@
 
 Canonical owner of the fleet's object-storage backend contract and the ratified
 default/fallback pair. Ratified by `T5-ratify-backend` of the
-`media-sdk-m8/todo/object-storage-backend-migration-2026-09-05.md` plan
-(gitignored; not the authority — this file is), after `T0`–`T4` proved the
+`.workspace/plans/media-service-m8/done/object-storage-backend-migration-2026-09-05.md`
+plan (gitignored; not the authority — this file is; it lived under `todo/`
+until it closed on 2026-09-16, and this line had misplaced it under
+`media-sdk-m8/`), after `T0`–`T4` proved the
 candidates against the executable S3 conformance harness in
 `media-sdk-m8/tests/conformance/`.
 

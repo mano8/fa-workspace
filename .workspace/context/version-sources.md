@@ -824,6 +824,18 @@ twice above for the media stack has no analogue here and no window to open. A
 stack that later consumes the published reparto image is the point at which
 that changes.
 
+**Superseded 2026-09-19 — one such stack exists, and it is off-tree.** The
+host-local `rpi_server/docente_reparto` compose (git-ignored at the workspace
+root, the 2026-09-13 entry below already names it) pins
+`image: tepochtli/reparto-docente-m8:<version>` for `reparto_service`; the
+base file also bind-mounts the sibling source over `/opt/reparto_service` and
+the production overlay `!override`s that mount away, so in production the
+image is what runs. It read `2.1.0` and was moved to **`2.2.0`** on disk
+ahead of publish, per the pin-before-publish rule (see *The reparto pair cut
+at 2.2.0* below). The three in-tree statements above still hold: no tracked
+stack pins the reparto image, `_PREVIOUSLY_LATEST` has no reparto entry, and
+the sweep that assumed otherwise would still find nothing to change in git.
+
 #### ⚠️ `fa-ui-m8` does **not** consume the business plugins as `file:` links
 
 The 2026-08-30 entry above states that "`fa-ui-m8/app` consumes the three
@@ -1323,6 +1335,28 @@ working tree is uncommitted). So: merge and publish `astro-reparto-m8@2.2.0`
 → `npm install` in `fa-ui-m8/app` and rebuild the host → then tag and
 release `reparto-docente-m8@2.2.0`. Both CHANGELOGs and both PR bodies state
 it.
+
+**Pin sweep for `reparto-docente-m8` `2.2.0`** — every site that names a
+reparto version, in tree and on this host:
+
+| Site | Was | Now |
+| --- | --- | --- |
+| `astro-reparto-m8/package.json` `repartoDocenteM8.testedServiceVersion` | `2.1.1` | `2.2.0` (`a60d536`) |
+| `astro-reparto-m8/REPOSITORY_CONTEXT.md` "tested at service version" | `2.1.1` | `2.2.0` (`a60d536`) |
+| `astro-reparto-m8` comments/docs naming the older service (`schemas.ts`, three tests, `docs/contract-inventory.md`) | `2.1.1` | `2.1.0` — the version that actually shipped (`a60d536`) |
+| `rpi_server/docente_reparto/docker-compose.yml` `reparto_service.image` (host-local, ignored) | `tepochtli/reparto-docente-m8:2.1.0` | `:2.2.0`, ahead of publish; README row corrected from "local build" |
+| `fa-ui-m8/docker_compose/dev_local_full_ui_m8` | `build:` from sibling source | unchanged — no version to pin |
+| `reparto-docente-m8/docker_compose/dev_reparto_m8` | `build:` from `../..` | unchanged — no version to pin |
+| `fa-ui-m8` `dev_ui_m8` / `hardened_ui_m8` | no `reparto_service` | unchanged — nothing to pin |
+| `.workspace/context/version-sources.md` mechanism table, published/working-tree table, fleet compatibility table | `2.1.1` / `2.1.0`–`2.1.1` / `2.1.1 (pending)` | `2.2.0` / `2.1.0`–`2.2.0` / `2.2.0 (pending)` |
+
+`CONTRACT_VERSION` `reparto-docente-m8@2.0.0` is deliberately **not** in this
+table: it is the contract axis, moves only when the served surface does, and
+the client's gate is an exact-match `Set` on it. The `fa-ui-m8` UI image tag
+the Pi runs (`tepochtli/fa-ui-m8:0.1.0-reparto*`) bakes in
+`@mano8/astro-reparto-m8` at build time, so it is not a reparto *pin* but it
+is on the critical path: it must be rebuilt on `2.2.0` of the plugin, under a
+new tag, before `reparto_service` `2.2.0` is pulled.
 
 Gates at the cut — service (Conda `fa_auth_m8`): Ruff format/check over 187
 files, **`mypy .` 0 errors over 180 files** (the 15 test-only errors this

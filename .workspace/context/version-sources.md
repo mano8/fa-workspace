@@ -32,11 +32,11 @@ release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.2.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.1.0 · `astro-ui-m8` 1.5.1 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.2.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.2.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 3.0.1 · `media-worker-m8` (`worker`) 1.0.0 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.1.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 3.0.1 · `media-worker-m8` (`worker`) 1.0.0 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.2.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -62,13 +62,13 @@ one-bump-per-unpublished-release rule.
 | `media-service-m8` | 3.0.1 | 3.0.1 | — published (3.0.0 and the 3.0.1 hard-purge FK patch both on 2026-09-16; see *Wave 8 publish* below) |
 | `media-worker-m8` | 1.0.0 | 1.0.0 | — published (2026-09-16; see *Wave 8 publish* below) |
 | `prompt-engine-m8` | 2.2.0 | 2.2.0 | — published |
-| `reparto-docente-m8` | 2.1.0 | 2.1.1 | pending |
+| `reparto-docente-m8` | 2.1.0 | 2.2.0 | pending — PR [#30](https://github.com/DocentesTools/reparto-docente-m8/pull/30) open; deploy **after** `astro-reparto-m8@2.2.0` (see *The reparto pair cut at 2.2.0* below) |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
 | `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
 | `astro-media-m8` | 2.2.0 | 2.2.0 | — published (2.1.0 and the 2.2.0 tracking release both on 2026-09-16; this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
 | `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
-| `astro-reparto-m8` | 2.0.0 | 2.1.0 | pending |
+| `astro-reparto-m8` | 2.1.0 | 2.2.0 | pending — `2.1.0` published 2026-09-08 (this row had been stale since); PR [#4](https://github.com/DocentesTools/astro-reparto-m8/pull/4) open; publish **first** |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
 than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and
@@ -663,7 +663,7 @@ versions coincide, so one range brackets both.
 | `fa-auth-m8` | 2.2.1 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
 | `media-service-m8` | 3.0.1 | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <4.0.0` (published in `2.1.0`; `2.2.0` tests against `3.0.1`) |
 | `prompt-engine-m8` | 2.2.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
-| `reparto-docente-m8` | 2.1.1 (pending) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate) |
+| `reparto-docente-m8` | 2.2.0 (pending; `2.1.1` was never published) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate); `2.2.0` tests against `2.2.0` |
 
 Each plugin's gate is bounded on the **service** version and must admit its
 backend's package version; each also repeats the pair as declarative
@@ -1274,6 +1274,64 @@ the second published consumer image resolving `auth-sdk-m8 3.2.0`, after
 pinned both, so the `prompt-engine-m8` #40 lock lesson did not recur.
 `reparto-docente-m8` remains the one consumer still on the pre-`W3.2`
 floor (`2.1.0` on Hub, 2026-08-30).
+
+### The reparto pair cut at 2.2.0 (2026-09-19, pending publish)
+
+Measured against on-disk source, `git ls-remote --tags origin` and
+`npm view`. Both rows were wrong again, in both of this file's ways.
+
+`astro-reparto-m8` `2.0.0`/`2.1.0`/pending → **`2.1.0` published, `2.2.0`
+working tree, pending.** The published column had been *stale* since
+2026-09-08: `v2.1.0` was tagged and `npm view @mano8/astro-reparto-m8`
+answers `latest: 2.1.0` (PR #3), yet the row went on saying `2.0.0`. The
+working tree then accumulated four commits under `[Unreleased]` — C8
+code-based error classification, C9 `Accept-Language` on every request, the
+C13 client half (optional `locale` on both export schemas), and the auth-peer
+`^2.6.0` / `js-yaml` `4.3.2` remediation — while `package.json` still read
+the already-live `2.1.0`. Cut to **`2.2.0`** (`a60d536`): a field and a
+header are a minor. `repartoDocenteM8.testedServiceVersion` moves `2.1.1` →
+`2.2.0` — the old value named a service version that was never published
+(next paragraph). `contract` stays `reparto-docente-m8@2.0.0`,
+`serviceVersionRange` stays `>=2.0.0 <3.0.0`; `verify:contract-operations`
+re-run green (116 operations). PR
+[#4](https://github.com/DocentesTools/astro-reparto-m8/pull/4) is open to
+`main`.
+
+`reparto-docente-m8` `2.1.0`/`2.1.1`/pending → **`2.1.0` published, `2.2.0`
+working tree, pending.** The row was *behind*, and the working-tree value it
+carried was itself a number that will never ship: `2.1.1` was bumped on
+2026-09-06 but never tagged, and C4–C14 (validation `params`, document
+identity, the 157-code error envelope, `Accept-Language` negotiation with
+`es`/`fr` gettext catalogs, coded bulk-preview prose, the persisted export
+`locale` column, the three-locale document catalog) plus the `fastapi-m8`
+`4.5.1` floor and the compose `fa-auth-m8` `2.2.1` repin all landed on top
+of it. Fifth application of the one-bump rule: `[2.1.1]` folds into
+**`[2.2.0]`** with every entry preserved (`7ee5c4a`), and the five task
+commits that had landed without CHANGELOG entries got them at the cut.
+`CONTRACT_VERSION` / `CONTRACT_RANGE` unchanged; `docs/served-api-surface.json`
+still byte-identical to the client's vendored copy. This release also closes
+the "one consumer still on the pre-`W3.2` floor" note two paragraphs up: the
+`2.2.0` image will resolve `fastapi-m8 4.5.1` / `auth-sdk-m8 3.2.0`. PR
+[#30](https://github.com/DocentesTools/reparto-docente-m8/pull/30) is open to
+`main`.
+
+**Publish order is load-bearing this time.** The service emits `locale` on
+every `ExportArtifactPublic` row; the live `2.1.0` client's schema is Zod
+`.strict()` without that field and would reject every export listing.
+`fa-ui-m8/app` pins `^2.0.0` from the registry (the `file:` link in its
+working tree is uncommitted). So: merge and publish `astro-reparto-m8@2.2.0`
+→ `npm install` in `fa-ui-m8/app` and rebuild the host → then tag and
+release `reparto-docente-m8@2.2.0`. Both CHANGELOGs and both PR bodies state
+it.
+
+Gates at the cut — service (Conda `fa_auth_m8`): Ruff format/check over 187
+files, **`mypy .` 0 errors over 180 files** (the 15 test-only errors this
+file recorded on 2026-09-06 are fixed in `3a67424`, so the README's command
+and CI's command finally agree), 2142 tests at 100% coverage, Bandit zero
+medium/high, Docker image builds and both catalogs load in a fresh container.
+Client (Node 24.18.1): typecheck, lint, build, 1085 tests at 100%, contract
+operations, nine fleet gates, registry drift/consumer, starter and headless
+fixture builds, `2.2.0` tarball standalone install, `npm audit` clean.
 
 ## One documented read command per mechanism
 

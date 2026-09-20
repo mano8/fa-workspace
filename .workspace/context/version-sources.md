@@ -1405,6 +1405,55 @@ under a new tag *before* pulling `tepochtli/reparto-docente-m8:2.2.0` on
 the Pi. Recorded so the deploy does not read the registry timestamps as
 proof the order was honoured.
 
+### The published fleet verified live under `TOKEN_MODE=stateful` (2026-09-20)
+
+The consumer-alignment closure plan's `B7` (`.workspace/plans/stack/todo/
+consumer-alignment-closure-remediation-plan-2026-08-16.md`), run on the
+Windows host against Docker Desktop 4.86.0 / Compose v5.3.1, one stack at a
+time, every stack torn back down to 0 containers and 0 project networks.
+Every consumer ran the **published** image, not a source build — each
+newest tag is byte-identical to `origin/main` (`fa-auth-m8` `v2.2.1` =
+`77f302c`, `media-service-m8` `v3.0.1` = `a6ecbe6`, `media-worker-m8`
+`v1.0.0` = `482106b`, `prompt-engine-m8` `v2.2.0` = `19caa6e`,
+`reparto-docente-m8` `v2.2.0` = `09e979a`), so "what the registry ships" and
+"what `main` carries" are the same measurement here. Issuer in every stack:
+`tepochtli/fa-auth-m8:2.2.1`, `TOKEN_MODE=stateful`, one login and one
+token per stack (a second login of the same user revokes the first token
+under stateful mode — the JWKS plan's `W3.4` trap, avoided by design).
+
+| Stack (compose dir) | Consumer image | Probe (reader/admin floor) | no token / garbage / **authenticated** | `fastapi-m8` / `auth-sdk-m8` resolved in the image | `~introspect:*` grant |
+| --- | --- | --- | --- | --- | --- |
+| `media-service-m8/docker_compose/hardened_media_m8` (+ `media-worker-m8:1.0.0`) | `tepochtli/media-service-m8:3.0.1` | `GET /media/category/` | `401` / `403` / **`200`** (×2) | `4.5.1` / `3.2.0` | answers as user `auth`; out-of-grant key → `NOPERM`; 0 `NOPERM` in either log |
+| `reparto-docente-m8/docker_compose/dev_reparto_m8` (build swapped for the image) | `tepochtli/reparto-docente-m8:2.2.0` | `GET /reparto/departments/` | `401` / `403` / **`200`** (×2) | `4.5.1` / `3.2.0` | same |
+| `prompt-engine-m8/docker_compose/dev_prompt_engine_m8` (provisioned from its `*.env.example`, build swapped for the image) | `tepochtli/prompt-engine-m8:2.2.0` | `GET /prompt/category/` | `401` / `403` / **`200`** (×2) | `4.5.1` / `3.2.0` | same |
+
+All three consumers therefore resolve the `W3.2` floor (`auth-sdk-m8 3.2.0`,
+`fastapi-m8 4.5.1`) **from the published tag**, which is what the JWKS plan's
+`W3.4` finding 1 said only a rebuilt local image did at the time. Measured
+with `importlib.metadata.version` inside each container: none of the three
+images ships `pip`, so the `pip show` form the plan's §6 named cannot run
+against them. Consumer `RestartCount` 0 and no `ERROR`/`Traceback` in any
+consumer log after the probes.
+
+**`fa-ui-m8` host against `@mano8/astro-reparto-m8@2.2.0` (the `B8`
+residual).** `fa-ui-m8/app` at the `origin/main` tree (`415df4f`, PR #26;
+lock `2.6.0` / `1.5.1` / `2.2.0` / `2.1.0` / `2.2.0`) served by `astro dev`
+through its same-origin proxy onto the reparto stack above; headless Chrome
+153 logged in through the plugin's form and loaded `/en/reparto`,
+`/en/reparto/setup/departments` and `/en/reparto/processes`. All three
+rendered — `data-reparto-route` `no-process` / `departments` / `processes`,
+three-stage sidebar, departments data table with its columns and paging,
+no `role=alert`, no page error — and every `/reparto/*` call the pages made
+(`assignment-processes/`, `schools/`, `departments/`) answered `200`. The
+`G12`(a) config crash is gone on the live payload, not only at install.
+Screenshots and the per-stack transcripts live in the session scratchpad;
+no token, credential or password hash is in either.
+
+Nothing under any repository changed: the two dev stacks ran under a
+scratchpad override (`image:` in place of `build:`, source bind mount
+dropped), the prompt stack's secrets were generated in the scratchpad and
+destroyed after, and every `git status` read clean afterwards.
+
 ## One documented read command per mechanism
 
 Run from the workspace root; each command prints the repo's authoritative

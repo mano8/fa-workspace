@@ -1478,8 +1478,12 @@ manifest↔runtime lock, which could not exist before this release gave it a
 
 The working tree and `main` read `2.3.0`; `origin` tags still end at
 `v2.2.0` and `npm view @mano8/astro-reparto-m8 version` reads `2.2.0`. The
-tag and publish are the operator's; `fa-ui-m8`'s `^2.2.0` pin follows the
-publish, never precedes it.
+tag and publish are the operator's and, by the plan's eleventh amendment
+(2026-09-20), deliberately deferred: the operator publishes once per
+repository when the plan is done (`B25`), so anything `B12` lands on this
+repository before then rides `2.3.0` under the one-bump-per-unpublished-
+release rule. `fa-ui-m8`'s `^2.2.0` pin follows the publish, never precedes
+it.
 
 ## One documented read command per mechanism
 

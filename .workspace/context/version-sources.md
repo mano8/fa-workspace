@@ -62,13 +62,13 @@ one-bump-per-unpublished-release rule.
 | `media-service-m8` | 3.0.1 | 3.0.1 | — published (3.0.0 and the 3.0.1 hard-purge FK patch both on 2026-09-16; see *Wave 8 publish* below) |
 | `media-worker-m8` | 1.0.0 | 1.0.0 | — published (2026-09-16; see *Wave 8 publish* below) |
 | `prompt-engine-m8` | 2.2.0 | 2.2.0 | — published |
-| `reparto-docente-m8` | 2.1.0 | 2.2.0 | pending — PR [#30](https://github.com/DocentesTools/reparto-docente-m8/pull/30) open; deploy **after** `astro-reparto-m8@2.2.0` (see *The reparto pair cut at 2.2.0* below) |
+| `reparto-docente-m8` | 2.2.0 | 2.2.0 | — published (2026-09-19; see *The reparto pair published* below) |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
 | `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
 | `astro-media-m8` | 2.2.0 | 2.2.0 | — published (2.1.0 and the 2.2.0 tracking release both on 2026-09-16; this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
 | `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
-| `astro-reparto-m8` | 2.1.0 | 2.2.0 | pending — `2.1.0` published 2026-09-08 (this row had been stale since); PR [#4](https://github.com/DocentesTools/astro-reparto-m8/pull/4) open; publish **first** |
+| `astro-reparto-m8` | 2.2.0 | 2.2.0 | — published (2026-09-19; see *The reparto pair published* below) |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
 than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and
@@ -663,7 +663,7 @@ versions coincide, so one range brackets both.
 | `fa-auth-m8` | 2.2.1 | `fa-auth-m8@2.0` | `astro-auth-m8` `>=2.0.0 <3.0.0` |
 | `media-service-m8` | 3.0.1 | `media-service-m8@1.1` | `astro-media-m8` `>=2.0.0 <4.0.0` (published in `2.1.0`; `2.2.0` tests against `3.0.1`) |
 | `prompt-engine-m8` | 2.2.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
-| `reparto-docente-m8` | 2.2.0 (pending; `2.1.1` was never published) | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate); `2.2.0` tests against `2.2.0` |
+| `reparto-docente-m8` | 2.2.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate); `2.2.0` tests against `2.2.0` |
 
 Each plugin's gate is bounded on the **service** version and must admit its
 backend's package version; each also repeats the pair as declarative
@@ -1366,6 +1366,44 @@ medium/high, Docker image builds and both catalogs load in a fresh container.
 Client (Node 24.18.1): typecheck, lint, build, 1085 tests at 100%, contract
 operations, nine fleet gates, registry drift/consumer, starter and headless
 fixture builds, `2.2.0` tarball standalone install, `npm audit` clean.
+
+### The reparto pair published (2026-09-19)
+
+Measured against GitHub, Docker Hub, npm and the pulled image, the same
+day as the cut above. Both rows flip to *published*.
+
+`reparto-docente-m8` `2.1.0`/`2.2.0`/pending → **`2.2.0` published.** PR
+[#30](https://github.com/DocentesTools/reparto-docente-m8/pull/30) merged
+at `90a0c22` (16:45Z); PR
+[#31](https://github.com/DocentesTools/reparto-docente-m8/pull/31)
+(`09e979a`, constraints regenerated after the Dependabot floor bumps,
+recorded under `[2.2.0]`) merged on top at 17:09Z; `v2.2.0` is tagged on
+`09e979a`, the `main` tip, release published 17:10Z;
+`docker-publish.yaml` run `35457262029` green. Hub `2.2.0` and `latest`
+share index digest
+`sha256:803e9c18671f7317cdb0ed191c50cc459525471da6d59bf3250eec5cc7562650`;
+the pulled image answers `reparto_service 2.2.0`, `fastapi-m8 4.5.1`,
+`auth-sdk-m8 3.2.0` — the last consumer onto the `W3.2` floor, which
+closes the JWKS `kid` plan
+(`.workspace/plans/stack/done/fa-auth-jwks-kid-key-binding-plan-2026-09-08.md`,
+`W3.7` line 6). `fix/jwks-kid-key-binding` is 0 ahead of `origin/main`;
+no PRs open.
+
+`astro-reparto-m8` `2.1.0`/`2.2.0`/pending → **`2.2.0` published.** PR
+[#4](https://github.com/DocentesTools/astro-reparto-m8/pull/4) merged at
+17:18Z, `v2.2.0` on `cf494b1`, `Publish Package` run `35458967201` green,
+`npm view @mano8/astro-reparto-m8 time` puts `2.2.0` at 17:45:43Z.
+
+**Registry order was service-first**, the reverse of the load-bearing
+order the cut section states: the service image was on Hub at ~17:10Z,
+the client on npm at 17:45Z. Nothing consumed the service image in that
+window — every stack that runs `reparto_service` builds from source, and
+the one host-local pin (`rpi_server/docente_reparto`) is pulled by hand —
+so the constraint that matters is unchanged and still stands for the
+deploy: rebuild the `fa-ui-m8` host on `@mano8/astro-reparto-m8@2.2.0`
+under a new tag *before* pulling `tepochtli/reparto-docente-m8:2.2.0` on
+the Pi. Recorded so the deploy does not read the registry timestamps as
+proof the order was honoured.
 
 ## One documented read command per mechanism
 

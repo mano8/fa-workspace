@@ -32,7 +32,7 @@ release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.2.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.2.0 · `astro-ui-m8` 1.5.1 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.2.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.3.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.1 |
@@ -68,7 +68,7 @@ one-bump-per-unpublished-release rule.
 | `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
 | `astro-media-m8` | 2.2.0 | 2.2.0 | — published (2.1.0 and the 2.2.0 tracking release both on 2026-09-16; this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
 | `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
-| `astro-reparto-m8` | 2.2.0 | 2.2.0 | — published (2026-09-19; see *The reparto pair published* below) |
+| `astro-reparto-m8` | 2.2.0 | 2.3.0 | **pending** (cut 2026-09-20, on `main` as `5d527b1`; see *`astro-reparto-m8` 2.3.0 — the service-version gate* below) |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
 than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and
@@ -1453,6 +1453,33 @@ Nothing under any repository changed: the two dev stacks ran under a
 scratchpad override (`image:` in place of `build:`, source bind mount
 dropped), the prompt stack's secrets were generated in the scratchpad and
 destroyed after, and every `git status` read clean afterwards.
+
+### `astro-reparto-m8` 2.3.0 — the service-version gate (2026-09-20, pending publish)
+
+The consumer-alignment closure plan's `B11` (`.workspace/plans/stack/todo/
+consumer-alignment-closure-remediation-plan-2026-08-16.md`, finding `G6`).
+Since `2.0.0` the client's `package.json` had advertised
+`repartoDocenteM8.serviceVersionRange` `>=2.0.0 <3.0.0` while
+`src/runtime/compatibility.ts` compared only the contract identity — the one
+plugin of four whose stated range was documentation, and three service
+releases shipped against it. `2.3.0` (PR #7, merged by the operator as
+`5d527b1`) adds `REPARTO_MIN_SERVICE_VERSION` `2.0.0`,
+`REPARTO_MAX_SERVICE_VERSION_EXCLUSIVE` `3.0.0`,
+`REPARTO_SERVICE_VERSION_RANGE` and `REPARTO_TESTED_SERVICE_VERSION`
+`2.2.0` — the manifest verbatim, in the shape `astro-media-m8` carries — and
+`assertRepartoCompatibility` now refuses a GET `/meta` `version` outside the
+range, after the contract-identity checks. `contract`, `serviceVersionRange`
+and `testedServiceVersion` are all unchanged; a minor because a host that
+was reaching a `1.x` or `3.x` service through the guard now fails at
+startup. The plan's `G7` gap (*"a known gap, recorded rather than fixed"*
+above) is still open for this repository until `B12` lands its
+manifest↔runtime lock, which could not exist before this release gave it a
+`MIN`/`MAX` pair to assert.
+
+The working tree and `main` read `2.3.0`; `origin` tags still end at
+`v2.2.0` and `npm view @mano8/astro-reparto-m8 version` reads `2.2.0`. The
+tag and publish are the operator's; `fa-ui-m8`'s `^2.2.0` pin follows the
+publish, never precedes it.
 
 ## One documented read command per mechanism
 

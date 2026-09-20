@@ -20,6 +20,9 @@ owned and usable outside this checkout.
 - [`contracts/agent-context-w2a.contract.md`](contracts/agent-context-w2a.contract.md)
   owns authority, scope, authorization, delivery, accounting, runtime,
   receipt, and capability rules.
+- [`context/markdown-conventions.md`](context/markdown-conventions.md) owns
+  the fleet's `.markdownlint` config file format and canonical `CHANGELOG.md`
+  release-heading form.
 - [`plans/`](plans/), [`analyse/`](analyse/), and [`status/`](status/) own plans,
   analyses, and evidence artifacts. Do not copy shared facts into `.codex/` or
   `.claude/`.

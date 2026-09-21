@@ -1485,6 +1485,31 @@ repository before then rides `2.3.0` under the one-bump-per-unpublished-
 release rule. `fa-ui-m8`'s `^2.2.0` pin follows the publish, never precedes
 it.
 
+### Five service patches cut on branches (2026-09-20, pending merge and publish)
+
+The consumer-alignment closure plan's `B23-converge-patch-layer` (Wave 6,
+finding `G18`): the five service images move to the one Debian patch-layer
+form and the one base digest that
+[`debian-patch-layer.md`](debian-patch-layer.md) now owns. Each is an
+image-only patch release, cut on `chore/patch-layer-convergence` in its
+repository, **not yet on `main`** — the merges are the plan's `B26` sweep
+and the tags/publishes its `B25` sweep (twelfth and eleventh amendments), so
+the two tables above keep reading `main` and `origin` and do not move here.
+
+| Repo | `main` today | Cut on the branch | PR |
+| --- | --- | --- | --- |
+| `fa-auth-m8` | 2.2.1 | 2.2.2 (`1c81741`; the two example packages follow, per `REPOSITORY_CONTEXT.md`) | [#127](https://github.com/mano8/fa-auth-m8/pull/127) |
+| `prompt-engine-m8` | 2.2.0 | 2.2.1 (`c910691`; `contracts/openapi.json` `info.version` moves with it, the contract axis does not) | [#42](https://github.com/mano8/prompt-engine-m8/pull/42) |
+| `reparto-docente-m8` | 2.2.0 | 2.2.1 (`3858abf`; contract `reparto-docente-m8@2.0.0` unchanged) | [#33](https://github.com/DocentesTools/reparto-docente-m8/pull/33) |
+| `media-service-m8` | 3.0.1 | 3.0.2 (`1b3dfe4`; contract `1.1` unchanged) | [#23](https://github.com/mano8/media-service-m8/pull/23) |
+| `media-worker-m8` | 1.0.0 | 1.0.1 (`a05449e`) | [#7](https://github.com/mano8/media-worker-m8/pull/7) |
+
+Under the one-bump-per-unpublished-release rule, anything else that lands on
+one of these repositories before `B25` runs rides the version in the third
+column. When a row merges, its *working tree* cell above moves and reads
+**pending**; when it publishes, the *published* cell follows and the stack
+pins that name the image move after the pull is confirmed — never before.
+
 ## One documented read command per mechanism
 
 Run from the workspace root; each command prints the repo's authoritative

@@ -23,6 +23,9 @@ owned and usable outside this checkout.
 - [`context/markdown-conventions.md`](context/markdown-conventions.md) owns
   the fleet's `.markdownlint` config file format and canonical `CHANGELOG.md`
   release-heading form.
+- [`context/debian-patch-layer.md`](context/debian-patch-layer.md) owns the
+  one Debian patch-layer form the five service images carry and the rule
+  that their base digests move together.
 - [`plans/`](plans/), [`analyse/`](analyse/), and [`status/`](status/) own plans,
   analyses, and evidence artifacts. Do not copy shared facts into `.codex/` or
   `.claude/`.

@@ -24,6 +24,9 @@ work. A child must remain usable without this parent workspace.
   mechanism: [version sources](.workspace/context/version-sources.md).
 - Ratified object-storage backend contract, default, and validated fallback:
   [object storage](.workspace/context/object-storage.md).
+- Ratified Debian patch-layer form for the five service images and the rule
+  that their base digests move together:
+  [debian patch layer](.workspace/context/debian-patch-layer.md).
 - Repository facets and policy selection: [repository registry](.workspace/repo-types.json),
   [policy index](.workspace/policy.index.json), and
   [policy metadata](.workspace/policy.metadata.json).

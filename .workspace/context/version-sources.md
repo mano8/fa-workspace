@@ -36,7 +36,7 @@ release state.
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.2 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.2 · `media-service-m8` (`media_service`) 3.0.1 · `media-worker-m8` (`worker`) 1.0.1 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.2.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.2 · `media-service-m8` (`media_service`) 3.0.2 · `media-worker-m8` (`worker`) 1.0.1 · `prompt-engine-m8` (`promt_engine_service`) 2.2.1 · `reparto-docente-m8` (`reparto_service`) 2.2.2 — read from `origin/main` 2026-09-22; the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py`. `fa-auth-m8` also carries the string in `examples/fastapi_full/__init__.py` and `examples/fastapi_minimal/__init__.py`, which move with it |
 
 ## Published release vs working-tree version
 
@@ -55,14 +55,14 @@ one-bump-per-unpublished-release rule.
 | --- | --- | --- | --- |
 | `auth-sdk-m8` | 3.2.0 | 3.2.0 | — published |
 | `fastapi-m8` | 4.5.1 | 4.5.1 | — published |
-| `fa-auth-m8` | 2.2.2 | 2.2.2 | — published (2026-09-22; the `B23` patch-layer convergence, see below) |
+| `fa-auth-m8` | 2.2.2 | 2.2.2 | — published (2026-09-22; the `B23` patch-layer convergence, see below). **`2.2.3` is open on PR #128** (`B27-dev-set-drift-repair`, 23 / 23 green, not merged), so `main` still reads `2.2.2` |
 | `imgtools_m8` | 2.1.2 | 2.1.2 | — published |
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-sdk-m8` | 1.0.0 | 1.0.0 | — published (2026-09-15; see *Wave 8 publish* below) |
-| `media-service-m8` | 3.0.1 | 3.0.1 | — published (3.0.0 and the 3.0.1 hard-purge FK patch both on 2026-09-16; see *Wave 8 publish* below) |
+| `media-service-m8` | 3.0.1 | **3.0.2** | **pending publish** — `3.0.2` merged to `main` 2026-09-22 (`B23` patch layer + `B27`'s `G20` repair, PRs #23 and #24); `3.0.0`/`3.0.1` published 2026-09-16, see *Wave 8 publish* below |
 | `media-worker-m8` | 1.0.1 | 1.0.1 | — published (2026-09-22; the `B23` patch-layer convergence, see below) |
-| `prompt-engine-m8` | 2.2.0 | 2.2.0 | — published |
-| `reparto-docente-m8` | 2.2.1 | 2.2.1 | — published (2026-09-22; the `B23` patch-layer convergence, see below) |
+| `prompt-engine-m8` | 2.2.0 | **2.2.1** | **pending publish** — `2.2.1` merged to `main` 2026-09-22 (`B23` patch layer + `B24`'s stack `.gitignore` + `B27`'s `G20` repair, PRs #42 and #43) |
+| `reparto-docente-m8` | 2.2.1 | **2.2.2** | **pending publish** — `2.2.2` merged to `main` 2026-09-22 (`B27-dev-set-drift-repair`, PR #34); `2.2.1` published earlier the same day with the `B23` patch layer, see below |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
 | `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
@@ -1598,3 +1598,42 @@ class, npm side. It was first closed by regenerating the lockfile up to `3.0.0`
 the correct version — `3.0.0` was never published, and the lockfile's original
 `2.0.0` was the right half of the split — so both files now read `2.0.0`. The
 other four `astro-*` plugins were already self-consistent.
+
+### `B27-dev-set-drift-repair` — four service repos (2026-09-22)
+
+Recorded here because it moves two published-version rows and because the
+mechanism map above was read from `origin/main`, not from a local clone —
+three of these tags did not exist locally when the branches were cut.
+
+`G20`: every one of these repositories declares its dev set with `>=` floors
+and installs it in CI, so `test` and `typecheck` resolve a fresh dependency
+graph on every run. The generation that resolved on 2026-09-22 — sqlmodel
+`0.0.46` / SQLAlchemy `2.0.54` / pydantic `2.13.5` — rejects naive datetimes
+at the column boundary and types SQLModel table constructors with their
+required fields, which turned four of `B23`'s five PRs red on defects that
+were already on `main`.
+
+| Repo | Version | Where it went | Publish |
+| --- | --- | --- | --- |
+| `prompt-engine-m8` | rides `2.2.1` (`### Fixed`, no new heading) | `main` via PR #43 → #42 | owed |
+| `media-service-m8` | rides `3.0.2` (`### Fixed`, no new heading) | `main` via PR #24 → #23 | owed |
+| `reparto-docente-m8` | **`2.2.2`** — own heading | `main` via PR #34 | owed |
+| `fa-auth-m8` | **`2.2.3`** — own heading | PR #128, open, 23 / 23 green | after merge |
+
+The one-bump-per-unpublished-release rule decided which of those is a ride
+and which is a new patch: `prompt-engine-m8` `2.2.1` and `media-service-m8`
+`3.0.2` were still unpublished, so the fix folded into them; `fa-auth-m8`
+`2.2.2` and `reparto-docente-m8` `2.2.1` were **published earlier the same
+day** and are therefore closed, so each takes a patch of its own.
+
+⚠️ **`fa-auth-m8` carries its version in three files**, not one:
+`auth_user_service/__init__.py` plus `examples/fastapi_full/__init__.py` and
+`examples/fastapi_minimal/__init__.py`. All three move together.
+
+⚠️ **`fa-auth-m8`'s gate is two mypy invocations and 23 checks**, not the one
+invocation the closure plan's §4 summarised: its `typecheck` job type-checks
+`auth_user_service` *and* `examples/fastapi_full`, and it has two workflows
+beyond `CI.yaml` (`database-integration.yaml`'s three-engine matrix and
+`example-smoke.yaml`'s six stack smokes). The bundled example keeps its own
+copies of the audit and category models, so it carries its own copy of any
+defect found in the service — 11 errors in 7 files in this case.

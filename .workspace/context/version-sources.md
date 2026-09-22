@@ -36,7 +36,7 @@ release state.
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.2 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.1 · `media-service-m8` (`media_service`) 3.0.1 · `media-worker-m8` (`worker`) 1.0.0 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.2.0 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.2 · `media-service-m8` (`media_service`) 3.0.1 · `media-worker-m8` (`worker`) 1.0.1 · `prompt-engine-m8` (`promt_engine_service`) 2.2.0 · `reparto-docente-m8` (`reparto_service`) 2.2.1 — the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py` |
 
 ## Published release vs working-tree version
 
@@ -55,14 +55,14 @@ one-bump-per-unpublished-release rule.
 | --- | --- | --- | --- |
 | `auth-sdk-m8` | 3.2.0 | 3.2.0 | — published |
 | `fastapi-m8` | 4.5.1 | 4.5.1 | — published |
-| `fa-auth-m8` | 2.2.1 | 2.2.1 | — published |
+| `fa-auth-m8` | 2.2.2 | 2.2.2 | — published (2026-09-22; the `B23` patch-layer convergence, see below) |
 | `imgtools_m8` | 2.1.2 | 2.1.2 | — published |
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-sdk-m8` | 1.0.0 | 1.0.0 | — published (2026-09-15; see *Wave 8 publish* below) |
 | `media-service-m8` | 3.0.1 | 3.0.1 | — published (3.0.0 and the 3.0.1 hard-purge FK patch both on 2026-09-16; see *Wave 8 publish* below) |
-| `media-worker-m8` | 1.0.0 | 1.0.0 | — published (2026-09-16; see *Wave 8 publish* below) |
+| `media-worker-m8` | 1.0.1 | 1.0.1 | — published (2026-09-22; the `B23` patch-layer convergence, see below) |
 | `prompt-engine-m8` | 2.2.0 | 2.2.0 | — published |
-| `reparto-docente-m8` | 2.2.0 | 2.2.0 | — published (2026-09-19; see *The reparto pair published* below) |
+| `reparto-docente-m8` | 2.2.1 | 2.2.1 | — published (2026-09-22; the `B23` patch-layer convergence, see below) |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
 | `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
@@ -1485,30 +1485,47 @@ repository before then rides `2.3.0` under the one-bump-per-unpublished-
 release rule. `fa-ui-m8`'s `^2.2.0` pin follows the publish, never precedes
 it.
 
-### Five service patches cut on branches (2026-09-20, pending merge and publish)
+### Three of the five `B23` patches published; two still on branches (2026-09-22)
 
-The consumer-alignment closure plan's `B23-converge-patch-layer` (Wave 6,
-finding `G18`): the five service images move to the one Debian patch-layer
-form and the one base digest that
-[`debian-patch-layer.md`](debian-patch-layer.md) now owns. Each is an
-image-only patch release, cut on `chore/patch-layer-convergence` in its
-repository, **not yet on `main`** — the merges are the plan's `B26` sweep
-and the tags/publishes its `B25` sweep (twelfth and eleventh amendments), so
-the two tables above keep reading `main` and `origin` and do not move here.
+The consumer-alignment closure plan's `B23-converge-patch-layer` (`G18`): the
+five service images converge on one Debian patch-layer form and one base
+digest, owned by [`debian-patch-layer.md`](debian-patch-layer.md). Cut
+2026-09-20 on `chore/patch-layer-convergence` in each repository; on
+2026-09-22 the operator merged and published three of them.
 
-| Repo | `main` today | Cut on the branch | PR |
+| Repo | Published | On `main` | State |
 | --- | --- | --- | --- |
-| `fa-auth-m8` | 2.2.1 | 2.2.2 (`1c81741`; the two example packages follow, per `REPOSITORY_CONTEXT.md`) | [#127](https://github.com/mano8/fa-auth-m8/pull/127) |
-| `prompt-engine-m8` | 2.2.0 | 2.2.1 (`c910691`; `contracts/openapi.json` `info.version` moves with it, the contract axis does not) | [#42](https://github.com/mano8/prompt-engine-m8/pull/42) |
-| `reparto-docente-m8` | 2.2.0 | 2.2.1 (`3858abf`; contract `reparto-docente-m8@2.0.0` unchanged) | [#33](https://github.com/DocentesTools/reparto-docente-m8/pull/33) |
-| `media-service-m8` | 3.0.1 | 3.0.2 (`1b3dfe4`; contract `1.1` unchanged) | [#23](https://github.com/mano8/media-service-m8/pull/23) |
-| `media-worker-m8` | 1.0.0 | 1.0.1 (`a05449e`) | [#7](https://github.com/mano8/media-worker-m8/pull/7) |
+| `fa-auth-m8` | **2.2.2** (2026-09-22) | 2.2.2 (`cc27ae0`) | published; image pulled and read back |
+| `reparto-docente-m8` | **2.2.1** (2026-09-22) | 2.2.1 (`d29ee51`) | published; image pulled and read back |
+| `media-worker-m8` | **1.0.1** (2026-09-22) | 1.0.1 (`585327f`) | published; image pulled and read back |
+| `prompt-engine-m8` | 2.2.0 | 2.2.0 | `2.2.1` cut on [PR #42](https://github.com/mano8/prompt-engine-m8/pull/42) (also carries the plan's `B24` stack `.gitignore`); **red on `G20`**, waits on `B27` |
+| `media-service-m8` | 3.0.1 | 3.0.1 | `3.0.2` cut on [PR #23](https://github.com/mano8/media-service-m8/pull/23); **red on `G20`**, waits on `B27` |
 
-Under the one-bump-per-unpublished-release rule, anything else that lands on
-one of these repositories before `B25` runs rides the version in the third
-column. When a row merges, its *working tree* cell above moves and reads
-**pending**; when it publishes, the *published* cell follows and the stack
-pins that name the image move after the pull is confirmed — never before.
+Each published image was read back inside the container: Debian 13.7,
+`OpenSSL 3.5.7`, no `curl`, no pip, `__version__` matching the tag.
+
+⚠️ **The three published versions are closed.** The plan's `B27` (dev-set
+drift repair) therefore takes **new** numbers in those repositories —
+`fa-auth-m8` `2.2.3`, `reparto-docente-m8` `2.2.2` — and rides the pending
+`2.2.1` / `3.0.2` in the two that have not published. The
+one-bump-per-unpublished-release rule applies to an unpublished version; a
+published one cannot be reused, and this exact mistake was caught once in
+this session because a local clone still showed the older tag. **Read
+`git ls-remote --tags origin`, not a local tag list.**
+
+⚠️ **§0.2 re-pins are owed, not done.** The three pulls are confirmed, so the
+stack pins that name those images may now move (`fa-auth-m8` ×10 sites plus
+`DOCKERHUB.md`/`README.md`, `media-worker-m8` ×4, `reparto-docente-m8`'s
+stacks). A pin still never precedes its publish.
+
+⚠️ **`reparto-docente-m8`'s image is not reproducible** (plan finding `G21`):
+its Dockerfile installs `-r requirements_prod.txt` unpinned where the other
+four install `--require-hashes -r requirements_prod.lock`. Measured inside
+the images published 2026-09-22: `fa-auth-m8:2.2.2` carries SQLAlchemy
+2.0.51 / sqlmodel 0.0.42 / pydantic 2.13.4, `reparto-docente-m8:2.2.1`
+carries 2.0.54 / 0.0.46 / 2.13.5. Same day, same fleet, different library
+generation — and an API timestamp spelling (`...Z` vs `...+00:00`) moved
+with it.
 
 ## One documented read command per mechanism
 

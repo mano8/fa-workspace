@@ -1644,3 +1644,33 @@ beyond `CI.yaml` (`database-integration.yaml`'s three-engine matrix and
 `example-smoke.yaml`'s six stack smokes). The bundled example keeps its own
 copies of the audit and category models, so it carries its own copy of any
 defect found in the service — 11 errors in 7 files in this case.
+
+### `G21` has a step: `B28-reparto-hash-locked-release-set` (opened 2026-09-23)
+
+`reparto-docente-m8` is still the only service image in the fleet installing
+an **unpinned** set (`reparto_service/Dockerfile` → `-r requirements_prod.txt`);
+the other four install `--require-hashes -r requirements_prod.lock`. So what
+that image ships is a property of the day it was built, not of the repository.
+
+Measured 2026-09-23, the gap is **three** things:
+
+| # | The four siblings have | `reparto-docente-m8` |
+| --- | --- | --- |
+| 1 | `requirements_prod.lock`, pinned + hashed | nothing |
+| 2 | `--require-hashes` install in the non-development branch | `-r requirements_prod.txt` |
+| 3 | a `test-shipped-lock` job + `scripts/shipped_lock_env.py`, and a `pip-audit` over the shipped lock | neither; `pip-audit` reads `requirements_dev.txt` only |
+
+Item 3 is the one that is easy to miss and is half the value: `pip-audit` and
+`trivy` **scan** a lock, neither **runs** it.
+
+**Version:** `B28` **rides `2.2.2`**, which is on `main` and unpublished, under
+the one-bump-per-unpublished-release rule. ⚠️ **That is conditional** — if
+`2.2.2` is published first, `B28` costs a `2.2.3` instead, so `B28` must land
+before this repository's publish.
+
+**Open decision (operator's):** which generation the lock pins. The published
+`2.2.1` image runs SQLAlchemy `2.0.54` / sqlmodel `0.0.46` / pydantic `2.13.5`;
+the four sibling locks pin `2.0.51` / `0.0.42` / `2.13.4`. Pinning today's
+resolve keeps the image contents where they already are but leaves this service
+on a different generation from the fleet; pinning the siblings' generation makes
+the five comparable but downgrades what this service ships.

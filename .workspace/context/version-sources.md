@@ -1674,3 +1674,39 @@ the four sibling locks pin `2.0.51` / `0.0.42` / `2.13.4`. Pinning today's
 resolve keeps the image contents where they already are but leaves this service
 on a different generation from the fleet; pinning the siblings' generation makes
 the five comparable but downgrades what this service ships.
+
+### `G22` — the fleet tests one library graph and ships another (2026-09-23)
+
+Measured from `origin/main` while scoping `B29`:
+
+| Repo | lock SQLAlchemy | lock sqlmodel | lock pydantic | runs its lock? |
+| --- | --- | --- | --- | --- |
+| `fa-auth-m8` | 2.0.51 | **0.0.42** | 2.13.4 | no |
+| `prompt-engine-m8` | 2.0.51 | **0.0.39** | 2.13.4 | **yes** |
+| `media-service-m8` | 2.0.51 | **0.0.39** | 2.13.4 | no |
+| `media-worker-m8` | — | — | 2.13.4 | no |
+| `reparto-docente-m8` | *no lock* | *no lock* | *no lock* | no |
+
+Every `test`/`typecheck` job installs `requirements_dev.txt`'s `>=` floors,
+which on 2026-09-23 resolve to **SQLAlchemy 2.0.54 / sqlmodel 0.0.46 /
+pydantic 2.13.5** — a generation **no lock pins**. There is also no single
+"older" generation: sqlmodel is split three ways across the fleet.
+
+⚠️ **Only `prompt-engine-m8` has a job that executes the shipped lock**
+(`test-shipped-lock`). `pip-audit` and `trivy` scan a lock; neither runs it.
+
+⚠️ **A second unpinned image exists** and it is not a service repo:
+`fa-auth-m8/examples/fastapi_full` installs `-r requirements_prod.txt` with
+floors and has no lock. It is never published, but `example-smoke.yaml`
+builds and runs it six times per CI run. `fastapi_minimal` is **not** in this
+class — two floors, none of the three packages, and nothing builds it.
+
+**Owner: `B29-align-shipped-library-generation`.** Four of the five ride an
+unpublished version on `main`, so the realignment costs no extra release —
+**until `B25` publishes**, which closes that window. `media-worker-m8` is
+already published and therefore takes a real `1.0.2`.
+
+Mechanism note for whoever runs it: use
+`pip-compile --upgrade-package <name>==<version>` for exactly the named pins.
+A blanket `--upgrade` moves ~49 pins per repository (`B23`'s anyio fix is the
+precedent for the narrow form).

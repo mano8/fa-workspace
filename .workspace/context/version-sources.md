@@ -36,7 +36,7 @@ release state.
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.2 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.2 · `media-service-m8` (`media_service`) 3.0.2 · `media-worker-m8` (`worker`) 1.0.1 · `prompt-engine-m8` (`promt_engine_service`) 2.2.1 · `reparto-docente-m8` (`reparto_service`) 2.2.2 — read from `origin/main` 2026-09-22; the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py`. `fa-auth-m8` also carries the string in `examples/fastapi_full/__init__.py` and `examples/fastapi_minimal/__init__.py`, which move with it |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.3 · `media-service-m8` (`media_service`) 3.0.2 · `media-worker-m8` (`worker`) 1.0.1 · `prompt-engine-m8` (`promt_engine_service`) 2.2.1 · `reparto-docente-m8` (`reparto_service`) 2.2.2 — read from `origin/main` 2026-09-22; the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py`. `fa-auth-m8` also carries the string in `examples/fastapi_full/__init__.py` and `examples/fastapi_minimal/__init__.py`, which move with it |
 
 ## Published release vs working-tree version
 
@@ -55,7 +55,7 @@ one-bump-per-unpublished-release rule.
 | --- | --- | --- | --- |
 | `auth-sdk-m8` | 3.2.0 | 3.2.0 | — published |
 | `fastapi-m8` | 4.5.1 | 4.5.1 | — published |
-| `fa-auth-m8` | 2.2.2 | 2.2.2 | — published (2026-09-22; the `B23` patch-layer convergence, see below). **`2.2.3` is open on PR #128** (`B27-dev-set-drift-repair`, 23 / 23 green, not merged), so `main` still reads `2.2.2` |
+| `fa-auth-m8` | 2.2.2 | **2.2.3** | **pending publish** — `2.2.3` merged to `main` 2026-09-22 (`B27-dev-set-drift-repair`, PR #128 → `259a609`); `2.2.2` published earlier the same day with the `B23` patch layer, see below |
 | `imgtools_m8` | 2.1.2 | 2.1.2 | — published |
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-sdk-m8` | 1.0.0 | 1.0.0 | — published (2026-09-15; see *Wave 8 publish* below) |
@@ -1618,13 +1618,20 @@ were already on `main`.
 | `prompt-engine-m8` | rides `2.2.1` (`### Fixed`, no new heading) | `main` via PR #43 → #42 | owed |
 | `media-service-m8` | rides `3.0.2` (`### Fixed`, no new heading) | `main` via PR #24 → #23 | owed |
 | `reparto-docente-m8` | **`2.2.2`** — own heading | `main` via PR #34 | owed |
-| `fa-auth-m8` | **`2.2.3`** — own heading | PR #128, open, 23 / 23 green | after merge |
+| `fa-auth-m8` | **`2.2.3`** — own heading | `main` via PR #128 (`259a609`) | owed |
 
 The one-bump-per-unpublished-release rule decided which of those is a ride
 and which is a new patch: `prompt-engine-m8` `2.2.1` and `media-service-m8`
 `3.0.2` were still unpublished, so the fix folded into them; `fa-auth-m8`
 `2.2.2` and `reparto-docente-m8` `2.2.1` were **published earlier the same
 day** and are therefore closed, so each takes a patch of its own.
+
+**Closed 2026-09-22: all four legs are on `main`**, each read with
+`merge-base --is-ancestor`, and `fa-auth-m8`'s `main` is green on all three
+of its workflows (`CI`, `Database integration`, `Maintained example smoke`).
+Four publishes are now owed — `prompt-engine-m8` `2.2.1`,
+`media-service-m8` `3.0.2`, `reparto-docente-m8` `2.2.2` and `fa-auth-m8`
+`2.2.3` — all of them `B25` rows, none of them a condition of `B27`.
 
 ⚠️ **`fa-auth-m8` carries its version in three files**, not one:
 `auth_user_service/__init__.py` plus `examples/fastapi_full/__init__.py` and

@@ -60,14 +60,14 @@ one-bump-per-unpublished-release rule.
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-sdk-m8` | 1.0.0 | 1.0.0 | — published (2026-09-15; see *Wave 8 publish* below) |
 | `media-service-m8` | 3.0.1 | **3.0.2** | **pending publish** — `3.0.2` merged to `main` 2026-09-22 (`B23` patch layer + `B27`'s `G20` repair, PRs #23 and #24); `3.0.0`/`3.0.1` published 2026-09-16, see *Wave 8 publish* below |
-| `media-worker-m8` | 1.0.1 | 1.0.1 | — published (2026-09-22; the `B23` patch-layer convergence, see below) |
+| `media-worker-m8` | 1.0.1 | **1.0.2** | **pending publish** — `1.0.2` merged to `main` 2026-09-23 (`B29-align-shipped-library-generation`, PR #8 → `03ffbcf`); `1.0.1` published 2026-09-22 with the `B23` patch layer, see below. Corrected 2026-09-25 (`B30`, `G29`): this row had said `main` = `1.0.1`, published; `main` has been `1.0.2` since `B29` |
 | `prompt-engine-m8` | 2.2.0 | **2.2.1** | **pending publish** — `2.2.1` merged to `main` 2026-09-22 (`B23` patch layer + `B24`'s stack `.gitignore` + `B27`'s `G20` repair, PRs #42 and #43) |
 | `reparto-docente-m8` | 2.2.1 | **2.2.2** | **pending publish** — `2.2.2` merged to `main` 2026-09-22 (`B27-dev-set-drift-repair`, PR #34); `2.2.1` published earlier the same day with the `B23` patch layer, see below |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
 | `astro-auth-m8` | 2.6.0 | 2.6.0 | — published |
 | `astro-media-m8` | 2.2.0 | 2.2.0 | — published (2.1.0 and the 2.2.0 tracking release both on 2026-09-16; this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
-| `astro-prompt-m8` | 2.1.0 | 2.1.0 | — published |
+| `astro-prompt-m8` | 2.1.0 | **2.1.1** | **pending publish** — `2.1.1` merged to `main` 2026-09-20 (`B12-manifest-runtime-parity-lock`, PR #20 → `8c39db9`). Corrected 2026-09-25 (`B30`, `G29`): this row had said `main` = `2.1.0`, published; `main` has been `2.1.1` since `B12` |
 | `astro-reparto-m8` | 2.2.0 | 2.3.0 | **pending** (cut 2026-09-20, on `main` as `5d527b1`; see *`astro-reparto-m8` 2.3.0 — the service-version gate* below) |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
@@ -1498,8 +1498,8 @@ digest, owned by [`debian-patch-layer.md`](debian-patch-layer.md). Cut
 | `fa-auth-m8` | **2.2.2** (2026-09-22) | 2.2.2 (`cc27ae0`) | published; image pulled and read back |
 | `reparto-docente-m8` | **2.2.1** (2026-09-22) | 2.2.1 (`d29ee51`) | published; image pulled and read back |
 | `media-worker-m8` | **1.0.1** (2026-09-22) | 1.0.1 (`585327f`) | published; image pulled and read back |
-| `prompt-engine-m8` | 2.2.0 | 2.2.0 | `2.2.1` cut on [PR #42](https://github.com/mano8/prompt-engine-m8/pull/42) (also carries the plan's `B24` stack `.gitignore`); **red on `G20`**, waits on `B27` |
-| `media-service-m8` | 3.0.1 | 3.0.1 | `3.0.2` cut on [PR #23](https://github.com/mano8/media-service-m8/pull/23); **red on `G20`**, waits on `B27` |
+| `prompt-engine-m8` | 2.2.0 | 2.2.1 | `2.2.1` cut on [PR #42](https://github.com/mano8/prompt-engine-m8/pull/42) (also carries the plan's `B24` stack `.gitignore`); merged 2026-09-22 (`0b9f573`) after `B27`'s #43 (`a5013c0`) cleared `G20`; **pending publish**, see the mechanism map above |
+| `media-service-m8` | 3.0.1 | 3.0.2 | `3.0.2` cut on [PR #23](https://github.com/mano8/media-service-m8/pull/23); merged 2026-09-22 (`a98ed16`) after `B27`'s #24 (`d8ea9cd`) cleared `G20`; **pending publish**, see the mechanism map above |
 
 Each published image was read back inside the container: Debian 13.7,
 `OpenSSL 3.5.7`, no `curl`, no pip, `__version__` matching the tag.

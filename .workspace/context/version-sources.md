@@ -19,7 +19,10 @@ source re-reads rather than a fleet re-measurement: `astro-prompt-m8` `1.2.0`
 → `2.0.0` (2026-08-23), then `astro-ui-m8` `1.4.2` → `1.5.0` and
 `media-sdk-m8` `0.6.0` → `0.7.0` (2026-08-24), then on 2026-08-30
 `astro-auth-m8` `2.4.0` → `2.4.1`, `astro-ui-m8` `1.5.0` → `1.5.1` and
-`media-worker-m8` `0.4.0` → `0.4.1` (see *The media pair re-measured*).
+`media-worker-m8` `0.4.0` → `0.4.1` (see *The media pair re-measured*). On
+2026-09-26 the five npm rows and `media-worker-m8` were re-read from
+`origin/main` after the Wave 9 release cascade (see *Wave 9 — the `astro-ui-m8`
+`1.5.2` cascade* below).
 
 `prompt-engine-m8` `2.0.0` → `2.1.0` was corrected in the same pass for a
 different reason: this table had been **contradicting the two tables below it**,
@@ -32,11 +35,11 @@ release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.2.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.3.0 · `astro-ui-m8` 1.5.1 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.7.1 · `astro-media-m8` 2.3.1 · `astro-prompt-m8` 2.2.1 · `astro-reparto-m8` 2.3.1 · `astro-ui-m8` 1.5.2 — read from `origin/main` 2026-09-26 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.3 — read from `origin/main` 2026-09-26 |
-| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.3 · `media-service-m8` (`media_service`) 3.0.2 · `media-worker-m8` (`worker`) 1.0.1 · `prompt-engine-m8` (`promt_engine_service`) 2.2.1 · `reparto-docente-m8` (`reparto_service`) 2.2.2 — read from `origin/main` 2026-09-22; the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py`. `fa-auth-m8` also carries the string in `examples/fastapi_full/__init__.py` and `examples/fastapi_minimal/__init__.py`, which move with it |
+| package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.3 · `media-service-m8` (`media_service`) 3.0.2 · `media-worker-m8` (`worker`) 1.0.2 · `prompt-engine-m8` (`promt_engine_service`) 2.2.1 · `reparto-docente-m8` (`reparto_service`) 2.2.2 — read from `origin/main` 2026-09-22 (`media-worker-m8` re-read 2026-09-26); the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py`. `fa-auth-m8` also carries the string in `examples/fastapi_full/__init__.py` and `examples/fastapi_minimal/__init__.py`, which move with it |
 
 ## Published release vs working-tree version
 
@@ -64,11 +67,11 @@ one-bump-per-unpublished-release rule.
 | `prompt-engine-m8` | 2.2.1 | 2.2.1 | — published (2026-09-26, tag `v2.2.1` = `main` `fd74ef3`; `tepochtli/prompt-engine-m8:2.2.1` pulled, `__version__` `2.2.1`). Carries `B23`, `B24`, `B27`, `B29`, `B30` and `B32` |
 | `reparto-docente-m8` | 2.2.2 | 2.2.2 | — published (2026-09-26, tag `v2.2.2` = `main` `169121b`; `tepochtli/reparto-docente-m8:2.2.2` pulled, `__version__` `2.2.2`). Carries `B27`, `B28`, `B30` and `B32` |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
-| `astro-ui-m8` | 1.5.1 | 1.5.1 | — published. `main` (`07da9b1`, PR #16) adds `CHANGELOG.md` to `files` and changes nothing a consumer runs; it reaches npm with the next ordinary release, and no bump is owed |
-| `astro-auth-m8` | 2.7.0 | 2.7.0 | — published (2026-09-26, tag `v2.7.0` = `main` `a5273f6`, PR #29; npm `latest` = `2.7.0`, tarball `testedServiceVersion` `2.2.3`). Tracks `fa-auth-m8` `2.2.3` (`B31`) and carries `B30`'s publish-workflow hardening |
-| `astro-media-m8` | 2.3.0 | 2.3.0 | — published (2026-09-26, tag `v2.3.0` = `main` `4bcd4f6`, PR #16; npm `latest` `2.3.0`; tarball tests `media-service-m8` `3.0.2`, auth peer `^2.7.0`, ships `CHANGELOG.md`). `2.1.0` and the `2.2.0` tracking release were published 2026-09-16, see *Wave 8 publish* below |
-| `astro-prompt-m8` | 2.2.0 | 2.2.0 | — published (2026-09-26, tag `v2.2.0` = `main` `b9dcebf`, PR #21; npm `latest` `2.2.0`; tarball tests `prompt-engine-m8` `2.2.1`, auth peer `^2.7.0`). The unpublished `2.1.1` (`B12`, on `main` since 2026-09-20) was renumbered `2.2.0` by `B31` and never shipped |
-| `astro-reparto-m8` | 2.3.0 | 2.3.0 | — published (2026-09-26, tag `v2.3.0` = `main` `b887c8d`, PR #9; npm `latest` `2.3.0`; tarball tests `reparto-docente-m8` `2.2.2`, auth peer `^2.7.0`, ships `CHANGELOG.md`; see *`astro-reparto-m8` 2.3.0 — the service-version gate* below) |
+| `astro-ui-m8` | 1.5.2 | 1.5.2 | — published (2026-09-26, tag `v1.5.2` = `main` `a4a14b8`, PR #18; npm `latest` `1.5.2`; the first tarball to ship `CHANGELOG.md` — `1.5.1` shipped without it, `G38`). Carries `B30`/`B33`/`B34` and `B37`'s publish-job lock guard |
+| `astro-auth-m8` | 2.7.1 | 2.7.1 | — published (2026-09-26, tag `v2.7.1` = `main` `eee73b9`, PR #32; npm `latest` `2.7.1`; tarball ships `CHANGELOG.md`, ui `^1.5.2`, `testedServiceVersion` `2.2.3`). Patch tracking `astro-ui-m8` `1.5.2` (`B39`); carries `B35` and `B37`. `2.7.0` (PR #29, `a5273f6`) tracked `fa-auth-m8` `2.2.3` (`B31`) |
+| `astro-media-m8` | 2.3.1 | 2.3.1 | — published (2026-09-26, tag `v2.3.1` = `main` `0cd04eb`, PR #18; npm `latest` `2.3.1`; tarball tests `media-service-m8` `3.0.2`, ui `^1.5.2`, auth peer `^2.7.1`, ships `CHANGELOG.md`). Patch tracking `astro-ui-m8` `1.5.2` / `astro-auth-m8` `2.7.1` (`B39`). `2.3.0` (PR #16, `4bcd4f6`) tracked `media-service-m8` `3.0.2`; `2.1.0` and `2.2.0` were published 2026-09-16, see *Wave 8 publish* below |
+| `astro-prompt-m8` | 2.2.1 | 2.2.1 | — published (2026-09-26, tag `v2.2.1` = `main` `c92edac`, PR #23; npm `latest` `2.2.1`; tarball tests `prompt-engine-m8` `2.2.1`, ui `^1.5.2`, auth peer `^2.7.1`, ships `CHANGELOG.md`). Patch tracking `astro-ui-m8` `1.5.2` / `astro-auth-m8` `2.7.1` (`B39`). `2.2.0` (PR #21, `b9dcebf`) was the renumbered, never-shipped `2.1.1` |
+| `astro-reparto-m8` | 2.3.1 | 2.3.1 | — published (2026-09-26, tag `v2.3.1` = `main` `f43721b`, PR #11; npm `latest` `2.3.1`; tarball tests `reparto-docente-m8` `2.2.2`, ui `^1.5.2`, auth peer `^2.7.1`, `astro` peer `^7.0.9`, ships `CHANGELOG.md`). Patch tracking `astro-ui-m8` `1.5.2` / `astro-auth-m8` `2.7.1` (`B39`); see *`astro-reparto-m8` 2.3.0 — the service-version gate* below |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
 than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and
@@ -1526,6 +1529,34 @@ the images published 2026-09-22: `fa-auth-m8:2.2.2` carries SQLAlchemy
 carries 2.0.54 / 0.0.46 / 2.13.5. Same day, same fleet, different library
 generation — and an API timestamp spelling (`...Z` vs `...+00:00`) moved
 with it.
+
+### Wave 9 — the `astro-ui-m8` `1.5.2` cascade (2026-09-26, published)
+
+The remediation plan's second final review found that
+`@mano8/astro-ui-m8@1.5.1` was on npm without `CHANGELOG.md` (`G38`): `files`
+gained it on `main` after that release. On the operator's instruction,
+`astro-ui-m8` released `1.5.2`, and the explicit-pin floors cascaded in
+dependency order. Each step was cut only after the previous package read back
+from the registry.
+
+| Package | Version | Tag = `main` merge | Floors it ships |
+| --- | --- | --- | --- |
+| `@mano8/astro-ui-m8` | `1.5.2` | `a4a14b8` (PR #18) | — |
+| `@mano8/astro-auth-m8` | `2.7.1` | `eee73b9` (PR #32) | ui `^1.5.2` |
+| `@mano8/astro-media-m8` | `2.3.1` | `0cd04eb` (PR #18) | ui `^1.5.2`, auth peer + dev `^2.7.1` |
+| `@mano8/astro-prompt-m8` | `2.2.1` | `c92edac` (PR #23) | ui `^1.5.2`, auth peer + dev `^2.7.1` |
+| `@mano8/astro-reparto-m8` | `2.3.1` | `f43721b` (PR #11) | ui `^1.5.2`, auth peer + dev `^2.7.1`, `astro` peer `^7.0.8` → `^7.0.9` |
+
+Each is a **patch**: the only shipped change is `package.json`'s floors
+(plus the README that states them, in media and reparto). No contract,
+service range or tested service version moved. Independent evidence, as this
+file requires: the npm registry document's `dist-tags.latest` is read three
+times in a row for all five, and every tarball is downloaded. Each carries
+`CHANGELOG.md` and the floors above. Every consumer lock's `integrity` equals
+the registry's `dist.integrity`. Each release also carries `B37`, the lock
+guard in the publish job, and in each run it ran before `npm ci`.
+`fa-ui-m8/app` then moved all five floors (it is never published, so it has no
+version row).
 
 ## One documented read command per mechanism
 

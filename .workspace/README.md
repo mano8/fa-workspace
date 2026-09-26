@@ -26,6 +26,9 @@ owned and usable outside this checkout.
 - [`context/debian-patch-layer.md`](context/debian-patch-layer.md) owns the
   one Debian patch-layer form the five service images carry and the rule
   that their base digests move together.
+- [`context/dependency-cascade.md`](context/dependency-cascade.md) owns the
+  order and touchpoints of a release cascade from `auth-sdk-m8` /
+  `fastapi-m8`; `scripts/cascade/check_cascade.py` is its executable mirror.
 - [`plans/`](plans/), [`analyse/`](analyse/), and [`status/`](status/) own plans,
   analyses, and evidence artifacts. Do not copy shared facts into `.codex/` or
   `.claude/`.

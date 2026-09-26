@@ -22,6 +22,9 @@ work. A child must remain usable without this parent workspace.
   [environment policy](.workspace/context/env.md).
 - Per-repository version-source mechanism and one documented read command per
   mechanism: [version sources](.workspace/context/version-sources.md).
+- Release-cascade order and touchpoints from `auth-sdk-m8` / `fastapi-m8`
+  down to compose stacks, client compatibility matrices and the version
+  matrix: [dependency cascade](.workspace/context/dependency-cascade.md).
 - Ratified object-storage backend contract, default, and validated fallback:
   [object storage](.workspace/context/object-storage.md).
 - Ratified Debian patch-layer form for the five service images and the rule

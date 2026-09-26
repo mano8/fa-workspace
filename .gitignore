@@ -64,6 +64,8 @@ CLAUDE.local.md
 !/.claude/README.md
 !/.claude/agents/
 !/.claude/agents/**
+!/.claude/skills/
+!/.claude/skills/**
 
 # DevContainer
 !/.devcontainer/

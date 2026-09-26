@@ -65,10 +65,10 @@ one-bump-per-unpublished-release rule.
 | `reparto-docente-m8` | 2.2.2 | 2.2.2 | — published (2026-09-26, tag `v2.2.2` = `main` `169121b`; `tepochtli/reparto-docente-m8:2.2.2` pulled, `__version__` `2.2.2`). Carries `B27`, `B28`, `B30` and `B32` |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `astro-ui-m8` | 1.5.1 | 1.5.1 | — published |
-| `astro-auth-m8` | 2.6.0 | 2.6.0 | — published. **`2.7.0` open** on PR #29 (`B31`, tracks `fa-auth-m8` `2.2.3`); not on `main` until that PR merges |
-| `astro-media-m8` | 2.2.0 | 2.2.0 | — published; **`2.3.0` open** on PR #16 (`B31`, tracks `media-service-m8` `3.0.2`) (2.1.0 and the 2.2.0 tracking release both on 2026-09-16; this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
-| `astro-prompt-m8` | 2.1.0 | **2.1.1** | **pending publish** — `2.1.1` merged to `main` 2026-09-20 (`B12-manifest-runtime-parity-lock`, PR #20 → `8c39db9`). Corrected 2026-09-25 (`B30`, `G29`): this row had said `main` = `2.1.0`, published; `main` has been `2.1.1` since `B12`. **Renumbered `2.2.0`** on PR #21 (`B31`, tracks `prompt-engine-m8` `2.2.1`; the unpublished `2.1.1` never ships) |
-| `astro-reparto-m8` | 2.2.0 | 2.3.0 | **pending** (cut 2026-09-20, on `main` as `5d527b1`; PR #9 adds `B31`'s tracking of `reparto-docente-m8` `2.2.2` to it; see *`astro-reparto-m8` 2.3.0 — the service-version gate* below) |
+| `astro-auth-m8` | 2.7.0 | 2.7.0 | — published (2026-09-26, tag `v2.7.0` = `main` `a5273f6`, PR #29; npm `latest` = `2.7.0`, tarball `testedServiceVersion` `2.2.3`). Tracks `fa-auth-m8` `2.2.3` (`B31`) and carries `B30`'s publish-workflow hardening |
+| `astro-media-m8` | 2.2.0 | 2.2.0 | — published; **`2.3.0` open** on PR #16 (`B31`, tracks `media-service-m8` `3.0.2`; auth floor `^2.7.0`) (2.1.0 and the 2.2.0 tracking release both on 2026-09-16; this row had been stale at 1.1.1/2.0.0 since 2026-09-01; see *Wave 8 publish* below) |
+| `astro-prompt-m8` | 2.1.0 | **2.1.1** | **pending publish** — `2.1.1` merged to `main` 2026-09-20 (`B12-manifest-runtime-parity-lock`, PR #20 → `8c39db9`). Corrected 2026-09-25 (`B30`, `G29`): this row had said `main` = `2.1.0`, published; `main` has been `2.1.1` since `B12`. **Renumbered `2.2.0`** on PR #21 (`B31`, tracks `prompt-engine-m8` `2.2.1`, auth floor `^2.7.0`; the unpublished `2.1.1` never ships) |
+| `astro-reparto-m8` | 2.2.0 | 2.3.0 | **pending** (cut 2026-09-20, on `main` as `5d527b1`; PR #9 adds `B31`'s tracking of `reparto-docente-m8` `2.2.2` and the `^2.7.0` auth floor to it; see *`astro-reparto-m8` 2.3.0 — the service-version gate* below) |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
 than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and

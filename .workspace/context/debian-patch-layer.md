@@ -3,7 +3,7 @@
 Canonical owner of the one Debian patch-layer form every service image in the
 fleet carries, and of the rule that their base digests move together. Ratified
 by `B23-converge-patch-layer` (Wave 6) of
-`.workspace/plans/stack/todo/consumer-alignment-closure-remediation-plan-2026-08-16.md`
+`.workspace/plans/stack/done/consumer-alignment-closure-remediation-plan-2026-08-16.md`
 (gitignored; not the authority — this file is), closing that plan's `G18`
 and, with it, `G17` and the residual of `G16`.
 

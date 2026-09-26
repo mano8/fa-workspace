@@ -2,7 +2,7 @@
 
 Canonical owner of the fleet's `.markdownlint` file format and canonical
 `CHANGELOG.md` release-heading form. Ratified by `B10-markdownlint-parity` of
-`.workspace/plans/stack/todo/consumer-alignment-closure-remediation-plan-2026-08-16.md`
+`.workspace/plans/stack/done/consumer-alignment-closure-remediation-plan-2026-08-16.md`
 (gitignored; not the authority — this file is), which found both decisions
 outstanding while adding the four repository configs that still lacked one.
 

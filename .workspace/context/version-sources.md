@@ -35,7 +35,7 @@ release state.
 | npm `package.json` at repo root | `astro-auth-m8` 2.6.0 · `astro-media-m8` 2.2.0 · `astro-prompt-m8` 2.1.0 · `astro-reparto-m8` 2.3.0 · `astro-ui-m8` 1.5.1 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
-| `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.2 |
+| `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.3 — read from `origin/main` 2026-09-26 |
 | package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.3 · `media-service-m8` (`media_service`) 3.0.2 · `media-worker-m8` (`worker`) 1.0.1 · `prompt-engine-m8` (`promt_engine_service`) 2.2.1 · `reparto-docente-m8` (`reparto_service`) 2.2.2 — read from `origin/main` 2026-09-22; the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py`. `fa-auth-m8` also carries the string in `examples/fastapi_full/__init__.py` and `examples/fastapi_minimal/__init__.py`, which move with it |
 
 ## Published release vs working-tree version
@@ -56,11 +56,11 @@ one-bump-per-unpublished-release rule.
 | `auth-sdk-m8` | 3.2.0 | 3.2.0 | — published |
 | `fastapi-m8` | 4.5.1 | 4.5.1 | — published |
 | `fa-auth-m8` | 2.2.2 | **2.2.3** | **pending publish** — `2.2.3` merged to `main` 2026-09-22 (`B27-dev-set-drift-repair`, PR #128 → `259a609`); `2.2.2` published earlier the same day with the `B23` patch layer, see below |
-| `imgtools_m8` | 2.1.2 | 2.1.2 | — published |
+| `imgtools_m8` | 2.1.3 | 2.1.3 | — published (2026-09-26, tag `v2.1.3` on `origin`, on PyPI; PR #75 — CI and dev-requirement bumps only, dependencies unchanged since `2.1.1`) |
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
 | `media-sdk-m8` | 1.0.0 | 1.0.0 | — published (2026-09-15; see *Wave 8 publish* below) |
 | `media-service-m8` | 3.0.1 | **3.0.2** | **pending publish** — `3.0.2` merged to `main` 2026-09-22 (`B23` patch layer + `B27`'s `G20` repair, PRs #23 and #24); `3.0.0`/`3.0.1` published 2026-09-16, see *Wave 8 publish* below |
-| `media-worker-m8` | 1.0.1 | **1.0.2** | **pending publish** — `1.0.2` merged to `main` 2026-09-23 (`B29-align-shipped-library-generation`, PR #8 → `03ffbcf`); `1.0.1` published 2026-09-22 with the `B23` patch layer, see below. Corrected 2026-09-25 (`B30`, `G29`): this row had said `main` = `1.0.1`, published; `main` has been `1.0.2` since `B29` |
+| `media-worker-m8` | 1.0.1 | **1.0.2** | **pending publish** — `1.0.2` merged to `main` 2026-09-23 (`B29-align-shipped-library-generation`, PR #8 → `03ffbcf`); `1.0.1` published 2026-09-22 with the `B23` patch layer, see below. Corrected 2026-09-25 (`B30`, `G29`): this row had said `main` = `1.0.1`, published; `main` has been `1.0.2` since `B29`. `1.0.2` also carries the `imgtools_m8` `2.1.3` pin (floor `>=2.1.3`, lock `==2.1.3`) once PR #10 merges — open 2026-09-26 |
 | `prompt-engine-m8` | 2.2.0 | **2.2.1** | **pending publish** — `2.2.1` merged to `main` 2026-09-22 (`B23` patch layer + `B24`'s stack `.gitignore` + `B27`'s `G20` repair, PRs #42 and #43) |
 | `reparto-docente-m8` | 2.2.1 | **2.2.2** | **pending publish** — `2.2.2` merged to `main` 2026-09-22 (`B27-dev-set-drift-repair`, PR #34); `2.2.1` published earlier the same day with the `B23` patch layer, see below |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |

@@ -38,6 +38,10 @@ work. A child must remain usable without this parent workspace.
 Never add a `Co-Authored-By` trailer to a commit, in any repository of this
 workspace. Commits are authored under the human's identity alone.
 
+Never put a Claude, Claude Code, Anthropic or model reference (no "Generated
+with Claude Code" footer, no model name) in a pull request's title or body,
+in any repository of this workspace.
+
 ## Claude delivery
 
 The current Claude capability evidence is limited. Use a verified

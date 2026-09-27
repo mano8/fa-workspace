@@ -45,6 +45,11 @@ Never put a Claude, Claude Code, Anthropic or model reference (no "Generated
 with Claude Code" footer, no model name) in a pull request's title or body,
 in any repository of this workspace.
 
+Never commit on, push to, or open a pull request from `main`. Choose the
+working branch this way, in any repository of this workspace: if the current
+branch has commits ahead of `main`, keep using the current branch; otherwise
+create a new branch from `main`.
+
 ## Claude delivery
 
 The current Claude capability evidence is limited. Use a verified

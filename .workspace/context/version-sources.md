@@ -22,7 +22,9 @@ source re-reads rather than a fleet re-measurement: `astro-prompt-m8` `1.2.0`
 `media-worker-m8` `0.4.0` → `0.4.1` (see *The media pair re-measured*). On
 2026-09-26 the five npm rows and `media-worker-m8` were re-read from
 `origin/main` after the Wave 9 release cascade (see *Wave 9 — the `astro-ui-m8`
-`1.5.2` cascade* below).
+`1.5.2` cascade* below). On 2026-09-27 the five npm rows were re-read from
+`origin/main` again, after the Wave 10 cascade (see *Wave 10 — the dependency
+compatibility cascade* below).
 
 `prompt-engine-m8` `2.0.0` → `2.1.0` was corrected in the same pass for a
 different reason: this table had been **contradicting the two tables below it**,
@@ -35,7 +37,7 @@ release state.
 
 | Mechanism | Repos (version at measurement) |
 | --- | --- |
-| npm `package.json` at repo root | `astro-auth-m8` 2.7.1 · `astro-media-m8` 2.3.1 · `astro-prompt-m8` 2.2.1 · `astro-reparto-m8` 2.3.1 · `astro-ui-m8` 1.5.2 — read from `origin/main` 2026-09-26 |
+| npm `package.json` at repo root | `astro-auth-m8` 2.7.2 · `astro-media-m8` 2.3.2 · `astro-prompt-m8` 2.2.2 · `astro-reparto-m8` 2.3.2 · `astro-ui-m8` 1.5.3 — read from `origin/main` 2026-09-27 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.3 — read from `origin/main` 2026-09-26 |
@@ -67,11 +69,11 @@ one-bump-per-unpublished-release rule.
 | `prompt-engine-m8` | 2.2.1 | 2.2.1 | — published (2026-09-26, tag `v2.2.1` = `main` `fd74ef3`; `tepochtli/prompt-engine-m8:2.2.1` pulled, `__version__` `2.2.1`). Carries `B23`, `B24`, `B27`, `B29`, `B30` and `B32` |
 | `reparto-docente-m8` | 2.2.2 | 2.2.2 | — published (2026-09-26, tag `v2.2.2` = `main` `169121b`; `tepochtli/reparto-docente-m8:2.2.2` pulled, `__version__` `2.2.2`). Carries `B27`, `B28`, `B30` and `B32` |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
-| `astro-ui-m8` | 1.5.2 | 1.5.2 | — published (2026-09-26, tag `v1.5.2` = `main` `a4a14b8`, PR #18; npm `latest` `1.5.2`; the first tarball to ship `CHANGELOG.md` — `1.5.1` shipped without it, `G38`). Carries `B30`/`B33`/`B34` and `B37`'s publish-job lock guard |
-| `astro-auth-m8` | 2.7.1 | 2.7.1 | — published (2026-09-26, tag `v2.7.1` = `main` `eee73b9`, PR #32; npm `latest` `2.7.1`; tarball ships `CHANGELOG.md`, ui `^1.5.2`, `testedServiceVersion` `2.2.3`). Patch tracking `astro-ui-m8` `1.5.2` (`B39`); carries `B35` and `B37`. `2.7.0` (PR #29, `a5273f6`) tracked `fa-auth-m8` `2.2.3` (`B31`) |
-| `astro-media-m8` | 2.3.1 | 2.3.1 | — published (2026-09-26, tag `v2.3.1` = `main` `0cd04eb`, PR #18; npm `latest` `2.3.1`; tarball tests `media-service-m8` `3.0.2`, ui `^1.5.2`, auth peer `^2.7.1`, ships `CHANGELOG.md`). Patch tracking `astro-ui-m8` `1.5.2` / `astro-auth-m8` `2.7.1` (`B39`). `2.3.0` (PR #16, `4bcd4f6`) tracked `media-service-m8` `3.0.2`; `2.1.0` and `2.2.0` were published 2026-09-16, see *Wave 8 publish* below |
-| `astro-prompt-m8` | 2.2.1 | 2.2.1 | — published (2026-09-26, tag `v2.2.1` = `main` `c92edac`, PR #23; npm `latest` `2.2.1`; tarball tests `prompt-engine-m8` `2.2.1`, ui `^1.5.2`, auth peer `^2.7.1`, ships `CHANGELOG.md`). Patch tracking `astro-ui-m8` `1.5.2` / `astro-auth-m8` `2.7.1` (`B39`). `2.2.0` (PR #21, `b9dcebf`) was the renumbered, never-shipped `2.1.1` |
-| `astro-reparto-m8` | 2.3.1 | 2.3.1 | — published (2026-09-26, tag `v2.3.1` = `main` `f43721b`, PR #11; npm `latest` `2.3.1`; tarball tests `reparto-docente-m8` `2.2.2`, ui `^1.5.2`, auth peer `^2.7.1`, `astro` peer `^7.0.9`, ships `CHANGELOG.md`). Patch tracking `astro-ui-m8` `1.5.2` / `astro-auth-m8` `2.7.1` (`B39`); see *`astro-reparto-m8` 2.3.0 — the service-version gate* below |
+| `astro-ui-m8` | 1.5.3 | 1.5.3 | — published (2026-09-27, tag `v1.5.3` = `main` `6ec692b`, PR #19; npm `latest` `1.5.3`; tarball ships `lucide-react` peer `^1.28.0`, no longer exactly `1.28.0`). Adds the fleet's dependency compatibility gate and `.npmrc` (see *Wave 10* below). `1.5.2` (PR #18, `a4a14b8`) was the first tarball to ship `CHANGELOG.md` (`G38`) |
+| `astro-auth-m8` | 2.7.2 | 2.7.2 | — published (2026-09-27, tag `v2.7.2` = `main` `3403f99`, PR #33; npm `latest` `2.7.2`; tarball ships ui `^1.5.3`, peers `@astrojs/react` `^6.0.1 \|\| ^7.0.0` and `@astrojs/starlight` `^0.41.3 \|\| ^0.42.0`, `testedServiceVersion` `2.2.3`). Patch (`Wave 10`). `2.7.1` (PR #32, `eee73b9`) tracked `astro-ui-m8` `1.5.2` (`B39`); `2.7.0` (PR #29, `a5273f6`) tracked `fa-auth-m8` `2.2.3` (`B31`) |
+| `astro-media-m8` | 2.3.2 | 2.3.2 | — published (2026-09-27, tag `v2.3.2` = `main` `ed8d68c`, PR #19; npm `latest` `2.3.2`; tarball tests `media-service-m8` `3.0.2`, ui `^1.5.3`, auth peer `^2.7.2`, the two widened `@astrojs` peers). Patch (`Wave 10`). `2.3.1` (PR #18, `0cd04eb`) tracked `B39`; `2.3.0` (PR #16, `4bcd4f6`) tracked `media-service-m8` `3.0.2`; `2.1.0` and `2.2.0` were published 2026-09-16, see *Wave 8 publish* below |
+| `astro-prompt-m8` | 2.2.2 | 2.2.2 | — published (2026-09-27, tag `v2.2.2` = `main` `7bc4198`, PR #24; npm `latest` `2.2.2`; tarball tests `prompt-engine-m8` `2.2.1`, ui `^1.5.3`, auth peer `^2.7.2`, the two widened `@astrojs` peers). Patch (`Wave 10`). `2.2.1` (PR #23, `c92edac`) tracked `B39`; `2.2.0` (PR #21, `b9dcebf`) was the renumbered, never-shipped `2.1.1` |
+| `astro-reparto-m8` | 2.3.2 | 2.3.2 | — published (2026-09-27, tag `v2.3.2` = `main` `cc27216`, PR #12; npm `latest` `2.3.2`; tarball tests `reparto-docente-m8` `2.2.2`, ui `^1.5.3`, auth peer `^2.7.2`, the two widened `@astrojs` peers, `astro` peer `^7.0.9`). Patch (`Wave 10`). `2.3.1` (PR #11, `f43721b`) tracked `B39`; see *`astro-reparto-m8` 2.3.0 — the service-version gate* below |
 
 Three rows moved on 2026-08-23, each re-read against its own remote rather
 than as part of a fleet sweep. `prompt-engine-m8` `1.0.0` → `2.0.0` and
@@ -1557,6 +1559,63 @@ the registry's `dist.integrity`. Each release also carries `B37`, the lock
 guard in the publish job, and in each run it ran before `npm ci`.
 `fa-ui-m8/app` then moved all five floors (it is never published, so it has no
 version row).
+
+### Wave 10 — the dependency compatibility cascade (2026-09-27, published)
+
+`fa-ui-m8` carried six Dependabot pull requests. Two could not merge. #40
+(`@astrojs/react` 7) fell outside every plugin's `^6.0.1` peer. #39
+(`react-dom` 19.3) arrived without the `react` half it requires. CI had passed
+both, and #36 before them, because `app/.npmrc`'s `legacy-peer-deps=true`
+switches off npm's peer check. On the operator's instruction, the fleet widened
+its peers and released them in dependency order. Each step was cut only after
+the previous package read back from the registry.
+
+| Package | Version | Tag = `main` merge | Floors it ships |
+| --- | --- | --- | --- |
+| `@mano8/astro-ui-m8` | `1.5.3` | `6ec692b` (PR #19) | `lucide-react` peer `1.28.0` → `^1.28.0` |
+| `@mano8/astro-auth-m8` | `2.7.2` | `3403f99` (PR #33) | ui `^1.5.3` |
+| `@mano8/astro-media-m8` | `2.3.2` | `ed8d68c` (PR #19) | ui `^1.5.3`, auth peer + dev `^2.7.2` |
+| `@mano8/astro-prompt-m8` | `2.2.2` | `7bc4198` (PR #24) | ui `^1.5.3`, auth peer + dev `^2.7.2` |
+| `@mano8/astro-reparto-m8` | `2.3.2` | `cc27216` (PR #12) | ui `^1.5.3`, auth peer + dev `^2.7.2` |
+
+The four plugins also widen `@astrojs/react` `^6.0.1` → `^6.0.1 || ^7.0.0`
+and `@astrojs/starlight` `^0.41.3` → `^0.41.3 || ^0.42.0`. Starlight 0.42 is
+the line built for `astro` 7.3. Under 0.41, `@astrojs/mdx` 7 pins
+`@astrojs/markdown-remark` 7.2.x, which is outside the `^7.3.0` optional peer
+`astro` 7.3 declares. `fa-ui-m8` had carried that mismatch since the #38 astro
+bump. Each release is a **patch**: peer ranges only widen, keeping both old
+lines, and every floor that rises points at a published release. No contract,
+service range or tested service version moved. `fa-ui-m8` PR #42 (`1251cbe`)
+then moved all five floors to `@astrojs/react` `^7.0.0`, Starlight `^0.42.4`,
+React `^19.3.0` and `vite` `^8.3.0` (the floor `@astrojs/react` 7 needs, which
+its own `vite` override had held at 8.2.0). Dependabot closed #39 and #40
+itself. Every consumer lock's `@mano8` `integrity` equals the registry's
+`dist.integrity`, and each `latest` read back three times in a row.
+
+**The fleet now checks declared ranges itself.** All six npm repositories
+carry a byte-identical `.npmrc` (`legacy-peer-deps=true`, documented), so npm
+and Dependabot never refuse to resolve on a peer conflict. An incompatible
+update therefore still arrives as a pull request. They also carry a
+byte-identical `scripts/verify-dependency-compat.mjs` and
+`tests/dependency-compat.test.ts` (under `app/` in `fa-ui-m8`), which put the
+check back. The gate reads `npm ls --all --json --long` with peer edges forced
+on, and fails on any installed package outside a declared range and on any
+missing required edge. CI runs it after `npm ci`. A third-party *optional
+peer* may be excused only in a `dependency-compat.waivers.json` entry with a
+written reason, and never an `@mano8` range. The fleet has one:
+`fa-ui-m8`'s `ajv-formats`, an optional peer of `@hookform/resolvers`' ajv
+resolver, which the app never imports. Known limit: npm reports an edge that
+`overrides` rewrites as satisfied, so a package held back by an override is
+invisible to the gate. `fa-ui-m8`'s `vite` was the case.
+
+The gate's first version spawned `npm` through a shell when run outside
+`npm run`. Codacy's Semgrep flagged it on `astro-reparto-m8` #12, whose tag
+carries the fix. `astro-ui-m8` #20, `astro-auth-m8` #34, `astro-media-m8` #20
+and `astro-prompt-m8` #25 brought the other four `main`s level. **No release
+is owed for them**: the script and test are outside every tarball, and packing
+those branches reproduced the published contents apart from the
+`[Unreleased]` changelog note. So `main` is ahead of each of those four tags
+by that change alone.
 
 ## One documented read command per mechanism
 

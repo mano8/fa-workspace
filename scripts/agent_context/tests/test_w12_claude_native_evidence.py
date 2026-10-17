@@ -217,6 +217,29 @@ class W12ClaudeNativeParserTests(unittest.TestCase):
         )
         self.assertEqual([item["path"] for item in injected], ["CLAUDE.md", "child/CLAUDE.md"])
 
+    def test_the_imported_conventions_owner_is_a_workspace_tier_source(self) -> None:
+        conventions = ".workspace/context/agent-conventions.md"
+        (self.root / ".workspace" / "context").mkdir(parents=True)
+        (self.root / conventions).write_text("# conventions\n", encoding="utf-8")
+        (self.root / ".workspace" / "context" / "other.md").write_text("# other\n", encoding="utf-8")
+        load = _load(self.root, [_capture_text(self.root, ("CLAUDE.md", conventions))])
+        sources = cne.instruction_sources(load, repositories=())
+        self.assertEqual(
+            [(item["policy_id"], item["path"], item["authority_tier"]) for item in sources],
+            [
+                ("instruction.root.claude-conventions", conventions, "workspace"),
+                ("instruction.root.claude", "CLAUDE.md", "workspace"),
+            ],
+        )
+        self.assertTrue(all(item["repository_id"] == "$workspace" for item in sources))
+        self.assertTrue(all(item["scope_prefix"] == "." for item in sources))
+        unexpected = _load(
+            self.root, [_capture_text(self.root, ("CLAUDE.md", ".workspace/context/other.md"))]
+        )
+        with self.assertRaises(w2b1.AgentContextError) as failure:
+            cne.instruction_sources(unexpected, repositories=())
+        self.assertEqual(failure.exception.code, "E_NATIVE_EVIDENCE")
+
     def test_manifest_binding_is_compared_in_both_directions(self) -> None:
         load = _load(self.root, [_capture_text(self.root, ("CLAUDE.md",))])
         evidence = cne.build_native_evidence(load, capability_row=_row())

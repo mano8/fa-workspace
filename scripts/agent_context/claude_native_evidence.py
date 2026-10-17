@@ -72,8 +72,11 @@ TRUST_RECORD = ".claude.json"
 # 12.1 measured that SessionStart carries additionalContext exactly as
 # UserPromptSubmit does.
 DUPLICATE_INJECTION_EVENTS = ("SessionStart", "UserPromptSubmit")
+# Root CLAUDE.md imports the workspace agent conventions, so the client lists
+# that owner as its own active project-memory source beside the bootstrap.
 NATIVE_INSTRUCTION_TIERS = {
     "CLAUDE.md": ("instruction.root.claude", "workspace"),
+    ".workspace/context/agent-conventions.md": ("instruction.root.claude-conventions", "workspace"),
 }
 REPOSITORY_INSTRUCTION_TIERS = {
     "CLAUDE.md": ("claude", "repository"),
@@ -519,7 +522,7 @@ def verify_manifest_native_binding(
 def _instruction_entry(path: str, selected: Sequence[str]) -> dict[str, str]:
     """Map one canonical instruction path onto its resolver entry."""
     parts = path.split("/")
-    if len(parts) == 1:
+    if len(parts) == 1 or path in NATIVE_INSTRUCTION_TIERS:
         if path not in NATIVE_INSTRUCTION_TIERS:
             _fail("E_NATIVE_EVIDENCE", f"unexpected workspace instruction source: {path}")
         policy_id, tier = NATIVE_INSTRUCTION_TIERS[path]

@@ -29,6 +29,9 @@ owned and usable outside this checkout.
 - [`context/dependency-cascade.md`](context/dependency-cascade.md) owns the
   order and touchpoints of a release cascade from `auth-sdk-m8` /
   `fastapi-m8`; `scripts/cascade/check_cascade.py` is its executable mirror.
+- [`context/agent-conventions.md`](context/agent-conventions.md) owns the
+  commit, branch and pull-request conventions every agent follows; the root
+  `CLAUDE.md` imports it, so Claude loads it natively with the bootstrap.
 - [`context/ai-provider-credentials.md`](context/ai-provider-credentials.md)
   owns the ratified AI-platform credential storage and KEK providers,
   data-class/boundary policy, job-context and signed-object contract,

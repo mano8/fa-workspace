@@ -79,7 +79,7 @@ TIER_ORDER = {"security": 0, "workspace": 1, "task": 2, "repository": 3}
 NATIVE_INSTRUCTION_FILES: dict[str, dict[str, tuple[str, ...]]] = {
     "codex": {"$workspace": ("AGENTS.md",), "repository": ("AGENTS.md",)},
     "claude": {
-        "$workspace": ("CLAUDE.md",),
+        "$workspace": ("CLAUDE.md", ".workspace/context/agent-conventions.md"),
         "repository": ("CLAUDE.md", "REPOSITORY_CONTEXT.md"),
     },
 }

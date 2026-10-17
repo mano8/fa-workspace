@@ -36,6 +36,10 @@ FORBIDDEN_PHRASES = (
     "<!--",
     "codex",
 )
+# The one workspace-owned file the bootstrap imports so Claude always loads the
+# agent conventions natively; the native-evidence allowlist names the same path.
+CONVENTIONS_IMPORT_PATH = ".workspace/context/agent-conventions.md"
+IMPORT_LINE_PATTERN = r"(?m)^[ \t]*@\S+[ \t]*$"
 FORBIDDEN_IMPORT_PATTERNS = (
     r"(?im)^\s*@(?:/)?AGENTS\.md\s*$",
     r"(?im)^\s*import\s+.*AGENTS\.md\s*$",
@@ -54,6 +58,19 @@ class RootClaudeValidationReport:
 
 def _fail(message: str) -> None:
     raise RootClaudeValidationError(message)
+
+
+def _validate_import_target(path: Path) -> None:
+    """Require the imported conventions owner to be a regular normative file."""
+    try:
+        if path.is_symlink() or not path.is_file():
+            _fail(f"imported conventions owner is not a regular file: {CONVENTIONS_IMPORT_PATH}")
+        raw = path.read_bytes()
+        raw.decode("utf-8", errors="strict")
+    except (OSError, UnicodeDecodeError) as error:
+        _fail(f"could not read the imported conventions owner as strict UTF-8: {error}")
+    if raw.startswith(b"\xef\xbb\xbf") or b"\r" in raw or not raw.endswith(b"\n"):
+        _fail("imported conventions owner must be UTF-8 without BOM, LF, and final newline")
 
 
 def validate_root_claude(workspace: Path) -> RootClaudeValidationReport:
@@ -82,6 +99,10 @@ def validate_root_claude(workspace: Path) -> RootClaudeValidationReport:
         _fail("root CLAUDE.md contains forbidden stale, hidden, or cross-agent content: " + ", ".join(present_forbidden))
     if any(re.search(pattern, text) for pattern in FORBIDDEN_IMPORT_PATTERNS):
         _fail("root CLAUDE.md imports root AGENTS.md")
+    imports = [line.strip() for line in re.findall(IMPORT_LINE_PATTERN, text)]
+    if imports != [f"@{CONVENTIONS_IMPORT_PATH}"]:
+        _fail(f"root CLAUDE.md must import exactly @{CONVENTIONS_IMPORT_PATH}")
+    _validate_import_target(workspace.resolve() / CONVENTIONS_IMPORT_PATH)
     return RootClaudeValidationReport(
         byte_count=len(raw), reference_count=len(REQUIRED_REFERENCES)
     )

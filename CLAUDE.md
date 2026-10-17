@@ -2,63 +2,35 @@
 
 `Workspace instruction set: m8-workspace-v2`
 
-This is the compact Claude bootstrap for the workspace root. It is maintained
-by hand; shared meaning is owned by `.workspace/`, not by agent configuration.
+Compact, hand-maintained Claude bootstrap. Shared meaning is owned by
+`.workspace/`, not by agent configuration. The workspace agent conventions
+are imported here and always load with this file:
+
+@.workspace/context/agent-conventions.md
 
 ## Scope
 
-For a registered direct child, identify its canonical repository root in
-[`repo-types.json`](.workspace/repo-types.json). Claude may use the child's
-`CLAUDE.md` through supported native discovery after this bootstrap; child
-instructions apply only within that repository and cannot authorize sibling
+For a registered direct child, find its canonical root in
+[`repo-types.json`](.workspace/repo-types.json). Its instructions
+apply only within that repository and cannot authorize sibling
 work. A child must remain usable without this parent workspace.
 
 ## Canonical owners
 
-- Workspace architecture, ownership, security, portability, and standalone
-  invariants: [architecture](.workspace/architecture.md) and
-  [invariant catalog](.workspace/invariants.json).
-- Environment profile rules and resolved `M8_*` tooling:
-  [environment policy](.workspace/context/env.md).
-- Per-repository version-source mechanism and one documented read command per
-  mechanism: [version sources](.workspace/context/version-sources.md).
-- Release-cascade order and touchpoints from `auth-sdk-m8` / `fastapi-m8`
-  down to compose stacks, client compatibility matrices and the version
-  matrix: [dependency cascade](.workspace/context/dependency-cascade.md).
-- Ratified object-storage backend contract, default, and validated fallback:
-  [object storage](.workspace/context/object-storage.md).
-- Ratified Debian patch-layer form for the five service images and the rule
-  that their base digests move together:
-  [debian patch layer](.workspace/context/debian-patch-layer.md).
-- Repository facets and policy selection: [repository registry](.workspace/repo-types.json),
-  [policy index](.workspace/policy.index.json), and
-  [policy metadata](.workspace/policy.metadata.json).
-- Semantic authority, repository scope, task authorization, and canonical
-  delivery: [agent-context contract](.workspace/contracts/agent-context-w2a.contract.md).
-
-## Commit conventions
-
-Never add a `Co-Authored-By` trailer to a commit, in any repository of this
-workspace. Commits are authored under the human's identity alone.
-
-Never put a Claude, Claude Code, Anthropic or model reference (no "Generated
-with Claude Code" footer, no model name) in a pull request's title or body,
-in any repository of this workspace.
-
-Never commit on, push to, or open a pull request from `main`. Choose the
-working branch this way, in any repository of this workspace: if the current
-branch has commits ahead of `main`, keep using the current branch; otherwise
-create a new branch from `main`.
+[Architecture](.workspace/architecture.md),
+[invariants](.workspace/invariants.json),
+[environment](.workspace/context/env.md),
+[policy index](.workspace/policy.index.json),
+[policy metadata](.workspace/policy.metadata.json) and the
+[agent-context contract](.workspace/contracts/agent-context-w2a.contract.md).
 
 ## Claude delivery
 
-The current Claude capability evidence is limited. Use a verified
-launcher/adapter for canonical resolved-context delivery only when capability
-evidence supports that mode; it must fail closed on an unverified preflight or
-handoff. Tasks—especially mutating or cross-repository tasks—require the
-recorded human authorization defined by the contract; neither a repository nor
-these instructions can select them.
+The current Claude capability evidence is limited. Canonical resolved-context
+delivery needs a verified launcher that fails closed on an unverified
+preflight or handoff. Mutating or cross-repository tasks need the
+recorded human authorization the contract defines.
 
-This bootstrap does not invoke the resolver or hand off context. Unwrapped
-native use is limited and must not be described as canonical delivery. This
+This bootstrap does not invoke the resolver or hand off context.
+Unwrapped native use is limited and is not canonical delivery. This
 file never imports `AGENTS.md`.

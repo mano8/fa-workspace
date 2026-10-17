@@ -29,6 +29,10 @@ owned and usable outside this checkout.
 - [`context/dependency-cascade.md`](context/dependency-cascade.md) owns the
   order and touchpoints of a release cascade from `auth-sdk-m8` /
   `fastapi-m8`; `scripts/cascade/check_cascade.py` is its executable mirror.
+- [`context/ai-provider-credentials.md`](context/ai-provider-credentials.md)
+  owns the ratified AI-platform credential storage and KEK providers,
+  data-class/boundary policy, job-context and signed-object contract,
+  capability-scope model, and network posture for provider credentials.
 - [`plans/`](plans/), [`analyse/`](analyse/), and [`status/`](status/) own plans,
   analyses, and evidence artifacts. Do not copy shared facts into `.codex/` or
   `.claude/`.

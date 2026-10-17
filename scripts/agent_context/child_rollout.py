@@ -1,7 +1,8 @@
 """Phase 8.1 standalone-child rollout contract validation and selection.
 
 This module does not edit a child or activate a client.  It validates the
-root-owned C01--C16 boundary record and models the two permitted instruction
+root-owned boundary record (frozen C01--C16 extractions plus born-conformant
+boundaries added by amendment) and models the two permitted instruction
 selection modes used by synthetic resolver fixtures: optional parent
 enhancement when a reviewed workspace is supplied, and local-only standalone
 operation when it is absent.
@@ -24,10 +25,22 @@ CONTRACT_ID = "m8-child-repository-rollout-v1"
 AGENT_ENTRYPOINTS = {"claude": "CLAUDE.md", "codex": "AGENTS.md"}
 EXACT_ALLOWLIST = ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"]
 CLASSIFICATIONS = {"neutral-asymmetric", "neutral-semantic-duplicate"}
+SCHEMA_VERSION = 2
+FROZEN_ON = "2026-07-20"
+AMENDED_ON = "2026-10-17"
+FROZEN_BOUNDARY_COUNT = 16
+EXTRACTION_DECISION = "extract-neutral-local-context"
+EXTRACTION_INPUTS = ["AGENTS.md", "CLAUDE.md"]
+# A child created with the template already in place has no legacy pair to
+# extract; its boundary hashes the three initial template files instead.
+BORN_CONFORMANT = "born-conformant"
+BORN_CONFORMANT_DECISION = "born-neutral-local-context"
+BORN_CONFORMANT_PHASE_STEP = "amendment-1"
 TOP_FIELDS = {
     "schema_version",
     "contract_id",
     "frozen_on",
+    "amended_on",
     "source_evidence",
     "boundaries",
 }
@@ -108,10 +121,10 @@ def validate_rollout_record(
     """Validate the closed root record, optionally rehashing saved live inputs."""
     workspace = workspace.resolve()
     _closed(record, TOP_FIELDS, "rollout record")
-    if record["schema_version"] != 1 or record["contract_id"] != CONTRACT_ID:
-        _fail("rollout record identity is not the frozen Phase 8.1 contract")
-    if record["frozen_on"] != "2026-07-20":
-        _fail("rollout record frozen date is unexpected")
+    if record["schema_version"] != SCHEMA_VERSION or record["contract_id"] != CONTRACT_ID:
+        _fail("rollout record identity is not the amended Phase 8.1 contract")
+    if record["frozen_on"] != FROZEN_ON or record["amended_on"] != AMENDED_ON:
+        _fail("rollout record frozen or amendment date is unexpected")
     try:
         w2b1.validate_registry_v2(registry)
     except w2b1.AgentContextError as error:
@@ -151,17 +164,21 @@ def validate_rollout_record(
         boundary = _closed(supplied, BOUNDARY_FIELDS, f"boundary C{offset:02d}")
         expected_id = f"C{offset:02d}"
         if boundary["boundary_id"] != expected_id:
-            _fail("boundaries must retain C01--C16 order")
-        expected_step = f"8.{offset + 1}"
+            _fail("boundaries must retain sequential C-number order")
+        frozen = offset <= FROZEN_BOUNDARY_COUNT
+        expected_step = f"8.{offset + 1}" if frozen else BORN_CONFORMANT_PHASE_STEP
         if boundary["phase_step"] != expected_step:
             _fail(f"{expected_id} has the wrong Phase 8 step")
         repository_id = boundary["repository_id"]
         if repository_id not in repositories or repository_id in seen_repositories:
             _fail(f"{expected_id} has an unknown or duplicate repository")
         seen_repositories.add(repository_id)
-        if boundary["classification"] not in CLASSIFICATIONS:
+        if frozen and boundary["classification"] not in CLASSIFICATIONS:
             _fail(f"{expected_id} has an unknown classification")
-        if boundary["decision"] != "extract-neutral-local-context":
+        if not frozen and boundary["classification"] != BORN_CONFORMANT:
+            _fail(f"{expected_id} must be classified born-conformant")
+        expected_decision = EXTRACTION_DECISION if frozen else BORN_CONFORMANT_DECISION
+        if boundary["decision"] != expected_decision:
             _fail(f"{expected_id} has an unsupported migration decision")
         if boundary["exact_allowlist"] != EXACT_ALLOWLIST:
             _fail(f"{expected_id} must use the frozen three-path allowlist")
@@ -175,11 +192,9 @@ def validate_rollout_record(
         if boundary["observed_auxiliary_sources"] != []:
             _fail(f"{expected_id} has unapproved auxiliary agent sources")
         inputs = boundary["input_files"]
-        if not isinstance(inputs, list) or [item.get("path") for item in inputs] != [
-            "AGENTS.md",
-            "CLAUDE.md",
-        ]:
-            _fail(f"{expected_id} must record the two classified input files")
+        expected_inputs = EXTRACTION_INPUTS if frozen else EXACT_ALLOWLIST
+        if not isinstance(inputs, list) or [item.get("path") for item in inputs] != expected_inputs:
+            _fail(f"{expected_id} must record its classified input files")
         for supplied_input in inputs:
             item = _closed(supplied_input, INPUT_FIELDS, f"{expected_id} input")
             if (

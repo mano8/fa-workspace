@@ -10,7 +10,7 @@ owned and usable outside this checkout.
   direction, security, portability, and standalone invariants.
 - [`invariants.json`](invariants.json) catalogs the invariant IDs; definitions
   remain in `architecture.md`.
-- [`repo-types.json`](repo-types.json) is the one registry of the 16 registered
+- [`repo-types.json`](repo-types.json) is the one registry of the 19 registered
   direct-child repositories. Internal paths such as `fa-ui-m8/app` are not
   repositories.
 - [`policy.index.json`](policy.index.json) and

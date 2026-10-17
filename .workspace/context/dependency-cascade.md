@@ -76,6 +76,22 @@ everything ───────► .workspace/context/version-sources.md
 `security-tests-m8`. `security-tests-m8/tests/test_deployment.py` names
 `tepochtli/fa-auth-m8` tags as test fixtures, not as pins; leave them.
 
+**Registered, not yet in the graph** (2026-10-17): `ai-gateway-m8`,
+`ai-sdk-m8` and `doctools-m8` carry only their instruction files, so no pin
+exists to measure. Where each joins once its scaffold lands:
+
+- `ai-gateway-m8` — a `fastapi-m8` consumer. It enters Phase 3 beside the
+  three consumers (package `ai_gateway`), inherits `ConsumerServiceSettings`,
+  and its image enters Phase 5 with its stacks.
+- `ai-sdk-m8` — a new platform root, consumed by `ai-gateway-m8` and by
+  `doctools-m8`'s `sandbox` and `provenance` extras. It pins neither
+  `auth-sdk-m8` nor `fastapi-m8`.
+- `doctools-m8` — a new platform root, consumed by `media-service-m8`; it
+  depends on `ai-sdk-m8` only.
+
+The graph, the tables below and the checker gain these rows from measured
+working trees, not before.
+
 Consumer services never import `auth-sdk-m8` directly
 (`media-service-m8/REPOSITORY_CONTEXT.md`); their `auth-sdk-m8` pin exists only
 in the hashed lock, pulled in via `fastapi-m8`. It still moves, because the

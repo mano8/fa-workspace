@@ -1,11 +1,12 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "contract_id": "m8-child-repository-rollout-v1",
   "frozen_on": "2026-07-20",
+  "amended_on": "2026-10-17",
   "source_evidence": [
     {
       "path": ".workspace/policy.index.json",
-      "sha256": "db8e572a3e200c2995786f7a460fe9ca61eb86ae101d7614483de35bbde95cc9"
+      "sha256": "377edf1dafd860fe68dcdb42ef7a041a7e92270580ff54d4ba339d11fa8c0863"
     },
     {
       "path": ".workspace/policy.metadata.json",
@@ -13,7 +14,7 @@
     },
     {
       "path": ".workspace/repo-types.json",
-      "sha256": "c8b7b91e104fd76785a332b37c1452388595d479abe9309b26b6d2975269f2aa"
+      "sha256": "9c074632889568ceaea868fc35a2b31812c6f1d8ff1aadd238e1e90b4ad3dfb3"
     }
   ],
   "boundaries": [
@@ -255,6 +256,54 @@
       "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
       "required_neutral_owner": "REPOSITORY_CONTEXT.md",
       "reconciliation_gates": ["merge detailed asymmetric reparto plugin facts", "remove mandatory parent and direct policy references", "preserve consumer-owned configuration"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C17",
+      "phase_step": "amendment-1",
+      "repository_id": "ai-gateway-m8",
+      "classification": "born-conformant",
+      "decision": "born-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 234, "sha256": "6c4b0b6b09186fb1d79f558801f61dd85d4cd276bc87e070faec693a0ee8b8ab"},
+        {"path": "CLAUDE.md", "bytes": 226, "sha256": "d6e5f54978d360266cde3e5ae250e675928ca36ec967eb3204d2c689f6fdcb76"},
+        {"path": "REPOSITORY_CONTEXT.md", "bytes": 1679, "sha256": "8ecaf48e401417e0209d9fe134eed877258ff08d22d4cd068444a85e38840328"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["born with the three-file template from its first instruction commit", "agent entrypoints carry only integration mechanics", "no absolute parent, workspace, or user-profile path"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C18",
+      "phase_step": "amendment-1",
+      "repository_id": "ai-sdk-m8",
+      "classification": "born-conformant",
+      "decision": "born-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 230, "sha256": "480833cb9eb2caecb17653b9d0f80434752b672405ee0ad575e7d07a3e5e015e"},
+        {"path": "CLAUDE.md", "bytes": 222, "sha256": "cb18b5fb028333f32ac02e8b7a7981ab567a0300753040e3ff3e5456f7daa44c"},
+        {"path": "REPOSITORY_CONTEXT.md", "bytes": 1614, "sha256": "2331a7ae4f3f43cb5e021334945d69a8c05a28f970cde0aca509bc6c9c344090"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["born with the three-file template from its first instruction commit", "agent entrypoints carry only integration mechanics", "no absolute parent, workspace, or user-profile path"],
+      "observed_auxiliary_sources": []
+    },
+    {
+      "boundary_id": "C19",
+      "phase_step": "amendment-1",
+      "repository_id": "doctools-m8",
+      "classification": "born-conformant",
+      "decision": "born-neutral-local-context",
+      "input_files": [
+        {"path": "AGENTS.md", "bytes": 232, "sha256": "518a85faff36efdc6b28ebb1fb0d15cdec2ad0ddb340c7c1f129e5a182808031"},
+        {"path": "CLAUDE.md", "bytes": 224, "sha256": "2d741f70decfce0432a087bb85b204fb30e072f55f7195dcca965af85f1922a1"},
+        {"path": "REPOSITORY_CONTEXT.md", "bytes": 1696, "sha256": "8e3f9f5000b614a907ad90191f25928c6d8e2b23ed227730dae832e993b3d85b"}
+      ],
+      "exact_allowlist": ["AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md"],
+      "required_neutral_owner": "REPOSITORY_CONTEXT.md",
+      "reconciliation_gates": ["born with the three-file template from its first instruction commit", "agent entrypoints carry only integration mechanics", "no absolute parent, workspace, or user-profile path"],
       "observed_auxiliary_sources": []
     }
   ]

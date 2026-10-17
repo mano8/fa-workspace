@@ -9,6 +9,8 @@
 - fastapi-m8
 - imgtools_m8
 - security-tests-m8
+- ai-sdk-m8
+- doctools-m8
 
 ### Service Layer
 
@@ -17,6 +19,7 @@
 - media-worker-m8
 - prompt-engine-m8
 - reparto-docente-m8
+- ai-gateway-m8
 
 ### Client Layer
 

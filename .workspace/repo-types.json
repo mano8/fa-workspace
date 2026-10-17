@@ -2,6 +2,20 @@
   "schema_version": 2,
   "repositories": [
     {
+      "id": "ai-gateway-m8",
+      "path": "ai-gateway-m8",
+      "kind": "api-service",
+      "layer": "service",
+      "facets": ["python", "service", "api-service", "fastapi", "auth-security", "ai"]
+    },
+    {
+      "id": "ai-sdk-m8",
+      "path": "ai-sdk-m8",
+      "kind": "sdk",
+      "layer": "platform",
+      "facets": ["python", "platform", "sdk", "auth-security", "ai"]
+    },
+    {
       "id": "astro-auth-m8",
       "path": "astro-auth-m8",
       "kind": "astro-plugin",
@@ -42,6 +56,13 @@
       "kind": "sdk",
       "layer": "platform",
       "facets": ["python", "platform", "sdk", "auth-security"]
+    },
+    {
+      "id": "doctools-m8",
+      "path": "doctools-m8",
+      "kind": "library",
+      "layer": "platform",
+      "facets": ["python", "platform", "library", "auth-security", "document-processing"]
     },
     {
       "id": "fa-auth-m8",

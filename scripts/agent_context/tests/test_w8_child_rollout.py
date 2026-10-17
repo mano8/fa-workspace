@@ -25,6 +25,12 @@ LIVE_ROLLOUTS_AVAILABLE = all(
     for repository in ROLLED_OUT_REPOSITORIES
     for name in ("AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md")
 )
+BORN_CONFORMANT_REPOSITORIES = ("ai-gateway-m8", "ai-sdk-m8", "doctools-m8")
+LIVE_BORN_CONFORMANT_AVAILABLE = all(
+    (WORKSPACE / repository / name).is_file()
+    for repository in BORN_CONFORMANT_REPOSITORIES
+    for name in ("AGENTS.md", "CLAUDE.md", "REPOSITORY_CONTEXT.md")
+)
 
 
 class ChildRolloutContractTests(unittest.TestCase):
@@ -43,13 +49,62 @@ class ChildRolloutContractTests(unittest.TestCase):
             self.record,
             verify_live_inputs=False,
         )
-        self.assertEqual(len(self.record["boundaries"]), 16)
+        self.assertEqual(len(self.record["boundaries"]), 19)
         self.assertTrue(
             all(
                 boundary["exact_allowlist"] == child_rollout.EXACT_ALLOWLIST
                 for boundary in self.record["boundaries"]
             )
         )
+        self.assertEqual(
+            [
+                (boundary["boundary_id"], boundary["repository_id"], boundary["classification"])
+                for boundary in self.record["boundaries"][16:]
+            ],
+            [
+                ("C17", "ai-gateway-m8", "born-conformant"),
+                ("C18", "ai-sdk-m8", "born-conformant"),
+                ("C19", "doctools-m8", "born-conformant"),
+            ],
+        )
+
+    @unittest.skipUnless(LIVE_BORN_CONFORMANT_AVAILABLE, "live child repositories are external")
+    def test_live_born_conformant_inputs_match_the_record(self) -> None:
+        child_rollout.validate_rollout_record(
+            WORKSPACE,
+            self.registry,
+            self.record,
+            verify_live_inputs=True,
+            verify_live_boundary_ids={"C17", "C18", "C19"},
+        )
+        for repository_id in BORN_CONFORMANT_REPOSITORIES:
+            for agent in ("codex", "claude"):
+                with self.subTest(repository=repository_id, agent=agent):
+                    nested = child_rollout.resolve_child_instruction_context(
+                        WORKSPACE / repository_id,
+                        repository_id=repository_id,
+                        agent=agent,
+                        workspace_root=WORKSPACE,
+                    )
+                    self.assertEqual(nested.mode, "parent-found")
+
+    def test_born_conformant_shape_is_confined_to_amended_boundaries(self) -> None:
+        frozen_as_born = copy.deepcopy(self.record)
+        frozen_as_born["boundaries"][0]["classification"] = "born-conformant"
+        with self.assertRaisesRegex(child_rollout.ChildRolloutError, "unknown classification"):
+            child_rollout.validate_rollout_record(WORKSPACE, self.registry, frozen_as_born)
+        amended_as_extraction = copy.deepcopy(self.record)
+        amended_as_extraction["boundaries"][16]["classification"] = "neutral-asymmetric"
+        with self.assertRaisesRegex(child_rollout.ChildRolloutError, "born-conformant"):
+            child_rollout.validate_rollout_record(WORKSPACE, self.registry, amended_as_extraction)
+        two_inputs = copy.deepcopy(self.record)
+        del two_inputs["boundaries"][17]["input_files"][2]
+        with self.assertRaisesRegex(child_rollout.ChildRolloutError, "classified input files"):
+            child_rollout.validate_rollout_record(WORKSPACE, self.registry, two_inputs)
+        unamended = copy.deepcopy(self.record)
+        unamended["schema_version"] = 1
+        with self.assertRaisesRegex(child_rollout.ChildRolloutError, "identity"):
+            child_rollout.validate_rollout_record(WORKSPACE, self.registry, unamended)
 
     @unittest.skipUnless(LIVE_ROLLOUTS_AVAILABLE, "live child repositories are external")
     def test_live_completed_c02_through_c16_rollouts_have_one_neutral_owner(self) -> None:

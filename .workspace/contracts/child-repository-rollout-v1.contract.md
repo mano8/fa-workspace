@@ -4,7 +4,8 @@
 
 **Frozen:** 2026-07-20
 
-**Status:** APPROVED FOR INDEPENDENT `C01`--`C16` ROLLOUT
+**Status:** APPROVED FOR INDEPENDENT `C01`--`C16` ROLLOUT; `C17`--`C19`
+added born-conformant by Amendment 1 (2026-10-17)
 
 **Machine record:** `child-repository-rollout-v1.boundaries.json`
 
@@ -76,6 +77,29 @@ must not redefine workspace authority, facet selection, cross-repository
 scope, task authorization, or shared invariants. Absolute `/.workspace`,
 `/workspace/...`, root-entrypoint, drive/user-profile, or mandatory-parent
 references are removed rather than translated to another host-specific path.
+
+## Amendment 1 — born-conformant children (2026-10-17)
+
+The machine record moves to `schema_version` 2 and gains `amended_on`. Its
+`source_evidence` is re-pinned to the registry and policy index that register
+three new children: `ai-gateway-m8` (`C17`), `ai-sdk-m8` (`C18`) and
+`doctools-m8` (`C19`). `C01`--`C16` are unchanged.
+
+A born-conformant child is created with the frozen template already in place.
+It has no legacy `AGENTS.md`/`CLAUDE.md` pair, so there is nothing to classify
+or extract. Its boundary differs from `C01`--`C16` in exactly four fields:
+
+- `phase_step` is `amendment-1`, not a Phase 8 step;
+- `classification` is `born-conformant`;
+- `decision` is `born-neutral-local-context`;
+- `input_files` hashes all three template files — `AGENTS.md`, `CLAUDE.md`,
+  `REPOSITORY_CONTEXT.md`, in that order — as committed on the child's first
+  instruction commit.
+
+The allowlist, the neutral owner, the reconciliation gates, the empty
+auxiliary-source set, the template rules and the drift rule above apply
+unchanged. A boundary after `C16` must be born-conformant; `C01`--`C16` can
+never become born-conformant.
 
 ## Parent-absent standalone fallback
 

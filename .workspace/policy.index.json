@@ -6,7 +6,7 @@
     "hard_bytes": 32768
   },
   "always": ["always.security", "always.workspace"],
-  "facet_ids": ["api-service", "arq", "astro", "astro-host", "astro-plugin", "auth-client", "auth-security", "client", "fastapi", "framework", "image-processing", "library", "media", "media-client", "platform", "prompt", "prompt-client", "pytest", "python", "sdk", "security-testing", "service", "shared", "shared-ui", "starlight", "teaching-assignment", "teaching-assignment-client", "test-suite", "typescript", "ui-library", "worker"],
+  "facet_ids": ["ai", "api-service", "arq", "astro", "astro-host", "astro-plugin", "auth-client", "auth-security", "client", "document-processing", "fastapi", "framework", "image-processing", "library", "media", "media-client", "platform", "prompt", "prompt-client", "pytest", "python", "sdk", "security-testing", "service", "shared", "shared-ui", "starlight", "teaching-assignment", "teaching-assignment-client", "test-suite", "typescript", "ui-library", "worker"],
   "facets": {
     "api-service": ["facet.kind.api-service"],
     "astro": ["facet.framework.astro"],

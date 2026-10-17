@@ -520,8 +520,10 @@ def _pty_session(project: ProbeProject, capture: Capture, arguments: Sequence[st
         environment = _client_environment(capture)
         environment["TERM"] = "xterm-256color"
         os.execvpe("claude", ["claude", *arguments], environment)
+    # The folder-trust dialog defaults to "No, exit" (2.1.302), so move to
+    # "Yes, I trust this folder" before confirming; a bare Enter would exit.
     keystrokes = [
-        (6.0, b"\r"), (9.0, b"2"), (11.0, b"\r"), (16.0, b"SAY PROBE"), (19.0, b"\r"),
+        (6.0, b"\x1b[B"), (7.0, b"\r"), (11.0, b"\r"), (16.0, b"SAY PROBE"), (19.0, b"\r"),
         (45.0, b"\x03"), (47.0, b"\x04"), (49.0, b"\x04"),
     ]
     captured = bytearray()
@@ -556,7 +558,13 @@ def _pty_session(project: ProbeProject, capture: Capture, arguments: Sequence[st
 def probe_interactive(project: ProbeProject, runner: Path) -> dict[str, Any]:
     """Measure the interactive row: startup gating, hook channel, and wrapper."""
     observations: dict[str, Any] = {"attempted": True}
-    session = "35353535-3535-4535-8535-353535353535"
+    # 2.1.302 refuses to start a session whose identity is already in use, so
+    # every interactive launch requests its own fixed identity.
+    sessions = {
+        10000: "35353535-3535-4535-8535-353535353501",
+        10001: "35353535-3535-4535-8535-353535353502",
+        "wrapper": "35353535-3535-4535-8535-353535353503",
+    }
     for size in (10000, 10001):
         fixture = build_fixture(size, "ascii")
         capture = Capture(project.base / f"capture-interactive-hook-{size}")
@@ -564,7 +572,7 @@ def probe_interactive(project: ProbeProject, runner: Path) -> dict[str, Any]:
         try:
             _pty_session(
                 project, capture,
-                ["--model", PROBE_MODEL, "--tools", "", "--session-id", session],
+                ["--model", PROBE_MODEL, "--tools", "", "--session-id", sessions[size]],
                 project.base / f"interactive-{size}.log",
             )
             observations[f"hook_additional_context_{size}_exact"] = capture.contains(fixture)
@@ -577,7 +585,7 @@ def probe_interactive(project: ProbeProject, runner: Path) -> dict[str, Any]:
         _pty_session(
             project, capture,
             [
-                "--model", PROBE_MODEL, "--tools", "", "--session-id", session,
+                "--model", PROBE_MODEL, "--tools", "", "--session-id", sessions["wrapper"],
                 "--append-system-prompt", fixture.decode("utf-8"),
             ],
             project.base / "interactive-wrapper.log",

@@ -26,10 +26,10 @@ from agent_context.shared_validation import validate_resolved
 
 
 ROOT = Path(__file__).resolve().parents[3]
-EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-07-28.json"
-REPORT = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-07-28.md"
+EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-17.json"
+REPORT = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-17.md"
 TOOL = ROOT / "scripts/agent_context/claude_native_evidence.py"
-CAPABILITY = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.json"
+CAPABILITY = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.json"
 SECTION_PREAMBLE = (
     "<system-reminder>\nAs you answer the user's questions, you can use the following context:\n"
     "# claudeMd\nCodebase and user instructions are shown below.\n\n"
@@ -80,6 +80,14 @@ class W12ClaudeNativeParserTests(unittest.TestCase):
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
+
+    def test_the_headingless_2_1_302_memory_block_is_still_recognised(self) -> None:
+        framed = _capture_text(self.root, self.paths).replace("# claudeMd\n", "")
+        sources, _ = cne.parse_active_sources([framed], self.root)
+        self.assertEqual([source.path for source in sources], sorted(self.paths))
+        with self.assertRaises(w2b1.AgentContextError) as failure:
+            cne.parse_active_sources([framed.replace(cne.MEMORY_SECTION_HEADING, "")], self.root)
+        self.assertEqual(failure.exception.code, "E_NATIVE_EVIDENCE")
 
     def test_active_sources_are_enumerated_from_the_clients_own_labels(self) -> None:
         sources, external = cne.parse_active_sources([_capture_text(self.root, self.paths)], self.root)
@@ -339,6 +347,8 @@ class W12ClaudeNativeEvidenceFreezeTests(unittest.TestCase):
         self.assertEqual(child["fail_closed"]["code"], "E_TRUST")
         self.assertEqual(
             [source["path"] for source in child["native_sources"]],
+            # The root bootstrap's import is external to a child launch scope,
+            # so the client skips it until the human approves external imports.
             ["CLAUDE.md", "fa-auth-m8/CLAUDE.md", "fa-auth-m8/REPOSITORY_CONTEXT.md"],
         )
         # Step 12.1 measured exactly this native set for the child launch scope.
@@ -402,7 +412,7 @@ class W12ClaudeNativeEvidenceFreezeTests(unittest.TestCase):
                 capability_row=capability,
                 reviewed_tree={"algorithm": "git-sha1", "value": "b" * 40},
                 agent="claude", platform=capability["platform"], mode=capability["mode"],
-                repositories=("fa-auth-m8",), native_evidence=native,
+                repositories=(self.evidence["classification_repository"],), native_evidence=native,
                 injection_evidence={
                     "generation": 0, "native_discovery_disabled": True,
                     "exact_once_handoff_proven": True,

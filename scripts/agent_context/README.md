@@ -267,7 +267,7 @@ those layers rather than replacing them, an `additionalContext` hook registered
 there is a second authority the launcher does not own and makes **both** rows
 ineligible with `E_CHANNEL`. The byte-exact round trip, the exactly-once
 evidence, and the 10,000/10,001 boundary are frozen in
-[`w12-claude-hook-channel-evidence-2026-07-28.md`](fixtures/evidence/w12-claude-hook-channel-evidence-2026-07-28.md).
+[`w12-claude-hook-channel-evidence-2026-10-17.md`](fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-17.md).
 
 ```bash
 scripts/claude-repo.sh --repository fa-auth-m8 "inspect the repository"

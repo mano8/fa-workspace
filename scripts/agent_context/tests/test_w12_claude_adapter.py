@@ -38,11 +38,11 @@ from agent_context.delivery_kernel import DeliveryKernel
 
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE_DIR = "scripts/agent_context/fixtures/evidence"
-NATIVE_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-native-load-evidence-2026-07-28.json"
-CAPABILITY = ROOT / EVIDENCE_DIR / "w12-claude-capability-evidence-2026-07-27.json"
+NATIVE_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-native-load-evidence-2026-10-17.json"
+CAPABILITY = ROOT / EVIDENCE_DIR / "w12-claude-capability-evidence-2026-10-17.json"
 ADAPTER_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-adapter-evidence-2026-07-28.json"
 ADAPTER_REPORT = ROOT / EVIDENCE_DIR / "w12-claude-adapter-evidence-2026-07-28.md"
-HOOK_CHANNEL = ROOT / EVIDENCE_DIR / "w12-claude-hook-channel-evidence-2026-07-28.json"
+HOOK_CHANNEL = ROOT / EVIDENCE_DIR / "w12-claude-hook-channel-evidence-2026-10-17.json"
 HOOK_ROW = "claude-devcontainer-non-interactive-hook-additional-context"
 FULL_ROW = "claude-devcontainer-non-interactive-append-system-prompt"
 SECTION_PREAMBLE = (
@@ -804,6 +804,8 @@ class W12ClaudeFrozenClassificationTests(unittest.TestCase):
 
     def setUp(self) -> None:
         self.evidence = json.loads(NATIVE_EVIDENCE.read_text(encoding="utf-8"))
+        # The frozen fit/overrun demonstration names its own subject repository.
+        self.subject = self.evidence["classification_repository"]
         self.scope = next(
             item for item in self.evidence["scopes"] if item["scope_id"] == "workspace-root"
         )
@@ -833,7 +835,7 @@ class W12ClaudeFrozenClassificationTests(unittest.TestCase):
         client = self.evidence["client"]
         return adapter.ClaudePreflight(
             workspace_root=ROOT, launch_scope=ROOT, project=".",
-            repositories=(ROOT / "fa-auth-m8",), repository_ids=("fa-auth-m8",),
+            repositories=(ROOT / self.subject,), repository_ids=(self.subject,),
             client_identity=client["identity"], client_version=client["version"],
             client_sha256=client["sha256"], settings=self.settings,
             config_sha256=self.load.config_sha256, trust_state="trusted",
@@ -851,7 +853,7 @@ class W12ClaudeFrozenClassificationTests(unittest.TestCase):
             resolution, _ = adapter.ClaudeLauncherAdapter(
                 client_command="unused"
             ).resolve_repositories(
-                workspace_root=ROOT, repository_ids=("fa-auth-m8",), preflight=self._preflight(),
+                workspace_root=ROOT, repository_ids=(self.subject,), preflight=self._preflight(),
             )
         self.assertEqual(resolution.capability.row_id, FULL_ROW)
         self.assertEqual(resolution.resolved.manifest["manifest_id"], frozen["manifest_id"])
@@ -882,7 +884,7 @@ class W12ClaudeFrozenClassificationTests(unittest.TestCase):
             resolution, _ = adapter.ClaudeLauncherAdapter(
                 client_command="unused"
             ).resolve_repositories(
-                workspace_root=ROOT, repository_ids=("fa-auth-m8",), preflight=self._preflight(),
+                workspace_root=ROOT, repository_ids=(self.subject,), preflight=self._preflight(),
             )
         self.assertEqual(
             [item["path"] for item in resolution.injection_evidence["sources"]],

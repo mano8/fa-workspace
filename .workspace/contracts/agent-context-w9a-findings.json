@@ -51,7 +51,7 @@
       "id": "w2a-contract",
       "classification": "tracked-normative-input",
       "path": ".workspace/contracts/agent-context-w2a.contract.md",
-      "sha256": "c5400f05255cb71f1b7de39cbb50d7d6578783d9f05fa153732651e00fa094e6",
+      "sha256": "e1e2f4f16fd0a5497135b12bf9e22a37d4695ac2643624eded5a17b8889525b7",
       "required_in_clean_checkout": true
     }
   ],

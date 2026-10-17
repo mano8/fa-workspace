@@ -3,7 +3,8 @@
 **Contract version:** `2.2.0`
 
 **Frozen:** 2026-07-21; Section 1 mode table and Claude capability references
-reconciled 2026-07-29 (Step 12.6)
+reconciled 2026-07-29 (Step 12.6); Claude capability references refreshed
+2026-10-17 to the dated client `2.1.302` artifacts, with no row status changed
 
 **Activation status:** `APPROVED_FOR_W2B`
 
@@ -21,10 +22,10 @@ its own recorded Claude project trust still fails closed with `E_TRUST`.
 `d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b`
 
 **Capability evidence (Claude):**
-`scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.json`,
+`scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.json`,
 bound to the Step 12.2 native-load evidence
-(`w12-claude-native-load-evidence-2026-07-28.json`) and the Step 12.4 hook
-round-trip evidence (`w12-claude-hook-channel-evidence-2026-07-28.json`); all
+(`w12-claude-native-load-evidence-2026-10-17.json`) and the Step 12.4 hook
+round-trip evidence (`w12-claude-hook-channel-evidence-2026-10-17.json`); all
 three hashes are pinned by `claude_delivery_adapter.py` and re-verified by
 `validate_workspace.py`.
 

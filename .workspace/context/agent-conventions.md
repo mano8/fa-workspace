@@ -4,7 +4,9 @@ Canonical owner of the commit, branch and pull-request conventions every
 agent follows in every repository of this workspace, and of the agent-facing
 pointers to the context owners the root bootstrap does not list. The root
 `CLAUDE.md` imports this file, so Claude loads it natively with the
-bootstrap.
+bootstrap in a session started at the workspace root. A session started
+inside a child repository loads it only after the human approves that
+project's external `CLAUDE.md` imports in the client.
 
 Workspace invariant: [`CFG-SINGLE-WORKSPACE-OWNER`](../architecture.md#cfg-single-workspace-owner)
 — no child repository or agent-specific directory may keep a competing copy.

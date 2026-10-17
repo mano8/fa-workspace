@@ -71,6 +71,20 @@ bypassing the hook would inject a second copy.
 > this report describe the state at Step 12.3 and are preserved as written; only
 > the tooling identities were recomputed for the tree that carries the wired
 > channel.
+>
+> **Refreshed 2026-10-17** for the dated client `2.1.302` evidence
+> ([12.1](w12-claude-capability-evidence-2026-10-17.md),
+> [12.2](w12-claude-native-load-evidence-2026-10-17.md),
+> [12.4](w12-claude-hook-channel-evidence-2026-10-17.md)). The JSON record's
+> tooling identities, dependencies, supersession, frozen reproduction (now the
+> 12.2 `fastapi-m8` record) and driven run were recomputed. The same live run
+> on `fa-auth-m8` now shows client `2.1.302` (`60d7eb7f…`) and configuration
+> `e914d9b8…`, with `.workspace/context/agent-conventions.md` (1,955 B) and
+> `CLAUDE.md` (1,326 B) native. It injects 7 policy units and both
+> `fa-auth-m8` instruction files under 33 absence proofs, in a 10,284 B
+> envelope for a 13,565 B total. The hook row is rejected with `E_BUDGET`,
+> and the receipt is `COMPLETED` with the transport hash equal to the
+> receipt's. The table below keeps the 2026-07-28 values.
 
 ## The driven run
 

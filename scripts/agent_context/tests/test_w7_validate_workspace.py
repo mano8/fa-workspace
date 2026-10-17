@@ -39,9 +39,9 @@ class WorkspaceValidatorTests(unittest.TestCase):
         evidence.mkdir(parents=True)
         for name in (
             "capability-evidence-2026-07-19.md",
-            "w12-claude-capability-evidence-2026-07-27.json",
-            "w12-claude-native-load-evidence-2026-07-28.json",
-            "w12-claude-hook-channel-evidence-2026-07-28.json",
+            "w12-claude-capability-evidence-2026-10-17.json",
+            "w12-claude-native-load-evidence-2026-10-17.json",
+            "w12-claude-hook-channel-evidence-2026-10-17.json",
         ):
             shutil.copy2(
                 WORKSPACE / "scripts" / "agent_context" / "fixtures" / "evidence" / name,

@@ -4,7 +4,7 @@
 
 Compact, hand-maintained Claude bootstrap. Shared meaning is owned by
 `.workspace/`, not by agent configuration. The workspace agent conventions
-are imported here and always load with this file:
+are imported here:
 
 @.workspace/context/agent-conventions.md
 

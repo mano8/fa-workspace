@@ -27,15 +27,15 @@
   },
   "depends_on": [
     {
-      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.json",
+      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.json",
       "note": "the two REQUIRED rows, their channels, limits, and the frozen client identity",
-      "sha256": "f3539f7f66135a6726253e97c5bab0b3858860e904b9148ec26d112d82c7c6f8",
+      "sha256": "3ea6472353928330ff7f685e4018a10f8317bd179ec3da79ad51440136dd55a4",
       "step": "12.1"
     },
     {
-      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-07-28.json",
+      "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-17.json",
       "note": "the claude-loopback-model-input-capture mechanism and its classification",
-      "sha256": "705d1b9d30a8b617d2c4b683b12d57d85e76ab29d206447951434201a0825634",
+      "sha256": "69ed619d9c56fd2d8eae19170cc2e08bef4e953d19d1c74440a73878c86a4dc8",
       "step": "12.2"
     }
   ],
@@ -48,34 +48,39 @@
         "--output-format",
         "json",
         "--session-id",
-        "63c29e94-b525-4d87-adf3-1761cb1d3364",
+        "0ce50cc5-31fe-4c41-ab42-2290bde7a8ac",
         "--append-system-prompt",
         "<serialized JCS envelope>"
       ],
-      "delivered_bytes": 9019,
-      "envelope_sha256": "ea6915181f3a127a889643e36e053e518f23b0e56ae844897cea3d39e209270e",
-      "manifest_id": "d97f0a9697c3c31d92946d19479aaffb6582f4caa81f0716d50fe5af3927b158",
+      "delivered_bytes": 10284,
+      "envelope_sha256": "612e3dfe3a344d93b7b117b84e962d4a9fd9c9cbce39f54ded1b1865b118846f",
+      "manifest_id": "ea0d16d7851749fdf4372999c1375149d1fccbd1cffd2946cdb1efeb01f98fed",
       "native_evidence_ids": [
-        "84b72a45f19c90af1e94cb0b3f5513a4755f175e8976cb8546484ec6d0eb4c75"
+        "d3668ec7b92ba4301a70f966ecb636d9e2e808965b222c71af9ca370a2078243"
       ],
       "previous_state": "SUBMISSION_STARTED",
       "runtime_dir_is_ignored": true,
       "session_identity_matches": true,
       "state": "COMPLETED",
-      "transport_envelope_bytes": 9019,
-      "transport_envelope_sha256": "ea6915181f3a127a889643e36e053e518f23b0e56ae844897cea3d39e209270e"
+      "transport_envelope_bytes": 10284,
+      "transport_envelope_sha256": "612e3dfe3a344d93b7b117b84e962d4a9fd9c9cbce39f54ded1b1865b118846f"
     },
-    "note": "One complete live run on the workspace root scope with fa-auth-m8 selected. The native-load capture was a real client launch against the loopback recorder; the transport ran through a recording seam, so no client was invoked for delivery and no vendor API was contacted.",
+    "note": "One complete live run on the workspace root scope with fa-auth-m8 selected, refreshed 2026-10-17 on client 2.1.302. The native-load capture was a real client launch against the loopback recorder; the transport ran through a recording seam, so no client was invoked for delivery and no vendor API was contacted.",
     "preflight": {
-      "client_identity": "/home/vscode/.local/share/claude/versions/2.1.220",
-      "client_sha256": "674f61f20ff306f3100cf9200e4c36c4b70278b5bef2884549819b942a89c863",
-      "client_version": "2.1.220 (Claude Code)",
-      "config_sha256": "62467e11f25d3b32e48dbe188a3a25220bc2329a8b769b3ff0dfce8d83418aca",
+      "client_identity": "/home/vscode/.local/share/claude/versions/2.1.302",
+      "client_sha256": "60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5",
+      "client_version": "2.1.302 (Claude Code)",
+      "config_sha256": "e914d9b8b20c57bd2f7b63550a4698ef2da78e17afc82d7d50fa9338d6e1b766",
       "native_sources": [
         {
+          "path": ".workspace/context/agent-conventions.md",
+          "source_bytes": 1955,
+          "source_sha256": "b4b7bdb3247dde176ad1fe5362d6fc3bc6dc14f97a4dae655e2ef8744f02115b"
+        },
+        {
           "path": "CLAUDE.md",
-          "source_bytes": 1905,
-          "source_sha256": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09"
+          "source_bytes": 1326,
+          "source_sha256": "6c22c0ee7741a7ab2b3c3ad7e44cdf07a24f7183d790549c827d9ae0bfdd51e1"
         }
       ],
       "project": ".",
@@ -88,16 +93,16 @@
       "accounting": {
         "client_context_allowance": 262144,
         "effective_hard_limit": 32768,
-        "estimated_tokens": 2731,
+        "estimated_tokens": 3392,
         "excluded_external_layers": [],
-        "model_visible_total": 10924,
-        "native_model_visible_bytes": 1905,
+        "model_visible_total": 13565,
+        "native_model_visible_bytes": 3281,
         "other_model_visible_bootstrap_bytes": 0,
         "policy_hard_limit": 32768,
-        "raw_injected_source_bytes": 5720,
+        "raw_injected_source_bytes": 6964,
         "reserved_margin": 32768,
-        "serialization_overhead_bytes": 3299,
-        "serialized_injected_envelope_bytes": 9019,
+        "serialization_overhead_bytes": 3320,
+        "serialized_injected_envelope_bytes": 10284,
         "verified_channel_limit": 65536
       },
       "channel_id": "claude-cli-append-system-prompt",
@@ -140,25 +145,30 @@
         },
         {
           "delivery": "native",
+          "path": ".workspace/context/agent-conventions.md",
+          "source_bytes": 1955
+        },
+        {
+          "delivery": "native",
           "path": "CLAUDE.md",
-          "source_bytes": 1905
+          "source_bytes": 1326
         },
         {
           "delivery": "inject",
           "path": "fa-auth-m8/CLAUDE.md",
-          "source_bytes": 162
+          "source_bytes": 161
         },
         {
           "delivery": "inject",
           "path": "fa-auth-m8/REPOSITORY_CONTEXT.md",
-          "source_bytes": 970
+          "source_bytes": 2215
         }
       ],
       "injected_absence_proofs": 33,
-      "native_evidence_id": "07435312b8f3f64b96f2a54312c8bde468c88a002332ab97d995dd2284e72076",
+      "native_evidence_id": "d3668ec7b92ba4301a70f966ecb636d9e2e808965b222c71af9ca370a2078243",
       "rejected_rows": [
         {
-          "reason": "E_BUDGET: model-visible context exceeds its effective hard limit; E_CHANNEL: no byte-exact hook round-trip evidence is frozen (Step 12.4)",
+          "reason": "E_BUDGET: model-visible context exceeds its effective hard limit",
           "row_id": "claude-devcontainer-non-interactive-hook-additional-context"
         }
       ],
@@ -301,15 +311,16 @@
     }
   ],
   "frozen_reproduction": {
-    "envelope_sha256": "133f51d989e7b6f414b0a1946dd6e32ad3acf17270d933b9c3a44e6d9b45a345",
-    "manifest_id": "c8322263666792dfcf3dcfe7ef03d14477f52c8f0b2feace7e71146f91705986",
-    "native_evidence_id": "480f90ee9a9884319f2800866403b93bfe41c8c61b82be28c528c50ea1164dbd",
+    "envelope_sha256": "63e1c4247b9f0ebf789d9b25b51c6e06450150f4d250110c56d99b1150355075",
+    "manifest_id": "f975faccf8dd57c3d01e34cc7d6acacd0eb233717e6fc88df18035ceb9bd5976",
+    "native_evidence_id": "1fafa88eb18e669636c2a20ad2fad7c7dec0fb086133a69800719c1b7ea8ffd2",
+    "repository": "fastapi-m8",
     "reviewed_tree": {
       "algorithm": "git-sha1",
       "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
     },
     "row_id": "claude-devcontainer-non-interactive-append-system-prompt",
-    "source": "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-07-28.json",
+    "source": "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-17.json",
     "test": "test_the_selected_row_and_identities_match_the_frozen_record",
     "variant": "with-injected-child-instructions"
   },
@@ -333,6 +344,7 @@
     "Step 12.5 owns interactive/non-interactive parity, duplicate-injection, and runtime-security fixtures against a real client invocation.",
     "The intended child-scope topology still needs a human to accept the /workspace/fa-auth-m8 trust dialog; the adapter fails closed with E_TRUST until then."
   ],
+  "refreshed": "2026-10-17",
   "reused_extended": [
     {
       "change": "the capability loader and redemption boundary moved here from the Codex launcher so both canonical launchers share exactly one path; the Codex names remain as aliases and no verification logic changed",
@@ -357,12 +369,12 @@
   "step": "12.3",
   "summary": "The canonical Claude launcher-adapter runs preflight, resolution, native/inject classification, channel selection by model_visible_total, delivery, and the shared kernel lifecycle. Every stage fails closed and blocks the user task.",
   "superseded_by": {
-    "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-07-28.json",
-    "hook_round_trip_evidence": "c9fe9601915491ca1b6085373f6c32ba76506b75985579a3a288be4f7135b922",
+    "artifact": "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-17.json",
+    "hook_round_trip_evidence": "db952a26d0ec610e4d62b7d9d22f1c89dffc37552325c57b67bde59857d82b33",
     "hook_row_status": "WIRED",
     "hook_row_status_at_12_3": "INELIGIBLE_UNTIL_12_4",
     "injection_authority": "one launcher-owned --settings UserPromptSubmit gate per launcher-controlled generation; a settings-registered additionalContext hook the launcher does not own makes both rows ineligible",
-    "note": "Step 12.4 froze the byte-exact hook round trip this step deliberately left open and wired the channel, so the hook row is no longer INELIGIBLE_UNTIL_12_4. The records below describe the state at Step 12.3 and are preserved; the tooling identities were recomputed for the tree that carries the wired channel.",
+    "note": "Step 12.4 froze the byte-exact hook round trip this step deliberately left open and wired the channel, so the hook row is no longer INELIGIBLE_UNTIL_12_4. The records below describe the state at Step 12.3 and are preserved; the tooling identities, dependencies, frozen reproduction and driven run were recomputed on 2026-10-17 for the refreshed client 2.1.302 evidence.",
     "step": "12.4",
     "wrapper_row_guard_at_12_3": "a registered additionalContext hook makes the wrapper channel ineligible"
   },
@@ -370,7 +382,7 @@
     {
       "path": "scripts/agent_context/claude_delivery_adapter.py",
       "role": "preflight, classification, channel selection, transport",
-      "sha256": "ab73447215bacaa23287ea27ee8ab5e8825ae756d6da6c6f9be4e9fa986a4d09"
+      "sha256": "1edc547852a96c4f7f3e3051648aa0f98dfe3deae02afec2897a1288e2ce8567"
     },
     {
       "path": "scripts/agent_context/claude_repo_launcher.py",
@@ -385,7 +397,7 @@
     {
       "path": "scripts/agent_context/tests/test_w12_claude_adapter.py",
       "role": "offline fail-closed, selection, lifecycle, and reproduction coverage",
-      "sha256": "2a387630851b99ccfa412878ee19032a972fa882e6f57d8268cad028d908e271"
+      "sha256": "4bd86743fa3895d9673d1e024f1fd3b64f7a14fce8d2b74090a660ff23e1925d"
     }
   ]
 }

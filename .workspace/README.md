@@ -31,7 +31,8 @@ owned and usable outside this checkout.
   `fastapi-m8`; `scripts/cascade/check_cascade.py` is its executable mirror.
 - [`context/agent-conventions.md`](context/agent-conventions.md) owns the
   commit, branch and pull-request conventions every agent follows; the root
-  `CLAUDE.md` imports it, so Claude loads it natively with the bootstrap.
+  `CLAUDE.md` imports it, so Claude loads it natively at the workspace root
+  (a child-repository session needs the human's external-import approval).
 - [`context/ai-provider-credentials.md`](context/ai-provider-credentials.md)
   owns the ratified AI-platform credential storage and KEK providers,
   data-class/boundary policy, job-context and signed-object contract,
@@ -76,7 +77,7 @@ not inferred from documentation or another platform. The tracked canonical
 artifacts consumed by validation and preflight are
 [`capability-evidence-2026-07-19.md`](../scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md)
 for Codex and
-[`w12-claude-capability-evidence-2026-07-27.md`](../scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-07-27.md)
+[`w12-claude-capability-evidence-2026-10-17.md`](../scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.md)
 (plus its bound 12.2 native-load and 12.4 hook-channel artifacts) for Claude.
 Ignored `.workspace/status/` observations are historical only and cannot alter
 canonical authority:

@@ -11,7 +11,7 @@ This module turns that mechanism into the fail-closed evidence the native-load
 evidence contract requires:
 
 * it enumerates every active model-visible instruction source from the client's
-  own ``# claudeMd`` labels rather than from any assumption about discovery;
+  own project-memory labels rather than from any assumption about discovery;
 * it proves each labelled workspace source byte-exact — the file's decoded
   bytes must follow its own label and appear exactly once in the whole captured
   model input — and rejects a labelled source outside the workspace, because a
@@ -52,7 +52,10 @@ from agent_context.probe_claude_capabilities import DUMMY_KEY, Capture
 
 
 MECHANISM = "claude-loopback-model-input-capture"
-MEMORY_SECTION_HEADING = "# claudeMd"
+# The sentence that opens the client's project-memory block.  2.1.220 put it
+# under a "# claudeMd" heading; a clean 2.1.302 CLI launch drops the heading
+# and keeps the sentence, so the sentence is the stable sentinel.
+MEMORY_SECTION_HEADING = "Codebase and user instructions are shown below."
 PROJECT_MEMORY_LABEL = "project instructions, checked into the codebase"
 LABEL_RE = re.compile(r"^Contents of (?P<path>.+?) \((?P<label>[^)\n]*)\):$", re.MULTILINE)
 LABEL_CONTENT_SEPARATOR = "\n\n"

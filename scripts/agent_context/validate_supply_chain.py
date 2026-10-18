@@ -8,7 +8,6 @@ import json
 import re
 from pathlib import Path
 
-
 ACTION_RE = re.compile(
     r"^\s*- uses:\s*(?P<name>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)@(?P<ref>[^\s#]+)"
     r"\s+#\s+(?P<version>v\S+)\s*$"
@@ -59,7 +58,7 @@ def validate_supply_chain(workspace: Path) -> None:
             packages[pending_name][1].add(hash_match["hash"])
             continue
         _fail(f"{lock.relative_to(workspace)}:{line_number} has malformed lock content")
-    required = {"ruff": "0.15.22", "cryptography": "49.0.0", "cffi": "2.1.0", "pycparser": "3.0"}
+    required = {"ruff": "0.16.0", "cryptography": "49.0.0", "cffi": "2.1.0", "pycparser": "3.0"}
     if set(packages) != set(required):
         _fail("tooling lock package set is not the reviewed root set")
     for name, version in required.items():

@@ -3,11 +3,11 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
-      "bom-ref": "application:@anthropic-ai/claude-code@2.1.217",
+      "bom-ref": "application:@anthropic-ai/claude-code@2.1.302",
       "hashes": [
         {
           "alg": "SHA-256",
-          "content": "2630fc5dc6db61bc03f86b95daf47766e5ed5b61873f7bb7cfea764c5ac5a9ba"
+          "content": "60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5"
         }
       ],
       "name": "@anthropic-ai/claude-code",
@@ -18,7 +18,7 @@
         }
       ],
       "type": "application",
-      "version": "2.1.217"
+      "version": "2.1.302"
     },
     {
       "bom-ref": "application:@openai/codex@0.144.6",
@@ -165,11 +165,11 @@
       "version": "3.12.13"
     },
     {
-      "bom-ref": "application:root-tooling-python-lock@2026-07-21",
+      "bom-ref": "application:root-tooling-python-lock@2026-10-18",
       "hashes": [
         {
           "alg": "SHA-256",
-          "content": "a0da875a5c7c202a95fa7963d2b1b1132a47bb32fa25140aa58a52a95d85b368"
+          "content": "927ff726ef6b10c9745723dc6d78a3b4e62965566d33579aa90f2d6c92b26f6c"
         }
       ],
       "name": "root-tooling-python-lock",
@@ -180,7 +180,7 @@
         }
       ],
       "type": "application",
-      "version": "2026-07-21"
+      "version": "2026-10-18"
     },
     {
       "bom-ref": "container:docker.io/library/python@3.12.13-slim-bookworm",
@@ -1491,11 +1491,11 @@
       "version": "2026.6.3"
     },
     {
-      "bom-ref": "library:ruff@0.15.22",
+      "bom-ref": "library:ruff@0.16.0",
       "hashes": [
         {
           "alg": "SHA-256",
-          "content": "365523eb91d9224e1bcb03b022fbf0facb8f9e23792a2c53d9d4b3924bdbdebb"
+          "content": "4f11a8d11010301d0a398a2fdef67691feca7294da6aef55e2150e8fa2cd520b"
         }
       ],
       "name": "ruff",
@@ -1506,7 +1506,7 @@
         }
       ],
       "type": "library",
-      "version": "0.15.22"
+      "version": "0.16.0"
     },
     {
       "bom-ref": "library:safetensors@0.8.0",
@@ -1981,7 +1981,7 @@
     "component": {
       "name": "fa-workspace-root-tooling",
       "type": "application",
-      "version": "9ac4958386258d8189f630386a73967499ae14ec90d7150524caa8785dfbb220"
+      "version": "09d41122d6cde71b16aa6d38c5b1d8bc89c81275f35248b5244a11d85d209b3a"
     },
     "properties": [
       {
@@ -1994,7 +1994,7 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/bootstrap-lock.json",
-        "value": "4d6caca02cf82b993ac88ff5487f5ebe8196fb3468f39599c5a451abb6d42a6f"
+        "value": "5be0edb93546a0e5b5a55cea2ddbabc8f3c1076459d41bf698efd19fb0b4cc2d"
       },
       {
         "name": "m8:source-sha256:.devcontainer/devcontainer-lock.json",
@@ -2014,11 +2014,11 @@
       },
       {
         "name": "m8:source-sha256:.devcontainer/setup.sh",
-        "value": "21a3f2d9305b44a81ba52cee74d4c87b9be85be5ff520c8a6052df6646180ffc"
+        "value": "71cb087f32c6b855f19af9bc515bd4a62edada21827689d0c2c48d546323c769"
       },
       {
         "name": "m8:source-sha256:.github/workflows/root-tooling.requirements.lock",
-        "value": "a0da875a5c7c202a95fa7963d2b1b1132a47bb32fa25140aa58a52a95d85b368"
+        "value": "927ff726ef6b10c9745723dc6d78a3b4e62965566d33579aa90f2d6c92b26f6c"
       },
       {
         "name": "m8:source-sha256:.github/workflows/workspace-policy-lint.yml",
@@ -2026,7 +2026,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:69badec0-fe28-5670-ae2a-c19f5580cd4d",
+  "serialNumber": "urn:uuid:7b2467e1-19a6-5f7a-8f49-46ec6ca5a1c2",
   "specVersion": "1.6",
   "version": 1
 }

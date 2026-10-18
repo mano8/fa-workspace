@@ -5,14 +5,13 @@ from __future__ import annotations
 import json
 import sys
 import unittest
-from unittest import mock
 from pathlib import Path
-
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from agent_context.generate_root_sbom import (  # noqa: E402
+from agent_context.generate_root_sbom import (
     SOURCE_PATHS,
     SbomError,
     build_sbom,
@@ -30,7 +29,7 @@ class W9eSbomTests(unittest.TestCase):
         } for property in sbom["metadata"]["properties"] if property["name"].startswith("m8:source-sha256:")))
         for expected in (
             "application:@openai/codex@0.144.6",
-            "application:@anthropic-ai/claude-code@2.1.217",
+            "application:@anthropic-ai/claude-code@2.1.302",
             "application:node@24.16.0",
             "application:python@3.12.13",
             "application:headroom-ai[mcp,proxy,code]@0.32.1",
@@ -40,7 +39,7 @@ class W9eSbomTests(unittest.TestCase):
             "container:docker.io/library/python@3.12.13-slim-bookworm",
             "application:actions/checkout@v6.0.1",
             "application:actions/setup-python@v6.2.0",
-            "library:ruff@0.15.22",
+            "library:ruff@0.16.0",
             "library:cryptography@49.0.0",
             "library:cffi@2.1.0",
             "library:pycparser@3.0",
@@ -60,7 +59,7 @@ class W9eSbomTests(unittest.TestCase):
             "8e8c483db84b4bee98b60c0593521ed34d9990e8",
         )
         for reference in (
-            "library:ruff@0.15.22", "library:cryptography@49.0.0",
+            "library:ruff@0.16.0", "library:cryptography@49.0.0",
             "library:cffi@2.1.0", "library:pycparser@3.0",
         ):
             self.assertEqual(
@@ -86,9 +85,11 @@ class W9eSbomTests(unittest.TestCase):
         validate_sbom(ROOT)
 
     def test_sbom_staleness_fails(self) -> None:
-        with mock.patch("agent_context.generate_root_sbom.canonical_bytes", return_value=b"drift\n"):
-            with self.assertRaisesRegex(SbomError, "stale"):
-                validate_sbom(ROOT)
+        with (
+            mock.patch("agent_context.generate_root_sbom.canonical_bytes", return_value=b"drift\n"),
+            self.assertRaisesRegex(SbomError, "stale"),
+        ):
+            validate_sbom(ROOT)
 
 
 if __name__ == "__main__":

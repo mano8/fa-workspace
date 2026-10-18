@@ -2,8 +2,8 @@
   "bootstrap": {
     "claude": {
       "package": "@anthropic-ai/claude-code",
-      "version": "2.1.217",
-      "binary_sha256": "2630fc5dc6db61bc03f86b95daf47766e5ed5b61873f7bb7cfea764c5ac5a9ba"
+      "version": "2.1.302",
+      "binary_sha256": "60d7eb7f12fbb28a52533fe8be5884097403562aa02dc73991a021c7067e29a5"
     },
     "codex": {
       "package": "@openai/codex",
@@ -62,10 +62,10 @@
     },
     "root_tooling": {
       "package": "root-tooling-python-lock",
-      "version": "2026-07-21",
+      "version": "2026-10-18",
       "type": "application",
       "requirements_lock": ".github/workflows/root-tooling.requirements.lock",
-      "record_sha256": "a0da875a5c7c202a95fa7963d2b1b1132a47bb32fa25140aa58a52a95d85b368"
+      "record_sha256": "927ff726ef6b10c9745723dc6d78a3b4e62965566d33579aa90f2d6c92b26f6c"
     }
   },
   "base_image": {

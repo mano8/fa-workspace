@@ -29,10 +29,10 @@
   "resumable_state": "COMPLETED",
   "schema_version": 1,
   "sha256": {
-    ".workspace/README.md": "f4e0ec594f201429ce220822e3d98af473b662cbf66d5fb137c4a08fe9fee8c4",
+    ".workspace/README.md": "45fee9009f68e0ed3328384aeaeb994fc46a198404d7f351c418402e4ad4e6c1",
     "AGENTS.md": "8b6b743d234696de8fa2b78285d12121cb6d6a747da286a692f037b74e2d07d1",
-    "CLAUDE.md": "eeeb65884b90d189e28353bbcc173c70b74f84e2ee6d00da02477f00cffcde09",
-    "scripts/agent_context/README.md": "4c97d8d175b67ce84c788cd453c6ab2760aa346e6f1111eb7354be650d784f28",
+    "CLAUDE.md": "6c22c0ee7741a7ab2b3c3ad7e44cdf07a24f7183d790549c827d9ae0bfdd51e1",
+    "scripts/agent_context/README.md": "bfd75fdc599b1f32c41a4110a4e865fc0d87cf9b641d9a95959556a856429bf4",
     "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md": "d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b"
   },
   "status": "CURRENT_POST_REMEDIATION",

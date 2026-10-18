@@ -47,6 +47,7 @@ PYPROJECT = "pyproject"
 DUNDER = "dunder"
 PACKAGE_JSON = "package.json"
 VERSION_FILES: dict[str, tuple[tuple[str, str], ...]] = {
+    "ai-gateway-m8": ((DUNDER, "ai_gateway/__init__.py"),),
     "auth-sdk-m8": ((PYPROJECT, "pyproject.toml"),),
     "fastapi-m8": ((PYPROJECT, "pyproject.toml"), (DUNDER, "fastapi_m8/_version.py")),
     "fa-auth-m8": (
@@ -65,6 +66,7 @@ VERSION_FILES: dict[str, tuple[tuple[str, str], ...]] = {
 }
 
 CONSUMER_PACKAGES = {
+    "ai-gateway-m8": "ai_gateway",
     "media-service-m8": "media_service",
     "prompt-engine-m8": "promt_engine_service",
     "reparto-docente-m8": "reparto_service",

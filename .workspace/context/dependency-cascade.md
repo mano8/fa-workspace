@@ -62,6 +62,7 @@ auth-sdk-m8                         platform SDK
 │   ├── media-service-m8            fastapi-m8 floor; auth-sdk-m8 transitive in lock
 │   ├── prompt-engine-m8            fastapi-m8 floor; auth-sdk-m8 transitive in lock
 │   ├── reparto-docente-m8          fastapi-m8 floor; auth-sdk-m8 transitive in lock
+│   ├── ai-gateway-m8               fastapi-m8 floor; auth-sdk-m8 transitive in lock (scaffold branch, 2026-10-18)
 │   └── (fa-auth-m8 examples/fastapi_full — rides fa-auth-m8, not a repository)
 └── fa-auth-m8                      issuer; direct auth-sdk-m8 floor + lock
 
@@ -76,13 +77,17 @@ everything ───────► .workspace/context/version-sources.md
 `security-tests-m8`. `security-tests-m8/tests/test_deployment.py` names
 `tepochtli/fa-auth-m8` tags as test fixtures, not as pins; leave them.
 
-**Registered, not yet in the graph** (2026-10-17): `ai-gateway-m8`,
-`ai-sdk-m8` and `doctools-m8` carry only their instruction files, so no pin
-exists to measure. Where each joins once its scaffold lands:
+**`ai-gateway-m8` joined** (measured 2026-10-18 from its scaffold branch
+`chore/repository-context-template` at `693d7ed`, not yet merged to `main`):
+a `fastapi-m8` consumer, package `ai_gateway`, floor
+`fastapi-m8[db,postgres]>=4.5.1,<5.0.0`, lock `fastapi-m8==4.5.1` /
+`auth-sdk-m8==3.2.0`. It is in Phase 3 and the checker. Its image enters
+Phase 5 with its first compose stack; none exists yet.
 
-- `ai-gateway-m8` — a `fastapi-m8` consumer. It enters Phase 3 beside the
-  three consumers (package `ai_gateway`), inherits `ConsumerServiceSettings`,
-  and its image enters Phase 5 with its stacks.
+**Registered, not yet in the graph** (2026-10-17): `ai-sdk-m8` and
+`doctools-m8` carry only their instruction files, so no pin exists to
+measure. Where each joins once its scaffold lands:
+
 - `ai-sdk-m8` — a new platform root, consumed by `ai-gateway-m8` and by
   `doctools-m8`'s `sandbox` and `provenance` extras. It pins neither
   `auth-sdk-m8` nor `fastapi-m8`.
@@ -107,7 +112,7 @@ is the union of these bases:
 | `CommonSettings` | `auth-sdk-m8` `auth_sdk_m8/core/config.py` | issuer and every consumer |
 | `ObservabilitySettingsMixin` | `auth-sdk-m8` `auth_sdk_m8/observability/settings.py` | issuer and every consumer |
 | `ConsumerAuthMixin` | `auth-sdk-m8` `auth_sdk_m8/core/consumer.py` | consumers only (via `ConsumerServiceSettings`) |
-| `ConsumerServiceSettings` | `fastapi-m8` `fastapi_m8/config.py` | `media-service-m8`, `prompt-engine-m8`, `reparto-docente-m8`, `fa-auth-m8/examples/fastapi_*` |
+| `ConsumerServiceSettings` | `fastapi-m8` `fastapi_m8/config.py` | `media-service-m8`, `prompt-engine-m8`, `reparto-docente-m8`, `ai-gateway-m8`, `fa-auth-m8/examples/fastapi_*` |
 | `Settings(ObservabilitySettingsMixin, CommonSettings)` | `fa-auth-m8` `auth_user_service/core/config.py` | — (the issuer) |
 
 So a key added to `ConsumerAuthMixin` touches the three consumers but **not**
@@ -167,7 +172,7 @@ Child-owned release under that repository's own procedure.
 | version in **three** files | `auth_user_service/__init__.py`, `examples/fastapi_full/__init__.py`, `examples/fastapi_minimal/__init__.py` (repository rule: *Example version alignment*) |
 | `CHANGELOG.md` | the entry |
 
-**`media-service-m8`, `prompt-engine-m8`, `reparto-docente-m8`** (consumers):
+**`media-service-m8`, `prompt-engine-m8`, `reparto-docente-m8`, `ai-gateway-m8`** (consumers):
 
 | Touchpoint | What moves |
 | --- | --- |
@@ -178,7 +183,7 @@ Child-owned release under that repository's own procedure.
 | `CHANGELOG.md` | the entry |
 
 Package directories: `media_service`, `promt_engine_service` (sic),
-`reparto_service`.
+`reparto_service`, `ai_gateway`.
 
 **Gate:** each image tag is on Docker Hub and pulled, and its in-container
 `__version__` equals the tag.

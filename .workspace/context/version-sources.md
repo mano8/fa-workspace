@@ -42,7 +42,7 @@ release state.
 | `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.3 — read from `origin/main` 2026-09-26 |
 | `pyproject.toml` `[project] version` literal — registered 2026-10-17, not yet scaffolded | `ai-sdk-m8` · `doctools-m8` — no version source exists yet; the row gains a version when each scaffold lands |
-| package `__init__.__version__` only — registered 2026-10-17, not yet scaffolded | `ai-gateway-m8` (`ai_gateway`, re-surfaced as `SERVICE_VERSION`) — no version source exists yet |
+| package `__init__.__version__` only (no pyproject version) — scaffold branch, not yet on `main` | `ai-gateway-m8` (`ai_gateway`) 0.1.0 — read 2026-10-18 from `chore/repository-context-template` `693d7ed`; re-surfaced as `SERVICE_VERSION` in `ai_gateway/core/config.py` |
 | package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.3 · `media-service-m8` (`media_service`) 3.0.2 · `media-worker-m8` (`worker`) 1.0.2 · `prompt-engine-m8` (`promt_engine_service`) 2.2.1 · `reparto-docente-m8` (`reparto_service`) 2.2.2 — read from `origin/main` 2026-09-22 (`media-worker-m8` re-read 2026-09-26); the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py`. `fa-auth-m8` also carries the string in `examples/fastapi_full/__init__.py` and `examples/fastapi_minimal/__init__.py`, which move with it |
 
 ## Published release vs working-tree version
@@ -72,7 +72,7 @@ one-bump-per-unpublished-release rule.
 | `reparto-docente-m8` | 2.2.2 | 2.2.2 | — published (2026-09-26, tag `v2.2.2` = `main` `169121b`; `tepochtli/reparto-docente-m8:2.2.2` pulled, `__version__` `2.2.2`). Carries `B27`, `B28`, `B30` and `B32` |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
 | `ai-sdk-m8` | — never published | — not scaffolded | — |
-| `ai-gateway-m8` | — never published | — not scaffolded | — |
+| `ai-gateway-m8` | — never published | 0.1.0 | pending (scaffold branch `chore/repository-context-template`, not yet on `main`) |
 | `doctools-m8` | — never published | — not scaffolded | — |
 | `astro-ui-m8` | 1.5.3 | 1.5.3 | — published (2026-09-27, tag `v1.5.3` = `main` `6ec692b`, PR #19; npm `latest` `1.5.3`; tarball ships `lucide-react` peer `^1.28.0`, no longer exactly `1.28.0`). Adds the fleet's dependency compatibility gate and `.npmrc` (see *Wave 10* below). `1.5.2` (PR #18, `a4a14b8`) was the first tarball to ship `CHANGELOG.md` (`G38`) |
 | `astro-auth-m8` | 2.7.2 | 2.7.2 | — published (2026-09-27, tag `v2.7.2` = `main` `3403f99`, PR #33; npm `latest` `2.7.2`; tarball ships ui `^1.5.3`, peers `@astrojs/react` `^6.0.1 \|\| ^7.0.0` and `@astrojs/starlight` `^0.41.3 \|\| ^0.42.0`, `testedServiceVersion` `2.2.3`). Patch (`Wave 10`). `2.7.1` (PR #32, `eee73b9`) tracked `astro-ui-m8` `1.5.2` (`B39`); `2.7.0` (PR #29, `a5273f6`) tracked `fa-auth-m8` `2.2.3` (`B31`) |

@@ -30,10 +30,10 @@ from agent_context.resolve_context import ResolutionRequest, resolve_context
 from agent_context.shared_validation import validate_resolved
 
 ROOT = Path(__file__).resolve().parents[3]
-EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-17.json"
-REPORT = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-17.md"
+EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-18.json"
+REPORT = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-18.md"
 TOOL = ROOT / "scripts/agent_context/claude_native_evidence.py"
-CAPABILITY = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.json"
+CAPABILITY = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-18.json"
 SECTION_PREAMBLE = (
     "<system-reminder>\nAs you answer the user's questions, you can use the following context:\n"
     "# claudeMd\nCodebase and user instructions are shown below.\n\n"

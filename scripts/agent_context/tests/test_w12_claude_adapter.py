@@ -37,11 +37,11 @@ from agent_context.delivery_kernel import DeliveryKernel
 
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE_DIR = "scripts/agent_context/fixtures/evidence"
-NATIVE_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-native-load-evidence-2026-10-17.json"
-CAPABILITY = ROOT / EVIDENCE_DIR / "w12-claude-capability-evidence-2026-10-17.json"
+NATIVE_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-native-load-evidence-2026-10-18.json"
+CAPABILITY = ROOT / EVIDENCE_DIR / "w12-claude-capability-evidence-2026-10-18.json"
 ADAPTER_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-adapter-evidence-2026-07-28.json"
 ADAPTER_REPORT = ROOT / EVIDENCE_DIR / "w12-claude-adapter-evidence-2026-07-28.md"
-HOOK_CHANNEL = ROOT / EVIDENCE_DIR / "w12-claude-hook-channel-evidence-2026-10-17.json"
+HOOK_CHANNEL = ROOT / EVIDENCE_DIR / "w12-claude-hook-channel-evidence-2026-10-18.json"
 HOOK_ROW = "claude-devcontainer-non-interactive-hook-additional-context"
 FULL_ROW = "claude-devcontainer-non-interactive-append-system-prompt"
 SECTION_PREAMBLE = (

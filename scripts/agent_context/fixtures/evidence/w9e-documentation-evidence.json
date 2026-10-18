@@ -29,10 +29,10 @@
   "resumable_state": "COMPLETED",
   "schema_version": 1,
   "sha256": {
-    ".workspace/README.md": "45fee9009f68e0ed3328384aeaeb994fc46a198404d7f351c418402e4ad4e6c1",
+    ".workspace/README.md": "d331393b0da83df06c7a8db0e1846f82e1ddb74143e869f80e2255b01e2384e5",
     "AGENTS.md": "8b6b743d234696de8fa2b78285d12121cb6d6a747da286a692f037b74e2d07d1",
     "CLAUDE.md": "6c22c0ee7741a7ab2b3c3ad7e44cdf07a24f7183d790549c827d9ae0bfdd51e1",
-    "scripts/agent_context/README.md": "bfd75fdc599b1f32c41a4110a4e865fc0d87cf9b641d9a95959556a856429bf4",
+    "scripts/agent_context/README.md": "16c8c49060e097ccc9292556c7af39eda497e3d0a197a44fa239bdfa986f9110",
     "scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md": "d921bcdbc26cb4e65ffc6f0ab642d191d543987594df5291cc904a01a4562e7b"
   },
   "status": "CURRENT_POST_REMEDIATION",

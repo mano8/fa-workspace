@@ -34,8 +34,8 @@ from agent_context import w2b1
 from agent_context.delivery_kernel import DeliveryKernel
 
 ROOT = Path(__file__).resolve().parents[3]
-EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-17.json"
-REPORT = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-17.md"
+EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-18.json"
+REPORT = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-18.md"
 HOOK_ROW = "claude-devcontainer-non-interactive-hook-additional-context"
 SESSION = "7d3c1c94-2f21-4a1a-9a4f-1f2a3b4c5d6e"
 LAUNCH = "launch-" + "a" * 32
@@ -438,7 +438,7 @@ class W12ClaudeHookChannelEvidenceTests(unittest.TestCase):
 
     def test_the_frozen_row_and_limits_match_the_capability_matrix(self) -> None:
         capability = json.loads(
-            (ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.json")
+            (ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-18.json")
             .read_text(encoding="utf-8")
         )
         row = next(item for item in capability["rows"] if item["row_id"] == HOOK_ROW)

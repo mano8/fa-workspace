@@ -77,7 +77,7 @@ not inferred from documentation or another platform. The tracked canonical
 artifacts consumed by validation and preflight are
 [`capability-evidence-2026-07-19.md`](../scripts/agent_context/fixtures/evidence/capability-evidence-2026-07-19.md)
 for Codex and
-[`w12-claude-capability-evidence-2026-10-17.md`](../scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.md)
+[`w12-claude-capability-evidence-2026-10-18.md`](../scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-18.md)
 (plus its bound 12.2 native-load and 12.4 hook-channel artifacts) for Claude.
 Ignored `.workspace/status/` observations are historical only and cannot alter
 canonical authority:

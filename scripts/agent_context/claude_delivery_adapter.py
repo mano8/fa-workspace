@@ -91,17 +91,17 @@ from agent_context.validate_claude_settings import (
 CONTAINER_MARKER = Path("/.dockerenv")
 
 CAPABILITY_EVIDENCE_PATH = (
-    "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.json"
+    "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-18.json"
 )
-CAPABILITY_EVIDENCE_SHA256 = "3ea6472353928330ff7f685e4018a10f8317bd179ec3da79ad51440136dd55a4"
+CAPABILITY_EVIDENCE_SHA256 = "01f0bb63cf5cd3b4387cb56b72a63245fa98d7743eef3fd57204e5c17063ffff"
 NATIVE_LOAD_EVIDENCE_PATH = (
-    "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-17.json"
+    "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-18.json"
 )
-NATIVE_LOAD_EVIDENCE_SHA256 = "69ed619d9c56fd2d8eae19170cc2e08bef4e953d19d1c74440a73878c86a4dc8"
+NATIVE_LOAD_EVIDENCE_SHA256 = "3e184f0087e0bdbe60a160c9d476941274aaf350cc31195456c7ed3ae62453c3"
 HOOK_CHANNEL_EVIDENCE_PATH = (
-    "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-17.json"
+    "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-18.json"
 )
-HOOK_CHANNEL_EVIDENCE_SHA256 = "319b165b9a024b7083cfac2c23ac8daf33dbfecd7b608fb3c5d492f63077e786"
+HOOK_CHANNEL_EVIDENCE_SHA256 = "90bf941bae75d46676e4c6bba53b3d2b1f20b63bbec5fd9a87f87b9ae476eb9e"
 
 HOOK_CHANNEL_ID = "claude-hook-additional-context"
 FULL_CONTENT_CHANNEL_ID = "claude-cli-append-system-prompt"
@@ -116,7 +116,7 @@ GATE_MODULE_PATH = "scripts/agent_context/claude_hook_gate.py"
 # hook-channel artifact and is bound into every armed generation; the hook row
 # stays ineligible whenever it is absent.
 HOOK_ROUND_TRIP_EVIDENCE: str | None = (
-    "db952a26d0ec610e4d62b7d9d22f1c89dffc37552325c57b67bde59857d82b33"
+    "94a034aeac5cca75f0f42980b67a37da60c8850fa4e2a012d96283a1e6fe65e7"
 )
 REPOSITORY_INSTRUCTION_FILES = ("CLAUDE.md", "REPOSITORY_CONTEXT.md")
 # The client frames native memory itself and that framing is client-owned, not

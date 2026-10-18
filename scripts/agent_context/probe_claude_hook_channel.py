@@ -63,7 +63,7 @@ CHANNEL_ID = gate.CHANNEL_ID
 # The hook row Step 12.1 froze; the round trip is evidence only for that row.
 HOOK_ROW_ID = "claude-devcontainer-non-interactive-hook-additional-context"
 CAPABILITY_EVIDENCE = (
-    "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.json"
+    "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-18.json"
 )
 FOREIGN_MARKER = "W12_FOREIGN_AUTHORITY_MARKER_1c8f"
 INHERITED_CLIENT_VARIABLES = (

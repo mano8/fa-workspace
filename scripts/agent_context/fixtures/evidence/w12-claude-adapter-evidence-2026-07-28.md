@@ -72,10 +72,11 @@ bypassing the hook would inject a second copy.
 > the tooling identities were recomputed for the tree that carries the wired
 > channel.
 >
-> **Refreshed 2026-10-17** for the dated client `2.1.302` evidence
-> ([12.1](w12-claude-capability-evidence-2026-10-17.md),
-> [12.2](w12-claude-native-load-evidence-2026-10-17.md),
-> [12.4](w12-claude-hook-channel-evidence-2026-10-17.md)). The JSON record's
+> **Refreshed 2026-10-17** for the dated client `2.1.302` evidence, and again
+> **2026-10-18** for the `2.1.302` bootstrap lock and the `ruff 0.16.0` lint
+> migration ([12.1](w12-claude-capability-evidence-2026-10-18.md),
+> [12.2](w12-claude-native-load-evidence-2026-10-18.md),
+> [12.4](w12-claude-hook-channel-evidence-2026-10-18.md)). The JSON record's
 > tooling identities, dependencies, supersession, frozen reproduction (now the
 > 12.2 `fastapi-m8` record) and driven run were recomputed. The same live run
 > on `fa-auth-m8` now shows client `2.1.302` (`60d7eb7f…`) and configuration

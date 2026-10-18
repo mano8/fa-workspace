@@ -15,7 +15,6 @@ from agent_context.delivery_kernel import (
 )
 from agent_context.resolve_context import ResolutionRequest, resolve_context
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 SOURCE_SHA = "a" * 64
 

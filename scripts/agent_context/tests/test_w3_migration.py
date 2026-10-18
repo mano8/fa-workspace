@@ -8,7 +8,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agent_context import child_rollout, w2b1
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 # Registered after Step 3.1 by the child-rollout Amendment 1; ratified rows.
 AMENDED_REPOSITORIES = [

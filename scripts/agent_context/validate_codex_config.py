@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import argparse
-import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import tomllib
 
 EXPECTED_SETTINGS: dict[str, Any] = {
     "approval_policy": "on-request",

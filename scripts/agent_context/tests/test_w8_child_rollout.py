@@ -12,7 +12,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agent_context import child_rollout, w2b1
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 ROLLED_OUT_REPOSITORIES = (
     "auth-sdk-m8", "media-sdk-m8", "fastapi-m8", "imgtools_m8",

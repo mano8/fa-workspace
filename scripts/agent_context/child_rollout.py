@@ -11,12 +11,12 @@ operation when it is absent.
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from agent_context import w2b1
-
 
 ROLLOUT_RECORD = Path(
     ".workspace/contracts/child-repository-rollout-v1.boundaries.json"

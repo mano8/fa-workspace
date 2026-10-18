@@ -18,7 +18,6 @@ from typing import Any, NoReturn
 
 from agent_context import w2b1
 
-
 CAPABILITY_FIELDS = {
     "agent",
     "platform",
@@ -279,8 +278,7 @@ def _validate_capability(row: Mapping[str, Any], request: ResolutionRequest) -> 
     if any(
         not isinstance(capability[field], bool)
         for field in CAPABILITY_FIELDS
-        if field.endswith("supported")
-        or field.endswith("available")
+        if field.endswith(("supported", "available"))
         or field == "blocks_closeout"
     ):
         _fail(

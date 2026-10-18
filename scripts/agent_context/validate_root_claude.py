@@ -7,7 +7,6 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-
 MAX_BOOTSTRAP_BYTES = 2048
 VERSION_MARKER = "Workspace instruction set: m8-workspace-v2"
 REQUIRED_REFERENCES = (

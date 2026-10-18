@@ -33,7 +33,6 @@ from agent_context import claude_hook_gate as gate
 from agent_context import w2b1
 from agent_context.delivery_kernel import DeliveryKernel
 
-
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-17.json"
 REPORT = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-hook-channel-evidence-2026-10-17.md"

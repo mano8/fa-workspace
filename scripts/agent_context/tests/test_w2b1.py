@@ -9,7 +9,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agent_context import w2b1
 
-
 SHA = "a" * 64
 
 
@@ -82,9 +81,11 @@ class CanonicalSerializationTests(unittest.TestCase):
             ("duplicate-metadata", lambda: w2b1.build_envelope(manifest_id=SHA, generation=0, entries=[entry, changed])),
         )
         for name, operation in fixtures:
-            with self.subTest(name=name):
-                with self.assertRaises(w2b1.AgentContextError):
-                    operation()
+            with (
+                self.subTest(name=name),
+                self.assertRaises(w2b1.AgentContextError),
+            ):
+                operation()
 
 
 class SchemaTests(unittest.TestCase):

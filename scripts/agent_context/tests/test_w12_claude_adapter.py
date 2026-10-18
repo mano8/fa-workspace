@@ -35,7 +35,6 @@ from agent_context import claude_repo_launcher, w2b1
 from agent_context.codex_adapter import CommandResult
 from agent_context.delivery_kernel import DeliveryKernel
 
-
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE_DIR = "scripts/agent_context/fixtures/evidence"
 NATIVE_EVIDENCE = ROOT / EVIDENCE_DIR / "w12-claude-native-load-evidence-2026-10-17.json"
@@ -310,11 +309,13 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
                 self.tearDown()
                 self.setUp()
                 mutate()
-                with self._patches(), self._client_patch(), self._environment():
-                    with self.assertRaises(w2b1.AgentContextError) as failure:
-                        self._adapter().preflight(
-                            workspace_root=self.root, repository_ids=("repo-a",)
-                        )
+                with (
+                    self._patches(), self._client_patch(), self._environment(),
+                    self.assertRaises(w2b1.AgentContextError) as failure,
+                ):
+                    self._adapter().preflight(
+                        workspace_root=self.root, repository_ids=("repo-a",)
+                    )
                 self.assertEqual(failure.exception.code, code)
                 self.assertIn(fragment, failure.exception.message)
 
@@ -324,25 +325,29 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
             ({"resolved_path": "/opt/other/claude"}, "E_CAPABILITY"),
             ({"version": "2.0.0 (Claude Code)"}, "E_CAPABILITY"),
         ):
-            with self.subTest(field=sorted(value)[0]):
+            with self.subTest(field=min(value)):
                 identity = {**self.client, **value}
-                with self._patches(), self._environment(), mock.patch.object(
-                    native, "client_identity",
-                    return_value=(identity["resolved_path"], identity["version"], identity["sha256"]),
+                with (
+                    self._patches(), self._environment(), mock.patch.object(
+                        native, "client_identity",
+                        return_value=(identity["resolved_path"], identity["version"], identity["sha256"]),
+                    ),
+                    self.assertRaises(w2b1.AgentContextError) as failure,
                 ):
-                    with self.assertRaises(w2b1.AgentContextError) as failure:
-                        self._adapter().preflight(
-                            workspace_root=self.root, repository_ids=("repo-a",)
-                        )
+                    self._adapter().preflight(
+                        workspace_root=self.root, repository_ids=("repo-a",)
+                    )
                 self.assertEqual(failure.exception.code, code)
                 self.assertIn("capability evidence", failure.exception.message)
 
     def test_an_untrusted_child_launch_scope_blocks_the_task(self) -> None:
-        with self._patches(), self._client_patch(), self._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._adapter().preflight(
-                    workspace_root=self.root, repository_ids=("repo-a",), project="repo-a",
-                )
+        with (
+            self._patches(), self._client_patch(), self._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._adapter().preflight(
+                workspace_root=self.root, repository_ids=("repo-a",), project="repo-a",
+            )
         self.assertEqual(failure.exception.code, "E_TRUST")
         self.assertIn("unrecorded", failure.exception.message)
         # A human trust decision, and only that, unblocks the child topology.
@@ -362,25 +367,29 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
 
     def test_a_settings_change_during_inspection_invalidates_the_capture(self) -> None:
         stale = {"project": {}, "user": None, "registered_hook_events": []}
-        with self._patches(), self._client_patch(), self._environment(), mock.patch.object(
-            self, "_inspector",
-            lambda **kwargs: _load(
-                self.root, ("CLAUDE.md",), settings=stale,
-                client_identity=self.client["resolved_path"], client_version=self.client["version"],
-                client_sha256=self.client["sha256"],
+        with (
+            self._patches(), self._client_patch(), self._environment(), mock.patch.object(
+                self, "_inspector",
+                lambda **kwargs: _load(
+                    self.root, ("CLAUDE.md",), settings=stale,
+                    client_identity=self.client["resolved_path"], client_version=self.client["version"],
+                    client_sha256=self.client["sha256"],
+                ),
             ),
+            self.assertRaises(w2b1.AgentContextError) as failure,
         ):
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._adapter().preflight(workspace_root=self.root, repository_ids=("repo-a",))
+            self._adapter().preflight(workspace_root=self.root, repository_ids=("repo-a",))
         self.assertEqual(failure.exception.code, "E_TRUST")
         self.assertIn("settings layer changed", failure.exception.message)
 
     def test_an_unselected_launch_scope_is_out_of_scope(self) -> None:
-        with self._patches(), self._client_patch(), self._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._adapter().preflight(
-                    workspace_root=self.root, repository_ids=("repo-a",), project="repo-b",
-                )
+        with (
+            self._patches(), self._client_patch(), self._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._adapter().preflight(
+                workspace_root=self.root, repository_ids=("repo-a",), project="repo-b",
+            )
         self.assertEqual(failure.exception.code, "E_SCOPE_UNAVAILABLE")
 
     # ----------------------------------------------------- classification
@@ -424,9 +433,11 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
             ]}
             return original(broken, evidence)
 
-        with mock.patch.object(native, "verify_manifest_native_binding", _shadow):
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._resolve()
+        with (
+            mock.patch.object(native, "verify_manifest_native_binding", _shadow),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._resolve()
         self.assertEqual(failure.exception.code, "E_NATIVE_EVIDENCE")
 
     # -------------------------------------------------------- channel selection
@@ -489,9 +500,11 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
                 self.assertEqual(failure.exception.code, "E_CHANNEL")
         self.tearDown()
         self.setUp()
-        with mock.patch.object(adapter, "HOOK_ROUND_TRIP_EVIDENCE", "e" * 64):
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._resolve()
+        with (
+            mock.patch.object(adapter, "HOOK_ROUND_TRIP_EVIDENCE", "e" * 64),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._resolve()
         self.assertEqual(failure.exception.code, "E_CHANNEL")
         self.assertIn("differs from the adapter", failure.exception.message)
 
@@ -564,14 +577,16 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
         armed = json.loads(
             (hooked.runtime_dir / hook_gate.CHANNEL_ENVELOPE_ARTIFACT).read_text(encoding="utf-8")
         )
-        with mock.patch.object(adapter, "HOOK_ROUND_TRIP_EVIDENCE", None):
-            with self._patches(), self._client_patch(), self._environment():
-                resolution, _ = self._adapter().resolve_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a",),
-                )
-                result = self._adapter().prepare_and_handoff_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a",), prompt="second",
-                )
+        with (
+            mock.patch.object(adapter, "HOOK_ROUND_TRIP_EVIDENCE", None),
+            self._patches(), self._client_patch(), self._environment(),
+        ):
+            resolution, _ = self._adapter().resolve_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",),
+            )
+            result = self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), prompt="second",
+            )
         self.assertEqual(result.receipt["channel_id"], adapter.FULL_CONTENT_CHANNEL_ID)
         command = self.commands[1]
         self.assertIn("--append-system-prompt", command)
@@ -583,11 +598,13 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
 
     def test_a_client_that_never_ran_the_gate_can_never_claim_delivery(self) -> None:
         self.run_registered_hook = False
-        with self._patches(), self._client_patch(), self._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._adapter().prepare_and_handoff_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a",), prompt="must not complete",
-                )
+        with (
+            self._patches(), self._client_patch(), self._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), prompt="must not complete",
+            )
         self.assertEqual(failure.exception.code, "E_CHANNEL")
         self.assertIn("injection authority did not deliver", failure.exception.message)
         sessions = sorted((self.root / ".workspace/.runtime").iterdir())
@@ -618,11 +635,13 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
 
     def test_a_failing_client_records_execution_ambiguous_and_blocks_the_task(self) -> None:
         self.returncode = 1
-        with self._patches(), self._client_patch(), self._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._adapter().prepare_and_handoff_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a",), prompt="must not complete",
-                )
+        with (
+            self._patches(), self._client_patch(), self._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), prompt="must not complete",
+            )
         self.assertEqual(failure.exception.code, "E_CHANNEL")
         sessions = sorted((self.root / ".workspace/.runtime").iterdir())
         receipt = json.loads((sessions[-1] / "receipt.json").read_text(encoding="utf-8"))
@@ -632,11 +651,13 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
 
     def test_a_different_reported_session_identity_never_claims_delivery(self) -> None:
         self.session_id = "11111111-2222-3333-4444-555555555555"
-        with self._patches(), self._client_patch(), self._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._adapter().prepare_and_handoff_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a",), prompt="must not complete",
-                )
+        with (
+            self._patches(), self._client_patch(), self._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), prompt="must not complete",
+            )
         # A client that answers with another session identity is a lifecycle
         # failure, and the submission stays terminal rather than being retried.
         self.assertEqual(failure.exception.code, "E_LIFECYCLE")
@@ -728,12 +749,14 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
     # ----------------------------------------------------------- authorization
 
     def test_a_mutating_task_cannot_be_selected_without_human_authorization(self) -> None:
-        with self._patches(), self._client_patch(), self._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._adapter().prepare_and_handoff_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a",), tasks=("git-commit",),
-                    operations=("git-commit",), prompt="must not start",
-                )
+        with (
+            self._patches(), self._client_patch(), self._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), tasks=("git-commit",),
+                operations=("git-commit",), prompt="must not start",
+            )
         self.assertEqual(failure.exception.code, "E_AUTHORIZATION")
         self.assertEqual(self.commands, [])
 
@@ -744,12 +767,14 @@ class W12ClaudeAdapterFixtureTests(unittest.TestCase):
             "source_sha256": "a" * 64, "repositories": ["repo-a"], "operations": ["git-commit"],
             "issued_at": "2026-07-28T00:00:00Z",
         }
-        with self._patches(), self._client_patch(), self._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                self._adapter(strict_trust_identity=True).resolve_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a",), tasks=("git-commit",),
-                    operations=("git-commit",), authorizations=(record,),
-                )
+        with (
+            self._patches(), self._client_patch(), self._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            self._adapter(strict_trust_identity=True).resolve_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), tasks=("git-commit",),
+                operations=("git-commit",), authorizations=(record,),
+            )
         self.assertEqual(failure.exception.code, "E_AUTHORIZATION")
         self.assertIn("externally verified", failure.exception.message)
 

@@ -57,7 +57,6 @@ from agent_context.tests import test_w12_claude_adapter as _adapter_fixtures
 from agent_context.tests.test_w12_claude_adapter import CAPABILITY, ROOT, _load
 from agent_context.tests.test_w12_claude_hook_channel import ArmedRuntime
 
-
 # media-service-m8 shares kind/layer and three of four facets with
 # fa-auth-m8 (python/service/api-service/fastapi) but diverges on its domain
 # facet (media vs auth-security), so the two repositories exercise a
@@ -356,12 +355,14 @@ class W12ClaudeResumeSourceDriftTests(unittest.TestCase):
                     )
                 self.assertEqual(len(f.commands), 1)
                 mutate()
-                with f._patches(), f._client_patch(), f._environment():
-                    with self.assertRaises(w2b1.AgentContextError) as failure:
-                        f._adapter().resume_and_handoff_repositories(
-                            workspace_root=f.root, runtime_dir=first.runtime_dir,
-                            repository_ids=("repo-a",), prompt="second turn",
-                        )
+                with (
+                    f._patches(), f._client_patch(), f._environment(),
+                    self.assertRaises(w2b1.AgentContextError) as failure,
+                ):
+                    f._adapter().resume_and_handoff_repositories(
+                        workspace_root=f.root, runtime_dir=first.runtime_dir,
+                        repository_ids=("repo-a",), prompt="second turn",
+                    )
                 # A source change yields a different manifest identity than
                 # the prior completed generation, so resume's own linkage
                 # check — not a silent rebuild under the old manifest — is
@@ -397,9 +398,11 @@ class W12ClaudeStandaloneScopeTests(unittest.TestCase):
                 adapter.find_workspace_root(orphan)
             self.assertEqual(discovery_failure.exception.code, "E_SCOPE_UNAVAILABLE")
             self.assertIn(".m8-workspace-root", discovery_failure.exception.message)
-            with f._patches(), f._client_patch(), f._environment():
-                with self.assertRaises(w2b1.AgentContextError) as preflight_failure:
-                    f._adapter().preflight(workspace_root=orphan, repository_ids=("repo-a",))
+            with (
+                f._patches(), f._client_patch(), f._environment(),
+                self.assertRaises(w2b1.AgentContextError) as preflight_failure,
+            ):
+                f._adapter().preflight(workspace_root=orphan, repository_ids=("repo-a",))
             self.assertEqual(preflight_failure.exception.code, "E_SCOPE_UNAVAILABLE")
         # Discovery fails before any capability, trust, or native evidence is
         # ever read, so no client command is ever built for an absent parent.
@@ -454,12 +457,14 @@ class W12ClaudeRuntimeSecurityReuseTests(unittest.TestCase):
         decoy.mkdir(mode=0o700)
         shutil.rmtree(real)
         real.symlink_to(decoy)
-        with f._patches(), f._client_patch(), f._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                f._adapter().resume_and_handoff_repositories(
-                    workspace_root=f.root, runtime_dir=real,
-                    repository_ids=("repo-a",), prompt="resume onto a reparsed path",
-                )
+        with (
+            f._patches(), f._client_patch(), f._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            f._adapter().resume_and_handoff_repositories(
+                workspace_root=f.root, runtime_dir=real,
+                repository_ids=("repo-a",), prompt="resume onto a reparsed path",
+            )
         self.assertEqual(failure.exception.code, "E_RUNTIME")
         # The first, real handoff is the only client invocation that ever ran.
         self.assertEqual(len(f.commands), 1)
@@ -472,12 +477,14 @@ class W12ClaudeRuntimeSecurityReuseTests(unittest.TestCase):
                 raise RuntimeError("simulated interruption")
 
         kernel = DeliveryKernel(fault_hook=_fault)
-        with f._patches(), f._client_patch(), f._environment():
-            with self.assertRaises(w2b1.AgentContextError) as failure:
-                f._adapter().prepare_and_handoff_repositories(
-                    workspace_root=f.root, repository_ids=("repo-a",),
-                    prompt="interrupted", kernel=kernel,
-                )
+        with (
+            f._patches(), f._client_patch(), f._environment(),
+            self.assertRaises(w2b1.AgentContextError) as failure,
+        ):
+            f._adapter().prepare_and_handoff_repositories(
+                workspace_root=f.root, repository_ids=("repo-a",),
+                prompt="interrupted", kernel=kernel,
+            )
         self.assertEqual(failure.exception.code, "E_CHANNEL")
         sessions = sorted((f.root / ".workspace" / ".runtime").iterdir())
         runtime_dir = sessions[-1]

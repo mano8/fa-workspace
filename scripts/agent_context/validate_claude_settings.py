@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA_URL = "https://json.schemastore.org/claude-code-settings.json"
 ALLOW_RULES = (
     "Bash(pip-audit -r *)",

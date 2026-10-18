@@ -14,7 +14,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, NoReturn
 
-
 MAX_BYTE_COUNT = 2_147_483_647
 MAX_SAFE_INTEGER = 9_007_199_254_740_991
 IDENTIFIER_RE = re.compile(r"^[a-z0-9._$-]{1,128}$")

@@ -20,12 +20,13 @@ import json
 import os
 import stat
 import subprocess
-import tomllib
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+import tomllib
 
 from agent_context import w2b1
 from agent_context.delivery_kernel import (
@@ -35,10 +36,13 @@ from agent_context.delivery_kernel import (
     TransportAdapter,
     TransportConfirmation,
 )
-from agent_context.resolve_context import ResolutionRequest, ResolvedContext, resolve_context
+from agent_context.resolve_context import (
+    ResolutionRequest,
+    ResolvedContext,
+    resolve_context,
+)
 from agent_context.shared_validation import validate_trust
 from agent_context.trust_identity import build_trust_identity
-
 
 MARKER_NAME = ".m8-workspace-root"
 MARKER_VALUE = "m8-workspace-v2\n"
@@ -620,7 +624,7 @@ class CodexDeliveryAdapter:
             zip(repository_ids, repositories, strict=True),
             key=lambda item: item[1].relative_to(root).as_posix(),
         )
-        return tuple([
+        return (
             {"policy_id": "instruction.root.agents", "repository_id": "$workspace",
              "scope_prefix": ".", "path": "AGENTS.md", "authority_tier": "workspace"},
             *[
@@ -629,7 +633,7 @@ class CodexDeliveryAdapter:
                  "path": f"{repository.relative_to(root).as_posix()}/AGENTS.md", "authority_tier": "repository"}
                 for repository_id, repository in children
             ],
-        ])
+        )
 
 
 @dataclass

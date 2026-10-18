@@ -50,7 +50,6 @@ from typing import Any, NoReturn
 from agent_context import w2b1
 from agent_context.probe_claude_capabilities import DUMMY_KEY, Capture
 
-
 MECHANISM = "claude-loopback-model-input-capture"
 # The sentence that opens the client's project-memory block.  2.1.220 put it
 # under a "# claudeMd" heading; a clean 2.1.302 CLI launch drops the heading

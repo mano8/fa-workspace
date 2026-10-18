@@ -17,7 +17,6 @@ from agent_context.validate_claude_settings import (
     validate_claude_settings,
 )
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 
 

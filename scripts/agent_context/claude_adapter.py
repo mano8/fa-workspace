@@ -28,7 +28,6 @@ from agent_context.delivery_kernel import (
     TransportAdapter,
 )
 
-
 CURRENT_CLAUDE_MODES = {
     "interactive": "LIMITED",
     "non-interactive": "LIMITED",
@@ -71,12 +70,14 @@ class ClaudeChannelEvidence:
         if not isinstance(payload_bytes, int) or isinstance(payload_bytes, bool) or payload_bytes < 0:
             _fail("E_CHANNEL", "payload byte count is invalid")
         direct = self.additional_context_limit
-        if isinstance(direct, int) and not isinstance(direct, bool) and direct >= 0:
-            if payload_bytes <= direct:
-                # Receipt channel identifiers follow the frozen lowercase
-                # identifier grammar; the underlying Claude hook field is
-                # named ``additionalContext``.
-                return "claude-hook-additional-context"
+        if (
+            isinstance(direct, int) and not isinstance(direct, bool) and direct >= 0
+            and payload_bytes <= direct
+        ):
+            # Receipt channel identifiers follow the frozen lowercase
+            # identifier grammar; the underlying Claude hook field is
+            # named ``additionalContext``.
+            return "claude-hook-additional-context"
         if (
             isinstance(self.full_content_channel_id, str)
             and self.full_content_channel_id

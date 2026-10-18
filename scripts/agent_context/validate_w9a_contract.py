@@ -6,15 +6,15 @@ import argparse
 import hashlib
 import re
 import sys
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
-from typing import Any, NoReturn, Sequence
+from typing import Any, NoReturn
 
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from agent_context import w2b1
-
 
 REGISTER_PATH = PurePosixPath(".workspace/contracts/agent-context-w9a-findings.json")
 CONTRACT_PATH = PurePosixPath(

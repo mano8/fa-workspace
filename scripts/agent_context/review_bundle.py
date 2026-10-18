@@ -29,7 +29,6 @@ if __package__ in {None, ""}:
 from agent_context import w2b1
 from agent_context.trust_identity import build_trust_identity
 
-
 SCHEMA_VERSION = 3
 CHECK_COMMANDS: dict[str, tuple[str, ...]] = {
     "authorization-negatives": ("python", "-m", "unittest", "scripts.agent_context.tests.test_w9b_authorization", "-q"),

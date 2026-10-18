@@ -14,7 +14,6 @@ from agent_context.validate_w9a_contract import (
     validate_w9a_contract,
 )
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 REGISTER = Path(".workspace/contracts/agent-context-w9a-findings.json")
 CONTRACT = Path(".workspace/contracts/agent-context-w9a-remediation.contract.md")

@@ -74,14 +74,17 @@ from agent_context.delivery_kernel import (
     TransportAdapter,
     TransportConfirmation,
 )
-from agent_context.resolve_context import ResolutionRequest, ResolvedContext, resolve_context
+from agent_context.resolve_context import (
+    ResolutionRequest,
+    ResolvedContext,
+    resolve_context,
+)
 from agent_context.shared_validation import validate_resolved, validate_trust
 from agent_context.trust_identity import build_trust_identity
 from agent_context.validate_claude_settings import (
     ClaudeSettingsValidationError,
     validate_claude_settings,
 )
-
 
 # Only the devcontainer rows were measured; every other platform row is frozen
 # ``UNSUPPORTED`` and nothing is inferred from this one.

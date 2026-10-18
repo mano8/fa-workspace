@@ -11,7 +11,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from agent_context import w2b1
 
-
 VALIDATORS = {
     "registry-v2": w2b1.validate_registry_v2,
     "policy-index-v2": w2b1.validate_policy_index_v2,

@@ -16,9 +16,12 @@ from agent_context.claude_adapter import (
     ClaudeDeliveryAdapter,
     ClaudeNativeInspection,
 )
-from agent_context.delivery_kernel import DeliveryKernel, DeliveryRequest, FakeTransportAdapter
+from agent_context.delivery_kernel import (
+    DeliveryKernel,
+    DeliveryRequest,
+    FakeTransportAdapter,
+)
 from agent_context.resolve_context import ResolvedContext
-
 
 WORKSPACE = Path(__file__).resolve().parents[3]
 

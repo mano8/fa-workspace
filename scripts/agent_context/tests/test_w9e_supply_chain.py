@@ -14,7 +14,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agent_context.validate_supply_chain import validate_supply_chain
 
-
 ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW = Path(".github/workflows/workspace-policy-lint.yml")
 LOCK = Path(".github/workflows/root-tooling.requirements.lock")

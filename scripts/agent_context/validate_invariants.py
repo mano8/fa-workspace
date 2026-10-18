@@ -6,15 +6,14 @@ import argparse
 import re
 import subprocess
 import sys
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
-from typing import Sequence
 
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from agent_context import w2b1
-
 
 INVARIANT_ID = re.compile(r"^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$")
 DEFINITION = re.compile(r"^### `(?P<id>[A-Z][A-Z0-9-]+)`$", re.MULTILINE)

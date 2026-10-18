@@ -162,15 +162,19 @@ class W6CodexAdapterTests(unittest.TestCase):
 
     def test_missing_native_child_or_untrusted_project_fails_before_execution(self) -> None:
         (self.repo / "AGENTS.md").unlink()
-        with self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}):
-            with self.assertRaisesRegex(w2b1.AgentContextError, "native AGENTS") as failure:
-                self._adapter().resolve_single_repository(workspace_root=self.root, repository_id="repo-a")
+        with (
+            self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}),
+            self.assertRaisesRegex(w2b1.AgentContextError, "native AGENTS") as failure,
+        ):
+            self._adapter().resolve_single_repository(workspace_root=self.root, repository_id="repo-a")
         self.assertEqual(failure.exception.code, "E_NATIVE_EVIDENCE")
         (self.repo / "AGENTS.md").write_text("child instructions\n", encoding="utf-8")
         (self.home / "config.toml").write_text("", encoding="utf-8")
-        with self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}):
-            with self.assertRaisesRegex(w2b1.AgentContextError, "not explicitly trusted") as failure:
-                self._adapter().resolve_single_repository(workspace_root=self.root, repository_id="repo-a")
+        with (
+            self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}),
+            self.assertRaisesRegex(w2b1.AgentContextError, "not explicitly trusted") as failure,
+        ):
+            self._adapter().resolve_single_repository(workspace_root=self.root, repository_id="repo-a")
         self.assertEqual(failure.exception.code, "E_TRUST")
 
     def test_no_marker_or_no_thread_started_never_claims_delivery(self) -> None:
@@ -213,13 +217,15 @@ class W6CodexAdapterTests(unittest.TestCase):
         self.assertEqual(result.receipt["authorization_ids"], ["human.cross"])
 
     def test_multi_repository_and_mutating_scope_cannot_self_authorize(self) -> None:
-        with self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}):
-            with self.assertRaisesRegex(w2b1.AgentContextError, "explicit human authorization") as missing:
-                self._adapter().prepare_and_handoff_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a", "repo-b"),
-                    tasks=("cross-repository",), operations=("analyze",),
-                    prompt="must not start",
-                )
+        with (
+            self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}),
+            self.assertRaisesRegex(w2b1.AgentContextError, "explicit human authorization") as missing,
+        ):
+            self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a", "repo-b"),
+                tasks=("cross-repository",), operations=("analyze",),
+                prompt="must not start",
+            )
         self.assertEqual(missing.exception.code, "E_AUTHORIZATION")
         self.assertEqual(self.exec_calls, 0)
 
@@ -264,11 +270,13 @@ class W6CodexAdapterTests(unittest.TestCase):
 
     def test_native_drift_after_inspection_blocks_the_user_task(self) -> None:
         self.mutate_before_transport = True
-        with self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}):
-            with self.assertRaisesRegex(w2b1.AgentContextError, "changed after inspection") as drift:
-                self._adapter().prepare_and_handoff_repositories(
-                    workspace_root=self.root, repository_ids=("repo-a",), prompt="must not start",
-                )
+        with (
+            self._patches(), patch.dict(os.environ, {"CODEX_HOME": str(self.home)}),
+            self.assertRaisesRegex(w2b1.AgentContextError, "changed after inspection") as drift,
+        ):
+            self._adapter().prepare_and_handoff_repositories(
+                workspace_root=self.root, repository_ids=("repo-a",), prompt="must not start",
+            )
         self.assertEqual(drift.exception.code, "E_NATIVE_EVIDENCE")
         self.assertEqual(self.exec_calls, 0)
 

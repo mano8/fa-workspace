@@ -85,7 +85,8 @@ class W9cSubmissionStateTests(unittest.TestCase):
             with self.subTest(boundary=boundary):
                 prepared = self._prepared()
                 kernel = DeliveryKernel(fault_hook=self._fault(boundary))
-                with self.assertRaises(Exception):
+                # The last boundary surfaces the injected fault itself.
+                with self.assertRaises((w2b1.AgentContextError, RuntimeError)):
                     kernel.handoff(prepared, FakeTransportAdapter())
                 # The immutable journal records that submission started even
                 # when a derived view write is torn; a new attempt fails closed.

@@ -47,7 +47,6 @@ if __package__ in {None, ""}:
 from agent_context import w2b1
 from agent_context.delivery_kernel import DeliveryKernel, exit_code
 
-
 HOOK_EVENT = "UserPromptSubmit"
 CHANNEL_ID = "claude-hook-additional-context"
 CHANNEL_STATE_ARTIFACT = "channel-state.json"

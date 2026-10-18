@@ -23,7 +23,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from agent_context import w2b1
 from agent_context.resolve_context import ResolutionRequest, resolve_context
 
-
 CAPABILITY_ROW = {
     "agent": "codex",
     "platform": "devcontainer",
@@ -60,7 +59,7 @@ SOURCE_SHA = "a" * 64
 def _load_json(path: Path) -> dict[str, Any]:
     value = w2b1.parse_strict_json(path.read_bytes())
     if not isinstance(value, dict):
-        raise ValueError(f"JSON object required: {path}")
+        raise TypeError(f"JSON object required: {path}")
     return value
 
 
@@ -280,7 +279,7 @@ def _measured(
         "native_evidence_id": native_evidence_id,
         "launch_id": None,
         "client_session_id": None,
-        "generation": resolved.manifest["generation"] if "generation" in resolved.manifest else 0,
+        "generation": resolved.manifest.get("generation", 0),
         "channel_id": CAPABILITY_ROW["channel_id"],
         "selected_policy_count": len(resolved.manifest["entries"]),
         "selected_invariant_ids": selected_invariants,

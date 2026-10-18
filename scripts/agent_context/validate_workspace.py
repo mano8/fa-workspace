@@ -15,18 +15,21 @@ import os
 import stat
 import subprocess
 import sys
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from agent_context import w2b1
-from agent_context import child_rollout
-from agent_context import claude_delivery_adapter
-from agent_context import codex_adapter
-from agent_context import resolve_context
+from agent_context import (
+    child_rollout,
+    claude_delivery_adapter,
+    codex_adapter,
+    resolve_context,
+    w2b1,
+)
 from agent_context.shared_validation import validate_persisted
 from agent_context.validate_claude_settings import validate_claude_settings
 from agent_context.validate_codex_config import validate_codex_config
@@ -34,7 +37,6 @@ from agent_context.validate_invariants import validate_workspace_invariants
 from agent_context.validate_migration_guards import validate_migration_guards
 from agent_context.validate_root_agents import validate_root_agents
 from agent_context.validate_root_claude import validate_root_claude
-
 
 CAPABILITY_EVIDENCE = Path(codex_adapter.CAPABILITY_EVIDENCE_PATH)
 CLAUDE_CAPABILITY_EVIDENCE = Path(claude_delivery_adapter.CAPABILITY_EVIDENCE_PATH)

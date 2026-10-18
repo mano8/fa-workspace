@@ -12,7 +12,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from agent_context.review_bundle import (  # noqa: E402
+from agent_context.review_bundle import (
     CHECK_COMMANDS,
     ReviewBundleError,
     _resolved_command,
@@ -20,7 +20,6 @@ from agent_context.review_bundle import (  # noqa: E402
     canonical_bytes,
     validate_bundle,
 )
-
 
 ROOT = Path(__file__).resolve().parents[3]
 ROOT_IDENTITY = {"commit": "a" * 40, "tree": "b" * 40}

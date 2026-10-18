@@ -14,7 +14,6 @@ from agent_context.validate_migration_guards import (
     validate_migration_guards,
 )
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 
 

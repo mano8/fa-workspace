@@ -19,11 +19,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from agent_context import claude_adapter, claude_native_evidence as cne, w2b1
-from agent_context.delivery_kernel import DeliveryKernel, DeliveryRequest, FakeTransportAdapter
+from agent_context import claude_adapter, w2b1
+from agent_context import claude_native_evidence as cne
+from agent_context.delivery_kernel import (
+    DeliveryKernel,
+    DeliveryRequest,
+    FakeTransportAdapter,
+)
 from agent_context.resolve_context import ResolutionRequest, resolve_context
 from agent_context.shared_validation import validate_resolved
-
 
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-native-load-evidence-2026-10-17.json"

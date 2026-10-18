@@ -14,7 +14,6 @@ from agent_context.validate_invariants import (
 )
 from agent_context.w2b1 import parse_strict_json
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 EXPECTED_IDS = {
     "ARCH-LAYER-DIRECTION",

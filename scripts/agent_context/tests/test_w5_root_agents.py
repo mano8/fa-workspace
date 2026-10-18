@@ -14,7 +14,6 @@ from agent_context.validate_root_agents import (
     validate_root_agents,
 )
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 
 

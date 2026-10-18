@@ -10,7 +10,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from agent_context import w2b1
 from agent_context.resolve_context import ResolutionRequest, resolve_context
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 
 

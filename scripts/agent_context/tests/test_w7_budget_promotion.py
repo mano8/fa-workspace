@@ -10,7 +10,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from agent_context import budget_promotion
 from agent_context.measure_w4_context import build_report
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 
 
@@ -27,9 +26,11 @@ class W7BudgetPromotionTests(unittest.TestCase):
         overflow = copy.deepcopy(snapshot)
         overflow["fixtures"][0]["model_visible_total"] = overflow["fixtures"][0]["effective_hard_limit"] + 1
         for enforce_preferred in (False, True):
-            with self.subTest(enforce_preferred=enforce_preferred):
-                with self.assertRaisesRegex(budget_promotion.BudgetPromotionError, "hard context budget overflow"):
-                    budget_promotion._validate_limits(overflow, enforce_preferred=enforce_preferred)
+            with (
+                self.subTest(enforce_preferred=enforce_preferred),
+                self.assertRaisesRegex(budget_promotion.BudgetPromotionError, "hard context budget overflow"),
+            ):
+                budget_promotion._validate_limits(overflow, enforce_preferred=enforce_preferred)
 
     def test_preferred_enforcement_is_reversible_without_weakening_hard_limit(self) -> None:
         snapshot = budget_promotion.report_snapshot(build_report(WORKSPACE, "1970-01-01T00:00:00Z"))

@@ -55,7 +55,6 @@ from agent_context.claude_native_evidence import client_identity
 from agent_context.delivery_kernel import DeliveryKernel
 from agent_context.probe_claude_capabilities import DUMMY_KEY, Capture, build_fixture
 
-
 PROBE_ID = "w12-claude-hook-channel-probe"
 PROBE_MODEL = "claude-haiku-4-5-20251001"
 MECHANISM = "claude-loopback-model-input-capture"

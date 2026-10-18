@@ -20,7 +20,6 @@ from agent_context import claude_adapter, codex_adapter, probe_claude_capabiliti
 from agent_context.resolve_context import ResolutionRequest, resolve_context
 from agent_context.shared_validation import validate_resolved
 
-
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.json"
 REPORT = ROOT / "scripts/agent_context/fixtures/evidence/w12-claude-capability-evidence-2026-10-17.md"

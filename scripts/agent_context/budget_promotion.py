@@ -14,7 +14,6 @@ if __package__ in {None, ""}:
 
 from agent_context.measure_w4_context import build_report
 
-
 BASELINE_PATH = Path("scripts/agent_context/fixtures/w7-preferred-budget-baseline.json")
 PROMOTION_FIXTURE_IDS = (
     "sdk-implementation",

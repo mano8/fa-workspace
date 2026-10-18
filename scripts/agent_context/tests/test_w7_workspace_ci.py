@@ -4,7 +4,6 @@ import json
 import unittest
 from pathlib import Path
 
-
 WORKSPACE = Path(__file__).resolve().parents[3]
 WORKFLOW = WORKSPACE / ".github/workflows/workspace-policy-lint.yml"
 

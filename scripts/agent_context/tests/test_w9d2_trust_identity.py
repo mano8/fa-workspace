@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-import subprocess
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -13,7 +13,11 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agent_context import w2b1
-from agent_context.trust_identity import CRITICAL_PATHS, build_trust_identity, verify_trust_identity
+from agent_context.trust_identity import (
+    CRITICAL_PATHS,
+    build_trust_identity,
+    verify_trust_identity,
+)
 
 
 class W9d2TrustIdentityTests(unittest.TestCase):
@@ -149,16 +153,20 @@ class W9d2TrustIdentityTests(unittest.TestCase):
             self._verify(identity)
         self.node.write_bytes(node_original)
 
-        with mock.patch(
-            "agent_context.trust_identity._config_inventory",
-            return_value=[{"kind": "global", "path": "global:config.toml", "sha256": "a" * 64}],
+        with (
+            mock.patch(
+                "agent_context.trust_identity._config_inventory",
+                return_value=[{"kind": "global", "path": "global:config.toml", "sha256": "a" * 64}],
+            ),
+            self.assertRaisesRegex(w2b1.AgentContextError, "drifted"),
         ):
-            with self.assertRaisesRegex(w2b1.AgentContextError, "drifted"):
-                self._verify(identity)
+            self._verify(identity)
 
-        with mock.patch("agent_context.trust_identity.platform.release", return_value="drifted"):
-            with self.assertRaisesRegex(w2b1.AgentContextError, "drifted"):
-                self._verify(identity)
+        with (
+            mock.patch("agent_context.trust_identity.platform.release", return_value="drifted"),
+            self.assertRaisesRegex(w2b1.AgentContextError, "drifted"),
+        ):
+            self._verify(identity)
 
     def test_capability_lock_config_or_instruction_drift_fails(self) -> None:
         identity = self._identity()

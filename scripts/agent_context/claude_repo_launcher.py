@@ -14,7 +14,10 @@ import sys
 from pathlib import Path
 
 from agent_context import authorization, w2b1
-from agent_context.claude_delivery_adapter import ClaudeLauncherAdapter, find_workspace_root
+from agent_context.claude_delivery_adapter import (
+    ClaudeLauncherAdapter,
+    find_workspace_root,
+)
 from agent_context.delivery_kernel import DeliveryKernel, exit_code
 
 

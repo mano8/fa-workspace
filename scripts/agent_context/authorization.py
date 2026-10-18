@@ -25,7 +25,6 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from agent_context import w2b1
 
-
 CAPABILITY_FIELDS = {"schema_version", "payload_jcs", "signature"}
 PAYLOAD_FIELDS = {
     "schema_version", "authorization_id", "issuer", "key_id", "nonce",

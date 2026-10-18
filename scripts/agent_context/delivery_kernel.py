@@ -16,8 +16,8 @@ import re
 import secrets
 import stat
 import tempfile
-from contextlib import contextmanager
 from collections.abc import Callable, Mapping
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import IntEnum
@@ -25,9 +25,8 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from agent_context import w2b1
-from agent_context.shared_validation import validate_persisted, validate_resolved
 from agent_context.resolve_context import ResolvedContext
-
+from agent_context.shared_validation import validate_persisted, validate_resolved
 
 ZERO_SHA256 = "0" * 64
 RUNTIME_DIRECTORY = ".workspace/.runtime"
@@ -270,7 +269,7 @@ class DeliveryKernel:
             if lock_acquired:
                 self._record_failure(prepared.runtime_dir, request, error.code)
             raise
-        except Exception as error:  # Adapter failures must never permit a task.
+        except Exception as error:  # noqa: BLE001 - adapter failures must never permit a task.
             if lock_acquired:
                 self._record_failure(prepared.runtime_dir, request, "E_CHANNEL")
             _fail("E_CHANNEL", f"transport callback failed: {type(error).__name__}")
@@ -413,10 +412,7 @@ class DeliveryKernel:
             _fail("E_RUNTIME", f"runtime resume failed: {error}")
 
     def _validate_request(self, request: DeliveryRequest) -> None:
-        try:
-            w2b1._identifier(request.client_session_id, "client_session_id")
-        except w2b1.AgentContextError:
-            raise
+        w2b1._identifier(request.client_session_id, "client_session_id")
         if not request.trusted:
             _fail("E_TRUST", "trusted reviewed workspace identity cannot be proved")
         if request.launch_id is not None:
@@ -691,9 +687,10 @@ class DeliveryKernel:
             _fail("E_RUNTIME", f"runtime containment check failed: {error}")
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode) or (not allow_root and resolved == contained_by.resolve()):
             _fail("E_RUNTIME", "runtime directory is unsafe")
-        if os.name == "posix":
-            if info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) & 0o077:
-                _fail("E_RUNTIME", "runtime directory is not owner-only")
+        if os.name == "posix" and (
+            info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) & 0o077
+        ):
+            _fail("E_RUNTIME", "runtime directory is not owner-only")
 
     @staticmethod
     def _channel_name(name: str) -> str:

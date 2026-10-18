@@ -26,7 +26,6 @@ from typing import Any
 
 from agent_context import w2b1
 
-
 ZERO_SHA256 = "0" * 64
 # Each client discovers a different native instruction file, so a child's
 # identity binds the instruction that client actually loads.

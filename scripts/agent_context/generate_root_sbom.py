@@ -11,7 +11,6 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-
 SBOM_PATH = Path("sbom/root-tooling.cdx.json")
 SOURCE_PATHS = (
     Path(".devcontainer/bootstrap-lock.json"),

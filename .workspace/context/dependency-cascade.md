@@ -62,9 +62,13 @@ auth-sdk-m8                         platform SDK
 │   ├── media-service-m8            fastapi-m8 floor; auth-sdk-m8 transitive in lock
 │   ├── prompt-engine-m8            fastapi-m8 floor; auth-sdk-m8 transitive in lock
 │   ├── reparto-docente-m8          fastapi-m8 floor; auth-sdk-m8 transitive in lock
-│   ├── ai-gateway-m8               fastapi-m8 floor; auth-sdk-m8 transitive in lock (scaffold branch, 2026-10-18)
+│   ├── ai-gateway-m8               fastapi-m8 floor; auth-sdk-m8 transitive in lock (plan branch, 2026-10-20)
 │   └── (fa-auth-m8 examples/fastapi_full — rides fa-auth-m8, not a repository)
 └── fa-auth-m8                      issuer; direct auth-sdk-m8 floor + lock
+
+ai-sdk-m8                           platform SDK (no auth-sdk-m8 or fastapi-m8 pin)
+├── ai-gateway-m8                   ai-sdk-m8[jobcontext] floor + lock (plan branch, 2026-10-20)
+└── doctools-m8                     sandbox/provenance extras name ai-sdk-m8[jobcontext], no version floor
 
 service images ──► compose stacks (five repositories + operator-local rpi_server)
 service versions ─► astro plugin compatibility.ts ─► plugin patch releases
@@ -77,25 +81,37 @@ everything ───────► .workspace/context/version-sources.md
 `security-tests-m8`. `security-tests-m8/tests/test_deployment.py` names
 `tepochtli/fa-auth-m8` tags as test fixtures, not as pins; leave them.
 
-**`ai-gateway-m8` joined** (measured 2026-10-18 from its scaffold branch
-`chore/repository-context-template` at `693d7ed`, not yet merged to `main`):
-a `fastapi-m8` consumer, package `ai_gateway`, floor
-`fastapi-m8[db,postgres]>=4.5.1,<5.0.0`, lock `fastapi-m8==4.5.1` /
-`auth-sdk-m8==3.2.0`. It is in Phase 3 and the checker. Its image enters
-Phase 5 with its first compose stack; none exists yet.
+**`ai-gateway-m8` joined** on 2026-10-18 and is re-measured here on
+2026-10-20. The measurement is from `feat/ai-gateway-sdk-plan` at `6e6470b`,
+not yet merged to `main`; `main` still carries the scaffold pins
+`fastapi-m8==4.5.1` and `auth-sdk-m8==3.2.0`.
 
-**Registered, not yet in the graph** (2026-10-17): `ai-sdk-m8` and
-`doctools-m8` carry only their instruction files, so no pin exists to
-measure. Where each joins once its scaffold lands:
+- It is a `fastapi-m8` consumer, package `ai_gateway`.
+- Floors: `fastapi-m8[db,postgres]>=4.6.0,<5.0.0` and
+  `ai-sdk-m8[jobcontext]>=0.2.0,<0.3.0`.
+- Lock: `fastapi-m8==4.6.0`, `auth-sdk-m8==3.2.1` and `ai-sdk-m8==0.2.0`.
+  They moved in one narrow `--upgrade-package` change (AI-gateway plan
+  `T8`).
+- It is in Phase 3 and the checker. Its image enters Phase 5 with its first
+  compose stack, and none exists yet.
 
-- `ai-sdk-m8` — a new platform root, consumed by `ai-gateway-m8` and by
-  `doctools-m8`'s `sandbox` and `provenance` extras. It pins neither
-  `auth-sdk-m8` nor `fastapi-m8`.
-- `doctools-m8` — a new platform root, consumed by `media-service-m8`; it
-  depends on `ai-sdk-m8` only.
+**`ai-sdk-m8` is a second platform root** (measured 2026-10-20 from
+`origin/main`, release `0.2.0`). Its dependencies are `pydantic` and `httpx`,
+and its `jobcontext` extra adds `cryptography`. It pins neither `auth-sdk-m8`
+nor `fastapi-m8`, so an `auth-sdk-m8` or `fastapi-m8` release never cascades
+into it. An `ai-sdk-m8` release cascades into two consumers:
 
-The graph, the tables below and the checker gain these rows from measured
-working trees, not before.
+- `ai-gateway-m8`: a floor and a lock move, as above;
+- `doctools-m8`: its `sandbox` and `provenance` extras name
+  `ai-sdk-m8[jobcontext]` with no version floor. The doctools plan sets that
+  floor when it pins the published SDK.
+
+**`doctools-m8`** (`0.1.0`, dependency `pydantic` only) has no consumer pin
+yet. `media-service-m8` does not depend on it on `origin/main`, measured
+2026-10-20; that edge arrives with the media plan.
+
+The checker does not cover the `ai-sdk-m8` root yet. It gains these rows
+when a release first cascades through it.
 
 Consumer services never import `auth-sdk-m8` directly
 (`media-service-m8/REPOSITORY_CONTEXT.md`); their `auth-sdk-m8` pin exists only

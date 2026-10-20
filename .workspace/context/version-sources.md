@@ -24,7 +24,10 @@ source re-reads rather than a fleet re-measurement: `astro-prompt-m8` `1.2.0`
 `origin/main` after the Wave 9 release cascade (see *Wave 9 — the `astro-ui-m8`
 `1.5.2` cascade* below). On 2026-09-27 the five npm rows were re-read from
 `origin/main` again, after the Wave 10 cascade (see *Wave 10 — the dependency
-compatibility cascade* below).
+compatibility cascade* below). On 2026-10-20 `auth-sdk-m8`, `fastapi-m8` and
+the three repositories registered on 2026-10-17 were re-read from
+`origin/main` (see *The `fastapi-m8` 4.6.0 release and the three new
+repositories* below).
 
 `prompt-engine-m8` `2.0.0` → `2.1.0` was corrected in the same pass for a
 different reason: this table had been **contradicting the two tables below it**,
@@ -39,10 +42,10 @@ release state.
 | --- | --- |
 | npm `package.json` at repo root | `astro-auth-m8` 2.7.2 · `astro-media-m8` 2.3.2 · `astro-prompt-m8` 2.2.2 · `astro-reparto-m8` 2.3.2 · `astro-ui-m8` 1.5.3 — read from `origin/main` 2026-09-27 |
 | npm `package.json` **not** at repo root | `fa-ui-m8` 0.1.0 — at `app/package.json` |
-| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.0 · `fastapi-m8` 4.5.1 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
+| `pyproject.toml` `[project] version` literal | `auth-sdk-m8` 3.2.1 · `fastapi-m8` 4.6.0 — read from `origin/main` 2026-10-20 · `media-sdk-m8` 1.0.0 · `security-tests-m8` 0.7.0 |
 | `pyproject.toml` `dynamic` → `__init__.__version__` | `imgtools_m8` 2.1.3 — read from `origin/main` 2026-09-26 |
-| `pyproject.toml` `[project] version` literal — registered 2026-10-17, not yet scaffolded | `ai-sdk-m8` · `doctools-m8` — no version source exists yet; the row gains a version when each scaffold lands |
-| package `__init__.__version__` only (no pyproject version) — scaffold branch, not yet on `main` | `ai-gateway-m8` (`ai_gateway`) 0.1.0 — read 2026-10-18 from `chore/repository-context-template` `693d7ed`; re-surfaced as `SERVICE_VERSION` in `ai_gateway/core/config.py` |
+| `pyproject.toml` `[project] version` literal — registered 2026-10-17 | `ai-sdk-m8` 0.1.0 · `doctools-m8` 0.1.0 — read from `origin/main` 2026-10-20 |
+| package `__init__.__version__` only (no pyproject version) — registered 2026-10-17 | `ai-gateway-m8` (`ai_gateway`) 0.1.0 — read from `origin/main` 2026-10-20; re-surfaced as `SERVICE_VERSION` in `ai_gateway/core/config.py` |
 | package `__init__.__version__` only (no pyproject version) | `fa-auth-m8` (`auth_user_service`) 2.2.3 · `media-service-m8` (`media_service`) 3.0.2 · `media-worker-m8` (`worker`) 1.0.2 · `prompt-engine-m8` (`promt_engine_service`) 2.2.1 · `reparto-docente-m8` (`reparto_service`) 2.2.2 — read from `origin/main` 2026-09-22 (`media-worker-m8` re-read 2026-09-26); the three consumers re-surface it as `SERVICE_VERSION` in `<pkg>/core/config.py`. `fa-auth-m8` also carries the string in `examples/fastapi_full/__init__.py` and `examples/fastapi_minimal/__init__.py`, which move with it |
 
 ## Published release vs working-tree version
@@ -60,8 +63,8 @@ one-bump-per-unpublished-release rule.
 
 | Repo | Published | Working tree | Pending? |
 | --- | --- | --- | --- |
-| `auth-sdk-m8` | 3.2.0 | 3.2.0 | — published |
-| `fastapi-m8` | 4.5.1 | 4.5.1 | — published |
+| `auth-sdk-m8` | 3.2.1 | 3.2.1 | — published (2026-10-19, tag `v3.2.1` = `main` `3d10bfc`, PR #92; PyPI `latest` `3.2.1`). Patch: dependency and CI maintenance only |
+| `fastapi-m8` | 4.6.0 | 4.6.0 | — published (2026-10-20, tag `v4.6.0` = `main` `b1a0497`, PR #46; PyPI `latest` `4.6.0`). Absorbs the never-published `4.5.2`; see *The `fastapi-m8` 4.6.0 release and the three new repositories* below |
 | `fa-auth-m8` | 2.2.3 | 2.2.3 | — published (2026-09-26, tag `v2.2.3` = `main` `3df05f5`, the `B32` pin merge; `tepochtli/fa-auth-m8:2.2.3` pulled, in-container `__version__` `2.2.3`). Carries `B27`, `B29`, `B30` and `B32` |
 | `imgtools_m8` | 2.1.3 | 2.1.3 | — published (2026-09-26, tag `v2.1.3` on `origin`, on PyPI; PR #75 — CI and dev-requirement bumps only, dependencies unchanged since `2.1.1`) |
 | `security-tests-m8` | 0.7.0 | 0.7.0 | — published |
@@ -71,9 +74,9 @@ one-bump-per-unpublished-release rule.
 | `prompt-engine-m8` | 2.2.1 | 2.2.1 | — published (2026-09-26, tag `v2.2.1` = `main` `fd74ef3`; `tepochtli/prompt-engine-m8:2.2.1` pulled, `__version__` `2.2.1`). Carries `B23`, `B24`, `B27`, `B29`, `B30` and `B32` |
 | `reparto-docente-m8` | 2.2.2 | 2.2.2 | — published (2026-09-26, tag `v2.2.2` = `main` `169121b`; `tepochtli/reparto-docente-m8:2.2.2` pulled, `__version__` `2.2.2`). Carries `B27`, `B28`, `B30` and `B32` |
 | `fa-ui-m8` | — never published | 0.1.0 | pending |
-| `ai-sdk-m8` | — never published | — not scaffolded | — |
-| `ai-gateway-m8` | — never published | 0.1.0 | pending (scaffold branch `chore/repository-context-template`, not yet on `main`) |
-| `doctools-m8` | — never published | — not scaffolded | — |
+| `ai-sdk-m8` | 0.1.0 | 0.1.0 | — published (2026-10-18, tag `v0.1.0` = `main` `ba230de`; PyPI `latest` `0.1.0`). The scaffold release; `0.2.0` is prepared on `feat/ai-gateway-sdk-plan`, unpublished |
+| `ai-gateway-m8` | 0.1.0 | 0.1.0 | — published (2026-10-18, tag `v0.1.0` = `ae8d125`, an ancestor of `main` `6edea4d`; `tepochtli/ai-gateway-m8:0.1.0` on Docker Hub, digest `sha256:13d00513…`, not pulled). The scaffold release |
+| `doctools-m8` | 0.1.0 | 0.1.0 | — published (2026-10-18, tag `v0.1.0` = `c81fb5b`, an ancestor of `main` `522449e`; PyPI `latest` `0.1.0`). The scaffold release |
 | `astro-ui-m8` | 1.5.3 | 1.5.3 | — published (2026-09-27, tag `v1.5.3` = `main` `6ec692b`, PR #19; npm `latest` `1.5.3`; tarball ships `lucide-react` peer `^1.28.0`, no longer exactly `1.28.0`). Adds the fleet's dependency compatibility gate and `.npmrc` (see *Wave 10* below). `1.5.2` (PR #18, `a4a14b8`) was the first tarball to ship `CHANGELOG.md` (`G38`) |
 | `astro-auth-m8` | 2.7.2 | 2.7.2 | — published (2026-09-27, tag `v2.7.2` = `main` `3403f99`, PR #33; npm `latest` `2.7.2`; tarball ships ui `^1.5.3`, peers `@astrojs/react` `^6.0.1 \|\| ^7.0.0` and `@astrojs/starlight` `^0.41.3 \|\| ^0.42.0`, `testedServiceVersion` `2.2.3`). Patch (`Wave 10`). `2.7.1` (PR #32, `eee73b9`) tracked `astro-ui-m8` `1.5.2` (`B39`); `2.7.0` (PR #29, `a5273f6`) tracked `fa-auth-m8` `2.2.3` (`B31`) |
 | `astro-media-m8` | 2.3.2 | 2.3.2 | — published (2026-09-27, tag `v2.3.2` = `main` `ed8d68c`, PR #19; npm `latest` `2.3.2`; tarball tests `media-service-m8` `3.0.2`, ui `^1.5.3`, auth peer `^2.7.2`, the two widened `@astrojs` peers). Patch (`Wave 10`). `2.3.1` (PR #18, `0cd04eb`) tracked `B39`; `2.3.0` (PR #16, `4bcd4f6`) tracked `media-service-m8` `3.0.2`; `2.1.0` and `2.2.0` were published 2026-09-16, see *Wave 8 publish* below |
@@ -675,9 +678,12 @@ versions coincide, so one range brackets both.
 | `prompt-engine-m8` | 2.2.0 | `prompt-engine-m8@2.1.0` | `astro-prompt-m8` `>=2.1.0 <3.0.0` |
 | `reparto-docente-m8` | 2.2.0 | `reparto-docente-m8@2.0.0` | `astro-reparto-m8` contract-only (no numeric service gate); `2.2.0` tests against `2.2.0` |
 
-`ai-gateway-m8` (registered 2026-10-17, never published) joins this axis
-with `CONTRACT_VERSION` `1.0` at its first release. It has no row yet
-because neither a package version nor a served contract exists to measure.
+`ai-gateway-m8` (registered 2026-10-17) joined this axis with its `0.1.0`
+scaffold release (2026-10-18): `ai_gateway/core/config.py` at `v0.1.0` sets
+`CONTRACT_VERSION` `1.0` and `CONTRACT_RANGE` `>=1.0.0 <2.0.0`. It has no row
+in the table above, because it has no browser plugin; its client gate is
+`ai-sdk-m8`'s `check_compatibility` (contract major 1), which ships in the
+unpublished `0.2.0`.
 
 Each plugin's gate is bounded on the **service** version and must admit its
 backend's package version; each also repeats the pair as declarative
@@ -1625,6 +1631,39 @@ is owed for them**: the script and test are outside every tarball, and packing
 those branches reproduced the published contents apart from the
 `[Unreleased]` changelog note. So `main` is ahead of each of those four tags
 by that change alone.
+
+### The `fastapi-m8` 4.6.0 release and the three new repositories (2026-10-20)
+
+Each row moved here only after its read-back. Tags were read with `git
+ls-remote --tags` against each remote, and versions from the PyPI JSON API
+and Docker Hub.
+
+- **`auth-sdk-m8` 3.2.1** (2026-10-19). Tag `v3.2.1` = `main` `3d10bfc`, and
+  PyPI `latest` is `3.2.1`. It changes dependencies and CI only, and its env
+  template is unchanged since `v3.2.0`.
+- **`fastapi-m8` 4.6.0** (2026-10-20). Tag `v4.6.0` = `main` `b1a0497` (PR
+  #46), and PyPI `latest` is `4.6.0`.
+  - The release carries the AI-gateway plan's `T12`:
+    - `build_service_client_guard`;
+    - six re-exports from `auth-sdk-m8`;
+    - `COMPAT_MATRIX["4.6"]`.
+  - It also absorbs `4.5.2` (PR #45, `767ce42`), which raised the
+    `auth-sdk-m8` floor to `3.2.1` and was never published. That follows
+    the one-bump-per-unpublished-release rule.
+  - The published wheel (SHA-256 `0e3dfb23…`, inspected without installing)
+    ships `fastapi_m8/_service_client.py`. Its metadata requires
+    `auth-sdk-m8[…]>=3.2.1,<4.0.0`, and its `_compat.py` maps both `4.5` and
+    `4.6` to that range.
+  - Who takes the new floor is not decided here. By the human rule of
+    2026-10-18, only `ai-gateway-m8` and the media plan's `T38`/`T47a` take
+    it, each with a narrow lock move. `fa-auth-m8`'s examples follow the
+    `auth-sdk-m8` 3.2.1 cascade.
+- **`ai-sdk-m8`, `ai-gateway-m8`, `doctools-m8` 0.1.0** (2026-10-18). These
+  are the three scaffold releases, which these rows had missed. Each
+  `v0.1.0` tag is on its `main`.
+  - `ai-sdk-m8` and `doctools-m8` are on PyPI.
+  - `ai-gateway-m8` is on Docker Hub as `tepochtli/ai-gateway-m8:0.1.0`. The
+    image was not pulled, so its in-container `__version__` is unmeasured.
 
 ## One documented read command per mechanism
 
